@@ -1,0 +1,39 @@
+{
+  "name": "StatutorySection",
+  "type": "object",
+  "properties": {
+    "title_number": {
+      "type": "number"
+    },
+    "chapter_number": {
+      "type": "number"
+    },
+    "section_code": {
+      "type": "string",
+      "description": "Full section code (e.g., 307.10)"
+    },
+    "title": {
+      "type": "string",
+      "description": "Section title"
+    },
+    "content": {
+      "type": "string",
+      "description": "Full text of the law section"
+    },
+    "effective_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "last_amended": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "title_number",
+    "chapter_number",
+    "section_code",
+    "title",
+    "content"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "StatutoryTitle",
+  "type": "object",
+  "properties": {
+    "number": {
+      "type": "number",
+      "description": "Title number (1-9)"
+    },
+    "name": {
+      "type": "string",
+      "description": "Title name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description of the title"
+    }
+  },
+  "required": [
+    "number",
+    "name"
+  ]
+}

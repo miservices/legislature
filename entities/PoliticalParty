@@ -1,0 +1,22 @@
+{
+  "name": "PoliticalParty",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "description": "Short code for the party (e.g., D, R, L)"
+    },
+    "name": {
+      "type": "string",
+      "description": "Full party name"
+    },
+    "color": {
+      "type": "string",
+      "description": "Color code for display (e.g., blue-500, red-500)"
+    }
+  },
+  "required": [
+    "code",
+    "name"
+  ]
+}

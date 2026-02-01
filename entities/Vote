@@ -1,0 +1,91 @@
+{
+  "name": "Vote",
+  "type": "object",
+  "properties": {
+    "bill_id": {
+      "type": "string",
+      "description": "Reference to the bill"
+    },
+    "bill_number": {
+      "type": "string"
+    },
+    "chamber": {
+      "type": "string",
+      "enum": [
+        "Senate",
+        "House"
+      ]
+    },
+    "vote_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "vote_type": {
+      "type": "string",
+      "enum": [
+        "Passage",
+        "Committee",
+        "Amendment",
+        "Veto Override",
+        "Procedural"
+      ]
+    },
+    "description": {
+      "type": "string"
+    },
+    "yeas": {
+      "type": "number"
+    },
+    "nays": {
+      "type": "number"
+    },
+    "absent": {
+      "type": "number"
+    },
+    "excused": {
+      "type": "number"
+    },
+    "result": {
+      "type": "string",
+      "enum": [
+        "Passed",
+        "Failed"
+      ]
+    },
+    "roll_call": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "member": {
+            "type": "string"
+          },
+          "member_email": {
+            "type": "string"
+          },
+          "vote": {
+            "type": "string",
+            "enum": [
+              "Yea",
+              "Nay",
+              "Absent",
+              "Excused"
+            ]
+          },
+          "party": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "bill_number",
+    "chamber",
+    "vote_date",
+    "vote_type",
+    "yeas",
+    "nays",
+    "result"
+  ]
+}

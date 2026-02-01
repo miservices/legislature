@@ -1,0 +1,40 @@
+{
+  "name": "JournalEntry",
+  "type": "object",
+  "properties": {
+    "chamber": {
+      "type": "string",
+      "enum": [
+        "Senate",
+        "House"
+      ]
+    },
+    "session_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "journal_number": {
+      "type": "number"
+    },
+    "title": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string",
+      "description": "Journal entry content/summary"
+    },
+    "pdf_url": {
+      "type": "string",
+      "description": "URL to the PDF version of the journal"
+    },
+    "session": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "chamber",
+    "session_date",
+    "journal_number",
+    "title"
+  ]
+}

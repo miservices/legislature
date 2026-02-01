@@ -1,0 +1,59 @@
+{
+  "name": "SessionCalendar",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Session name (e.g., 2025 Regular Session)"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "session_days": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "chamber": {
+            "type": "string",
+            "enum": [
+              "Senate",
+              "House",
+              "Both"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "Regular",
+              "Special",
+              "Recess"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Scheduled session days"
+    }
+  },
+  "required": [
+    "name",
+    "start_date",
+    "end_date"
+  ]
+}
