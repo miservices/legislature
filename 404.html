@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Page Not Found – Redirecting…</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: #061423;
+        color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        text-align: center;
+    }
+    a {
+        color: #4da3ff;
+        text-decoration: none;
+        margin-top: 1rem;
+    }
+</style>
+</head>
+<body>
+    <h1>404 – Page Not Found</h1>
+    <p>Redirecting to the Michigan Legislature index…</p>
+    <p>If you are not redirected automatically, <a href="/legislature/mcl/">click here</a>.</p>
+
+    <script>
+        // Get the current path
+        const path = window.location.pathname.replace(/^\/legislature\/mcl/, '');
+        // Redirect to index.html and store the path in hash for SPA routing
+        window.location.replace('/legislature/mcl/index.html#' + path);
+    </script>
+</body>
+</html>
