@@ -164,12 +164,12 @@ footer {
 
 <script>
 const BASE_PATH = "/legislature/mcl";
-const CSV_URL =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vQaZtiF885qU65kN8IttJzYV8NcCiBFYI0Pn8z27HG8owEIiAeI2W4eg0r2Rpd-rdjVmMJXiKINu-gt/pub?output=csv";
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaZtiF885qU65kN8IttJzYV8NcCiBFYI0Pn8z27HG8owEIiAeI2W4eg0r2Rpd-rdjVmMJXiKINu-gt/pub?output=csv";
 
 let sections = {};
 let chapters = {};
 
+// Load CSV and parse
 fetch(CSV_URL)
     .then(r => r.text())
     .then(parseCSV);
@@ -180,10 +180,8 @@ function parseCSV(text) {
 
     for (let c of text) {
         if (c === '"') inQ = !inQ;
-        if (c === '\n' && !inQ) {
-            rows.push(cur);
-            cur = '';
-        } else cur += c;
+        if (c === '\n' && !inQ) { rows.push(cur); cur = ''; } 
+        else cur += c;
     }
     rows.push(cur);
 
@@ -198,22 +196,17 @@ function parseCSV(text) {
 
         const [citation, type, title, act, desc] = cols;
 
-        if (type?.toLowerCase() === "chapter") {
-            chapters[citation] = { citation, title };
-        }
-
-        if (type?.toLowerCase() === "section") {
-            sections[citation] = { citation, title, act, desc };
-        }
+        if (type?.toLowerCase() === "chapter") chapters[citation] = { citation, title };
+        if (type?.toLowerCase() === "section") sections[citation] = { citation, title, act, desc };
     });
 
     buildChapters();
     route();
 }
 
+// Build chapter list
 function buildChapters() {
     const root = document.getElementById("laws");
-
     Object.values(chapters).forEach(ch => {
         const chap = document.createElement("div");
         chap.className = "chapter";
@@ -234,6 +227,7 @@ function buildChapters() {
     });
 }
 
+// Navigation using hash
 function navigateChapter(ch) {
     location.hash = ch;
     openChapter(ch);
@@ -244,7 +238,7 @@ function navigateSection(sec) {
     openSection(sec);
 }
 
-
+// Open a chapter and list its sections
 function openChapter(ch) {
     document.querySelectorAll(".sections").forEach(s => s.style.display = "none");
     document.querySelectorAll(".toggle").forEach(t => t.textContent = "+");
@@ -269,6 +263,7 @@ function openChapter(ch) {
     }
 }
 
+// Open a section
 function openSection(cite) {
     document.querySelector(".section-view")?.remove();
 
@@ -278,7 +273,8 @@ function openSection(cite) {
     const ch = cite.split(".")[0];
     openChapter(ch);
 
-    const [actName, actNum] = s.act.split("|").map(x => x.trim());
+    let actName = "", actNum = "";
+    if (s.act) [actName, actNum] = s.act.split("|").map(x => x.trim());
 
     const view = document.createElement("div");
     view.className = "section-view";
@@ -287,7 +283,7 @@ function openSection(cite) {
         <div class="download">Download Section</div>
 
         <div class="meta">
-            <div><a href="${BASE_PATH}/${ch}">Chapter ${ch}</a></div>
+            <div><a href="#${ch}">Chapter ${ch}</a></div>
             <div class="act">
                 <div>${actName}</div>
                 <div>${actNum}</div>
@@ -303,6 +299,7 @@ function openSection(cite) {
     document.getElementById("laws").appendChild(view);
 }
 
+// Route based on hash
 function route() {
     const hash = location.hash.replace("#", "");
     if (!hash) return;
@@ -311,7 +308,8 @@ function route() {
     else openChapter(hash);
 }
 
-window.addEventListener("popstate", route);
+window.addEventListener("hashchange", route);
+window.addEventListener("load", route);
 </script>
 
 </body>
