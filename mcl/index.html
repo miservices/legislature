@@ -235,14 +235,15 @@ function buildChapters() {
 }
 
 function navigateChapter(ch) {
-    history.pushState({}, "", `${BASE_PATH}/${ch}`);
+    location.hash = ch;
     openChapter(ch);
 }
 
 function navigateSection(sec) {
-    history.pushState({}, "", `${BASE_PATH}/${sec}`);
+    location.hash = sec;
     openSection(sec);
 }
+
 
 function openChapter(ch) {
     document.querySelectorAll(".sections").forEach(s => s.style.display = "none");
@@ -303,12 +304,13 @@ function openSection(cite) {
 }
 
 function route() {
-    const path = location.pathname.replace(BASE_PATH, "").replace(/^\/+/, "");
-    if (!path) return;
+    const hash = location.hash.replace("#", "");
+    if (!hash) return;
 
-    if (path.includes(".")) openSection(path);
-    else openChapter(path);
+    if (hash.includes(".")) openSection(hash);
+    else openChapter(hash);
 }
+
 
 window.addEventListener("popstate", route);
 </script>
