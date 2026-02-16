@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Michigan Legislature</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --primary: #0b3c5d;
+    --secondary: #1d6fa5;
+    --accent: #e0b400;
+    --light: #f4f6f8;
+    --dark: #1a1a1a;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+    background: var(--light);
+    color: var(--dark);
+    line-height: 1.6;
+}
+
+/* HEADER */
+header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    padding: 1.25rem 2rem;
+}
+
+.header-inner {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 1.5rem;
+    font-weight: 500;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* HERO */
+.hero {
+    background:
+        linear-gradient(rgba(11,60,93,0.85), rgba(11,60,93,0.85)),
+        url("https://upload.wikimedia.org/wikipedia/commons/8/88/Michigan_State_Capitol_exterior.jpg")
+        center/cover no-repeat;
+    color: #fff;
+    padding: 6rem 2rem;
+}
+
+.hero-inner {
+    max-width: 900px;
+    margin: auto;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    max-width: 700px;
+}
+
+/* QUICK ACTIONS */
+.actions {
+    max-width: 1200px;
+    margin: -3rem auto 3rem;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.action-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 1.75rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.action-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+.action-card h3 {
+    margin-bottom: 0.5rem;
+    color: var(--primary);
+}
+
+.action-card p {
+    font-size: 0.95rem;
+}
+
+.action-card a {
+    display: inline-block;
+    margin-top: 1rem;
+    font-weight: 600;
+    color: var(--secondary);
+    text-decoration: none;
+}
+
+/* INFO SECTION */
+.info {
+    max-width: 1200px;
+    margin: auto;
+    padding: 3rem 2rem;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+.info h2 {
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.info p {
+    margin-bottom: 1rem;
+}
+
+/* SIDEBAR */
+.sidebar {
+    background: #fff;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+}
+
+.sidebar h3 {
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar li {
+    margin-bottom: 0.75rem;
+}
+
+/* FOOTER */
+footer {
+    background: var(--primary);
+    color: #fff;
+    padding: 2rem;
+    margin-top: 3rem;
+}
+
+.footer-inner {
+    max-width: 1200px;
+    margin: auto;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.footer-inner div {
+    margin-bottom: 0.5rem;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-inner">
+        <div class="logo">Michigan Legislature</div>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#">Bills</a>
+            <a href="#">Committees</a>
+            <a href="#">Senators &amp; Representatives</a>
+            <a href="#">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="hero-inner">
+        <h1>The Legislative Branch of Michigan</h1>
+        <p>
+            Advancing the laws of the State of Michigan through transparency,
+            accountability, and public service.
+        </p>
+    </div>
+</section>
+
+<section class="actions">
+    <div class="action-card">
+        <h3>Search Legislation</h3>
+        <p>Find bills, resolutions, and public acts currently before the Legislature.</p>
+        <a href="#">Search Bills →</a>
+    </div>
+
+    <div class="action-card">
+        <h3>Committee Hearings</h3>
+        <p>View upcoming hearings, agendas, and archived legislative sessions.</p>
+        <a href="#">View Hearings →</a>
+    </div>
+
+    <div class="action-card">
+        <h3>Track a Bill</h3>
+        <p>Monitor legislative progress and receive updates on specific measures.</p>
+        <a href="#">Track Legislation →</a>
+    </div>
+
+    <div class="action-card">
+        <h3>Public Records</h3>
+        <p>Access official legislative documents, journals, and voting records.</p>
+        <a href="#">View Records →</a>
+    </div>
+</section>
+
+<section class="info">
+    <div>
+        <h2>About the Michigan Legislature</h2>
+        <p>
+            The Michigan Legislature consists of the Senate and the House of
+            Representatives. Together, they enact laws, approve budgets,
+            and provide oversight of state government.
+        </p>
+        <p>
+            This website serves as the official public portal for legislative
+            information, ensuring citizens have direct access to the lawmaking
+            process.
+        </p>
+    </div>
+
+    <aside class="sidebar">
+        <h3>Quick Facts</h3>
+        <ul>
+            <li>✔ 38 Senators</li>
+            <li>✔ 110 Representatives</li>
+            <li>✔ Regular &amp; Special Sessions</li>
+            <li>✔ Public Committee Hearings</li>
+        </ul>
+    </aside>
+</section>
+
+<footer>
+    <div class="footer-inner">
+        <div>
+            © 2026 Michigan Legislature  
+        </div>
+        <div>
+            This is an official State of Michigan website
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>
