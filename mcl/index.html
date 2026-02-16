@@ -27,7 +27,6 @@ body {
     color: var(--text);
 }
 
-/* HEADER */
 header {
     text-align: center;
     padding: 1.75rem 1rem 1rem;
@@ -43,14 +42,12 @@ header p {
     color: var(--muted);
 }
 
-/* MAIN */
 main {
     max-width: 1100px;
     margin: 2.5rem auto;
     padding: 0 2rem;
 }
 
-/* CHAPTER LIST */
 .chapter {
     border: 1px solid var(--border);
     margin-bottom: 1rem;
@@ -76,7 +73,6 @@ main {
     font-size: 1.3rem;
 }
 
-/* SECTION LIST */
 .sections {
     display: none;
     border-top: 1px solid var(--border);
@@ -97,7 +93,6 @@ main {
     font-weight: 600;
 }
 
-/* SECTION VIEW */
 .section-view {
     margin-top: 3rem;
     border-top: 2px solid var(--border);
@@ -168,10 +163,11 @@ footer {
 </footer>
 
 <script>
+const BASE_PATH = "/legislature/mcl";
 const CSV_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaZtiF885qU65kN8IttJzYV8NcCiBFYI0Pn8z27HG8owEIiAeI2W4eg0r2Rpd-rdjVmMJXiKINu-gt/pub?output=csv";
 
-let sections = [];
+let sections = {};
 let chapters = {};
 
 fetch(CSV_URL)
@@ -191,7 +187,7 @@ function parseCSV(text) {
     }
     rows.push(cur);
 
-    const data = rows.slice(1).map(r => {
+    rows.slice(1).forEach(r => {
         let cols = [], v = '', q = false;
         for (let c of r) {
             if (c === '"') { q = !q; continue; }
@@ -199,76 +195,87 @@ function parseCSV(text) {
             else v += c;
         }
         cols.push(v.trim());
-        return cols;
+
+        const [citation, type, title, act, desc] = cols;
+
+        if (type?.toLowerCase() === "chapter") {
+            chapters[citation] = { citation, title };
+        }
+
+        if (type?.toLowerCase() === "section") {
+            sections[citation] = { citation, title, act, desc };
+        }
     });
 
-    build(data);
-    handleHash();
+    buildChapters();
+    route();
 }
 
-function build(data) {
+function buildChapters() {
     const root = document.getElementById("laws");
 
-    data.forEach(r => {
-        const [citation, type, title, act, desc] = r;
+    Object.values(chapters).forEach(ch => {
+        const chap = document.createElement("div");
+        chap.className = "chapter";
+        chap.dataset.chapter = ch.citation;
 
-        if (type.toLowerCase() === "section") {
-            sections.push({ citation, title, act, desc });
-            return;
-        }
+        const h = document.createElement("div");
+        h.className = "chapter-header";
+        h.innerHTML = `<div class="chapter-title">Chapter ${ch.citation} — ${ch.title}</div><div class="toggle">+</div>`;
 
-        if (type.toLowerCase() === "chapter") {
-            const chap = document.createElement("div");
-            chap.className = "chapter";
-            chap.dataset.chapter = citation;
+        const list = document.createElement("div");
+        list.className = "sections";
 
-            const h = document.createElement("div");
-            h.className = "chapter-header";
-            h.innerHTML = `<div class="chapter-title">Chapter ${citation} — ${title}</div><div class="toggle">+</div>`;
+        h.onclick = () => navigateChapter(ch.citation);
 
-            const list = document.createElement("div");
-            list.className = "sections";
-
-            h.onclick = () => openChapter(citation);
-
-            chap.appendChild(h);
-            chap.appendChild(list);
-            root.appendChild(chap);
-
-            chapters[citation] = chap;
-        }
+        chap.appendChild(h);
+        chap.appendChild(list);
+        root.appendChild(chap);
     });
+}
+
+function navigateChapter(ch) {
+    history.pushState({}, "", `${BASE_PATH}/${ch}`);
+    openChapter(ch);
+}
+
+function navigateSection(sec) {
+    history.pushState({}, "", `${BASE_PATH}/${sec}`);
+    openSection(sec);
 }
 
 function openChapter(ch) {
-    location.hash = `chapter-${ch}`;
-
     document.querySelectorAll(".sections").forEach(s => s.style.display = "none");
     document.querySelectorAll(".toggle").forEach(t => t.textContent = "+");
 
-    const chapter = chapters[ch];
-    const list = chapter.querySelector(".sections");
+    const chapter = document.querySelector(`[data-chapter="${ch}"]`);
+    if (!chapter) return;
 
+    const list = chapter.querySelector(".sections");
     list.style.display = "block";
     chapter.querySelector(".toggle").textContent = "−";
 
     if (!list.hasChildNodes()) {
-        sections
+        Object.values(sections)
             .filter(s => s.citation.startsWith(ch + "."))
             .forEach(s => {
                 const item = document.createElement("div");
                 item.className = "section-item";
                 item.innerHTML = `<span>§ ${s.citation}</span> — ${s.title}`;
-                item.onclick = () => openSection(s, ch);
+                item.onclick = () => navigateSection(s.citation);
                 list.appendChild(item);
             });
     }
 }
 
-function openSection(s, ch) {
-    location.hash = `section-${s.citation}`;
-
+function openSection(cite) {
     document.querySelector(".section-view")?.remove();
+
+    const s = sections[cite];
+    if (!s) return;
+
+    const ch = cite.split(".")[0];
+    openChapter(ch);
 
     const [actName, actNum] = s.act.split("|").map(x => x.trim());
 
@@ -279,7 +286,7 @@ function openSection(s, ch) {
         <div class="download">Download Section</div>
 
         <div class="meta">
-            <div><a href="#chapter-${ch}">Chapter ${ch}</a></div>
+            <div><a href="${BASE_PATH}/${ch}">Chapter ${ch}</a></div>
             <div class="act">
                 <div>${actName}</div>
                 <div>${actNum}</div>
@@ -295,25 +302,15 @@ function openSection(s, ch) {
     document.getElementById("laws").appendChild(view);
 }
 
-function handleHash() {
-    const hash = location.hash.replace("#", "");
-    if (!hash) return;
+function route() {
+    const path = location.pathname.replace(BASE_PATH, "").replace(/^\/+/, "");
+    if (!path) return;
 
-    if (hash.startsWith("chapter-")) {
-        openChapter(hash.replace("chapter-", ""));
-    }
-
-    if (hash.startsWith("section-")) {
-        const cite = hash.replace("section-", "");
-        const chapter = cite.split(".")[0];
-        openChapter(chapter);
-
-        const sec = sections.find(s => s.citation === cite);
-        if (sec) openSection(sec, chapter);
-    }
+    if (path.includes(".")) openSection(path);
+    else openChapter(path);
 }
 
-window.addEventListener("hashchange", handleHash);
+window.addEventListener("popstate", route);
 </script>
 
 </body>
