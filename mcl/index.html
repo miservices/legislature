@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Michigan Legislature – Michigan Compiled Laws</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --bg: #061423;
+    --bg2: #0b1e33;
+    --primary: #4da3ff;
+    --text: #ffffff;
+    --muted: #b7c6d9;
+    --border: #1e3550;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+    background: linear-gradient(180deg, var(--bg), var(--bg2));
+    color: var(--text);
+}
+
+/* HEADER */
+header {
+    text-align: center;
+    padding: 1.75rem 1rem 1rem;
+}
+
+header h1 {
+    font-size: 2.2rem;
+}
+
+header p {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--muted);
+}
+
+/* MAIN */
+main {
+    max-width: 1100px;
+    margin: 2.5rem auto;
+    padding: 0 2rem;
+}
+
+/* CHAPTER LIST */
+.chapter {
+    border: 1px solid var(--border);
+    margin-bottom: 1rem;
+}
+
+.chapter-header {
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+}
+
+.chapter-header:hover {
+    background: rgba(255,255,255,0.04);
+}
+
+.chapter-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.toggle {
+    font-size: 1.3rem;
+}
+
+/* SECTION LIST */
+.sections {
+    display: none;
+    border-top: 1px solid var(--border);
+}
+
+.section-item {
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--border);
+    cursor: pointer;
+}
+
+.section-item:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.section-item span {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* SECTION VIEW */
+.section-view {
+    margin-top: 3rem;
+    border-top: 2px solid var(--border);
+    padding-top: 2.5rem;
+}
+
+.section-view h2 {
+    font-size: 2rem;
+}
+
+.download {
+    margin-top: 0.25rem;
+    color: var(--primary);
+}
+
+.meta {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.meta a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.meta .act {
+    margin-top: 1rem;
+    font-weight: 600;
+}
+
+.meta .act div:last-child {
+    color: var(--muted);
+    font-weight: 400;
+}
+
+.section-text {
+    margin-top: 2rem;
+    white-space: pre-wrap;
+    line-height: 1.75;
+}
+
+.section-text .heading {
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+footer {
+    margin-top: 5rem;
+    padding: 2rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Michigan Legislature</h1>
+    <p>Michigan Compiled Laws Complete Through PA 2 of 2026</p>
+</header>
+
+<main id="laws"></main>
+
+<footer>
+    © 2026 Michigan Legislature — Official State of Michigan Website
+</footer>
+
+<script>
+const CSV_URL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vQaZtiF885qU65kN8IttJzYV8NcCiBFYI0Pn8z27HG8owEIiAeI2W4eg0r2Rpd-rdjVmMJXiKINu-gt/pub?output=csv";
+
+let sections = [];
+let chapters = {};
+
+fetch(CSV_URL)
+    .then(r => r.text())
+    .then(parseCSV);
+
+function parseCSV(text) {
+    const rows = [];
+    let cur = '', inQ = false;
+
+    for (let c of text) {
+        if (c === '"') inQ = !inQ;
+        if (c === '\n' && !inQ) {
+            rows.push(cur);
+            cur = '';
+        } else cur += c;
+    }
+    rows.push(cur);
+
+    const data = rows.slice(1).map(r => {
+        let cols = [], v = '', q = false;
+        for (let c of r) {
+            if (c === '"') { q = !q; continue; }
+            if (c === ',' && !q) { cols.push(v.trim()); v = ''; }
+            else v += c;
+        }
+        cols.push(v.trim());
+        return cols;
+    });
+
+    build(data);
+    handleHash();
+}
+
+function build(data) {
+    const root = document.getElementById("laws");
+
+    data.forEach(r => {
+        const [citation, type, title, act, desc] = r;
+
+        if (type.toLowerCase() === "section") {
+            sections.push({ citation, title, act, desc });
+            return;
+        }
+
+        if (type.toLowerCase() === "chapter") {
+            const chap = document.createElement("div");
+            chap.className = "chapter";
+            chap.dataset.chapter = citation;
+
+            const h = document.createElement("div");
+            h.className = "chapter-header";
+            h.innerHTML = `<div class="chapter-title">Chapter ${citation} — ${title}</div><div class="toggle">+</div>`;
+
+            const list = document.createElement("div");
+            list.className = "sections";
+
+            h.onclick = () => openChapter(citation);
+
+            chap.appendChild(h);
+            chap.appendChild(list);
+            root.appendChild(chap);
+
+            chapters[citation] = chap;
+        }
+    });
+}
+
+function openChapter(ch) {
+    location.hash = `chapter-${ch}`;
+
+    document.querySelectorAll(".sections").forEach(s => s.style.display = "none");
+    document.querySelectorAll(".toggle").forEach(t => t.textContent = "+");
+
+    const chapter = chapters[ch];
+    const list = chapter.querySelector(".sections");
+
+    list.style.display = "block";
+    chapter.querySelector(".toggle").textContent = "−";
+
+    if (!list.hasChildNodes()) {
+        sections
+            .filter(s => s.citation.startsWith(ch + "."))
+            .forEach(s => {
+                const item = document.createElement("div");
+                item.className = "section-item";
+                item.innerHTML = `<span>§ ${s.citation}</span> — ${s.title}`;
+                item.onclick = () => openSection(s, ch);
+                list.appendChild(item);
+            });
+    }
+}
+
+function openSection(s, ch) {
+    location.hash = `section-${s.citation}`;
+
+    document.querySelector(".section-view")?.remove();
+
+    const [actName, actNum] = s.act.split("|").map(x => x.trim());
+
+    const view = document.createElement("div");
+    view.className = "section-view";
+    view.innerHTML = `
+        <h2>MCL – Section ${s.citation}</h2>
+        <div class="download">Download Section</div>
+
+        <div class="meta">
+            <div><a href="#chapter-${ch}">Chapter ${ch}</a></div>
+            <div class="act">
+                <div>${actName}</div>
+                <div>${actNum}</div>
+            </div>
+        </div>
+
+        <div class="section-text">
+            <div class="heading">${s.citation} ${s.title}</div>
+            ${s.desc || ""}
+        </div>
+    `;
+
+    document.getElementById("laws").appendChild(view);
+}
+
+function handleHash() {
+    const hash = location.hash.replace("#", "");
+    if (!hash) return;
+
+    if (hash.startsWith("chapter-")) {
+        openChapter(hash.replace("chapter-", ""));
+    }
+
+    if (hash.startsWith("section-")) {
+        const cite = hash.replace("section-", "");
+        const chapter = cite.split(".")[0];
+        openChapter(chapter);
+
+        const sec = sections.find(s => s.citation === cite);
+        if (sec) openSection(sec, chapter);
+    }
+}
+
+window.addEventListener("hashchange", handleHash);
+</script>
+
+</body>
+</html>
