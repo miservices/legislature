@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Legislative Bills</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+<style>
+:root {
+    --primary: #0b3c5d;
+    --secondary: #1d6fa5;
+    --accent: #e0b400;
+    --light: #f4f6f8;
+    --dark: #1a1a1a;
+}
+
+* { box-sizing: border-box; margin:0; padding:0; font-family: "Segoe UI", Arial, sans-serif; }
+
+body { background: var(--light); color: var(--dark); line-height: 1.6; }
+
+/* HEADER */
+header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; padding: 1.25rem 2rem; }
+.header-inner { max-width: 1200px; margin: auto; display: flex; justify-content: space-between; align-items: center; }
+.logo { font-size: 1.6rem; font-weight: 700; letter-spacing: 0.5px; }
+nav a { color: #ffffffcc; text-decoration: none; margin-left: 1.5rem; font-weight: 500; padding-bottom: 4px; transition: all 0.2s ease; }
+nav a:hover { color: #fff; }
+nav a.active { color: #fff; font-weight: 700; border-bottom: 3px solid var(--accent); padding-bottom: 6px; }
+
+/* HERO */
+.hero { background: linear-gradient(rgba(11,60,93,0.85), rgba(11,60,93,0.85)), url("https://upload.wikimedia.org/wikipedia/commons/8/88/Michigan_State_Capitol_exterior.jpg") center/cover no-repeat; color: #fff; padding: 6rem 2rem; text-align: center; }
+.hero h1 { font-size: 3rem; margin-bottom: 1rem; }
+.hero p { font-size: 1.25rem; max-width: 700px; margin: 0 auto; }
+
+/* FILTERS */
+.filter-container { max-width: 1200px; margin: 2rem auto; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.filter-container input, .filter-container select { padding: 10px 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; color: var(--dark); }
+
+/* BILLS LIST */
+#results { max-width: 1200px; margin: 0 auto 3rem auto; }
+.bill-card { background: #fff; padding: 18px 22px; margin-bottom: 15px; border-radius: 12px; cursor: pointer; position: relative; transition: all 0.2s ease-in-out; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.bill-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.bill-number { font-weight: bold; font-size: 18px; color: var(--primary); margin-bottom: 6px; }
+.bill-name { font-weight: 600; font-size: 16px; color: var(--dark); margin-bottom: 4px; line-height: 1.4; }
+.bill-desc { font-size: 14px; color: var(--secondary); line-height: 1.4; }
+.status-label { position: absolute; top: 18px; right: 18px; background-color: var(--secondary); color: #fff; font-size: 12px; font-weight: bold; padding: 4px 8px; border-radius: 8px; text-transform: uppercase; }
+
+/* DETAIL VIEW */
+.back-button { display: inline-block; margin-bottom: 25px; padding: 10px 16px; background-color: var(--primary); color: #fff; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
+.back-button:hover { background-color: var(--secondary); }
+
+.detail-container { background: #fff; border-radius: 12px; padding: 25px 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); max-width: 1000px; margin: 0 auto 50px auto; }
+.detail-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 15px; }
+.detail-number { font-size: 22px; font-weight: bold; color: var(--primary); }
+.detail-meta { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.detail-meta div { background: var(--light); padding: 5px 10px; border-radius: 8px; font-size: 14px; color: var(--secondary); }
+.detail-name { font-weight: 600; font-size: 18px; color: var(--dark); margin-bottom: 10px; line-height: 1.5; }
+.detail-desc { font-size: 15px; color: var(--secondary); margin-bottom: 20px; line-height: 1.4; }
+.detail-sponsors { margin-top: 10px; font-size: 15px; color: var(--dark); margin-bottom: 20px; }
+
+.pdf-links div { margin-bottom: 8px; font-size: 14px; }
+.pdf-links a { color: var(--primary); text-decoration: none; font-weight: bold; border-bottom: 1px dotted var(--primary); }
+.pdf-links a:hover { text-decoration: underline; }
+
+.history-section { background: var(--light); padding: 20px; border-radius: 12px; }
+.history-header { font-weight: bold; color: var(--primary); font-size: 18px; margin-bottom: 8px; }
+.history-note { font-size: 13px; font-style: italic; margin-bottom: 12px; color: var(--secondary); }
+.history-item { margin-left: 10px; font-size: 14px; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.08); }
+.history-item:last-child { border-bottom: none; }
+
+/* FOOTER */
+footer { background: var(--primary); color: #fff; padding: 2rem; margin-top: 3rem; text-align: center; font-size: 0.9rem; }
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-inner">
+        <div class="logo">Michigan Legislature</div>
+        <nav>
+            <a href="https://miservices.github.io/legislature/" target="_self">Home</a>
+            <a href="https://miservices.github.io/legislature/about" target="_self">About</a>
+            <a href="https://miservices.github.io/legislature/mcl" target="_self">Laws</a>
+            <a href="https://miservices.github.io/legislature/bills" target="_self">Bills</a>
+            <a href="https://miservices.github.io/legislature/resolutions" target="_self">Resolutions</a>
+            <a href="https://miservices.github.io/legislature/journals" target="_self">Journals</a>
+        </nav>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="hero-inner">
+        <h1>Legislative Bills</h1>
+        <p>Search and track bills introduced in the Senate and House of Representatives.</p>
+    </div>
+</section>
+
+<div class="filter-container">
+    <input id="search" placeholder="Search bills…" oninput="applyFilters()">
+    <select id="chamberFilter" onchange="applyFilters()">
+        <option value="">All Chambers</option>
+        <option value="House">House</option>
+        <option value="Senate">Senate</option>
+    </select>
+    <select id="statusFilter" onchange="applyFilters()">
+        <option value="">All Statuses</option>
+    </select>
+</div>
+
+<div id="results">Loading bills…</div>
+
+<footer>
+    © 2026 Michigan Legislature | Official State of Michigan Website
+</footer>
+
+<script>
+let billsData = [];
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ31EfUU7mCQYrcQAhNTKXey6ep6f6rACOykAkPa2FIfQtAN3iRgPxumI-3AdcyYKZUVoIpuI0NDnJL/pub?gid=0&single=true&output=csv";
+
+document.addEventListener("DOMContentLoaded", () => {
+  Papa.parse(CSV_URL, { download:true, header:true, skipEmptyLines:true, complete: results => {
+      billsData = results.data.filter(b => b["Bill No"]);
+      populateStatusFilter();
+      renderResults(billsData);
+  }});
+});
+
+function populateStatusFilter() {
+  const statusSet = new Set(billsData.map(b => b["Status"]).filter(Boolean));
+  const select = document.getElementById("statusFilter");
+  statusSet.forEach(s => { const opt = document.createElement("option"); opt.value = s; opt.innerText = s; select.appendChild(opt); });
+}
+
+function formatBillHeader(bill) {
+  const billNo = bill["Bill No"] ? bill["Bill No"].trim() : "—";
+  if (bill["PA No"]) return `${bill["PA No"]} | ${formatBillNo(billNo)}`;
+  return formatBillNo(billNo);
+}
+function formatBillNo(billNo) {
+  if (!billNo) return "—";
+  if (billNo.startsWith("SB")) return "Senate Bill " + billNo.replace("SB","").trim();
+  if (billNo.startsWith("HB")) return "House Bill " + billNo.replace("HB","").trim();
+  return billNo;
+}
+
+function applyFilters() {
+  const q = document.getElementById("search").value.toLowerCase();
+  const chamber = document.getElementById("chamberFilter").value;
+  const status = document.getElementById("statusFilter").value;
+
+  renderResults(billsData.filter(b => {
+    const matchesSearch =
+      (b["Bill No"] || "").toLowerCase().includes(q) ||
+      (b["PA No"] || "").toLowerCase().includes(q) ||
+      (b["Name"] || "").toLowerCase().includes(q) ||
+      (b["Description"] || "").toLowerCase().includes(q);
+
+    const matchesChamber = !chamber || (b["Intro Chamber"] || "").toLowerCase().includes(chamber.toLowerCase());
+    const matchesStatus = !status || (b["Status"] || "") === status;
+    return matchesSearch && matchesChamber && matchesStatus;
+  }));
+
+  document.getElementById("top")?.scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderResults(data) {
+  const container = document.getElementById("results");
+  container.innerHTML = "";
+  if (!data.length) { container.innerText = "No bills found."; return; }
+
+  data.forEach((bill,i)=>{
+    const div = document.createElement("div");
+    div.className = "bill-card";
+    div.onclick = ()=>showDetail(i);
+    div.innerHTML = `
+      <div class="bill-number">${formatBillHeader(bill)}</div>
+      <div class="bill-name">${bill["Name"] || "Untitled"}</div>
+      <div class="bill-desc">${bill["Description"] || ""}</div>
+      <div class="status-label">${bill["Status"] || "—"}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function showDetail(index) {
+  const bill = billsData[index];
+  const container = document.getElementById("results");
+
+  container.innerHTML = `
+    <button class="back-button" onclick="applyFilters()">← Back</button>
+    <div class="detail-container">
+      <div class="detail-header">
+        <div class="detail-number">${formatBillHeader(bill)}</div>
+        <div class="detail-meta">
+          <div>Originating: ${bill["Intro Chamber"] || "—"}</div>
+          <div>Status: ${bill["Status"] || "—"}</div>
+        </div>
+      </div>
+      <div class="detail-name">${bill["Name"] || "Untitled"}</div>
+      <div class="detail-desc">${bill["Description"] || ""}</div>
+      <div class="detail-sponsors"><strong>Sponsors:</strong> ${bill["Sponsors"] || "—"}</div>
+      <div class="pdf-links">
+        <div>${bill["Intro PDF"] ? `<a href="${bill["Intro PDF"]}" target="_blank">Introduced Bill.pdf</a>` : ""}</div>
+        <div>${bill["Concurred PDF"] ? `<a href="${bill["Concurred PDF"]}" target="_blank">Concurred Bill.pdf</a>` : ""}</div>
+        <div>${bill["PA PDF"] ? `<a href="${bill["PA PDF"]}" target="_blank">Public Act.pdf</a>` : ""}</div>
+      </div>
+      <div class="history-section">
+        <div class="history-header">History</div>
+        <div class="history-note">Note: House actions are in lowercase, Senate actions are in UPPERCASE.</div>
+        ${renderHistory(bill["History"])}
+      </div>
+    </div>
+  `;
+  document.getElementById("top")?.scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderHistory(history) {
+  if (!history) return "<div>No history available.</div>";
+  return history.split("|").map(e => `<div class="history-item">${e.trim()}</div>`).join("");
+}
+
+// Highlight active nav link
+document.addEventListener("DOMContentLoaded", function() {
+    const current = window.location.href;
+    document.querySelectorAll("nav a").forEach(link => {
+        if (current === link.href || (link.href.endsWith("/") && current.endsWith("/"))) {
+            link.classList.add("active");
+        }
+    });
+});
+</script>
+
+<a id="top"></a>
+</body>
+</html>
