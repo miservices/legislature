@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>About – Michigan Legislature</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --primary: #0b3c5d;
+    --secondary: #1d6fa5;
+    --accent: #e0b400;
+    --light: #f4f6f8;
+    --dark: #1a1a1a;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+    background: var(--light);
+    color: var(--dark);
+    line-height: 1.6;
+}
+
+/* HEADER */
+header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    padding: 1.25rem 2rem;
+}
+
+.header-inner {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* NAVIGATION */
+nav a {
+    color: #ffffffcc;
+    text-decoration: none;
+    margin-left: 1.5rem;
+    font-weight: 500;
+    padding-bottom: 4px;
+}
+
+nav a:hover {
+    color: #fff;
+}
+
+nav a.active {
+    color: #fff;
+    font-weight: 700;
+    border-bottom: 3px solid var(--accent);
+}
+
+/* HERO */
+.hero {
+    background:
+        linear-gradient(rgba(11,60,93,0.85), rgba(11,60,93,0.85)),
+        url("https://upload.wikimedia.org/wikipedia/commons/8/88/Michigan_State_Capitol_exterior.jpg")
+        center/cover no-repeat;
+    color: #fff;
+    padding: 6rem 2rem;
+}
+
+.hero-inner {
+    max-width: 900px;
+    margin: auto;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    max-width: 700px;
+}
+
+/* CONTENT */
+.content {
+    max-width: 900px;
+    margin: 3rem auto;
+    padding: 0 2rem;
+}
+
+.content h2 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.content p {
+    margin-bottom: 1.25rem;
+}
+
+/* FOOTER */
+footer {
+    background: var(--primary);
+    color: #fff;
+    padding: 2rem;
+    margin-top: 3rem;
+}
+
+.footer-inner {
+    max-width: 1200px;
+    margin: auto;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.footer-inner div {
+    margin-bottom: 0.5rem;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-inner">
+        <div class="logo">Michigan Legislature</div>
+        <nav>
+            <a href="https://miservices.github.io/legislature/" target="_self">Home</a>
+            <a href="https://miservices.github.io/legislature/about" class="active" target="_self">About</a>
+            <a href="https://miservices.github.io/legislature/mcl" target="_self">Laws</a>
+            <a href="https://miservices.github.io/legislature/bills" target="_self">Bills</a>
+            <a href="https://miservices.github.io/legislature/resolutions" target="_self">Resolutions</a>
+            <a href="https://miservices.github.io/legislature/journals" target="_self">Journals</a>
+        </nav>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="hero-inner">
+        <h1>About the Michigan Legislature</h1>
+        <p>
+            Learn how Michigan's legislative branch serves the public and upholds the law through transparency, accountability, and civic engagement.
+        </p>
+    </div>
+</section>
+
+<div class="content">
+    <h2>Our Mission</h2>
+    <p>
+        The Michigan Legislature exists to enact laws, adopt resolutions, and maintain official records that govern the state. We are committed to ensuring that every action taken reflects the interests and needs of the people of Michigan.
+    </p>
+
+    <h2>Structure</h2>
+    <p>
+        The Legislature consists of two chambers: the Senate, with 38 members, and the House of Representatives, with 110 members. Together, these elected officials debate, propose, and vote on legislation that affects every Michigan resident.
+    </p>
+
+    <h2>Transparency & Public Access</h2>
+    <p>
+        We provide open access to legislative proceedings, including bills, resolutions, and journals, so citizens can stay informed and engaged in the lawmaking process.
+    </p>
+
+    <h2>History</h2>
+    <p>
+        Established under the Michigan Constitution, the Legislature has evolved over decades to become a transparent and accountable body. Today, it serves as the official voice of Michigan citizens in shaping the laws of the state.
+    </p>
+
+    <h2>Get Involved</h2>
+    <p>
+        Citizens are encouraged to follow legislative sessions, review proposed bills, and provide feedback. Our goal is to foster an engaged and informed public that can participate meaningfully in governance.
+    </p>
+</div>
+
+<footer>
+    <div class="footer-inner">
+        <div>© 2026 Michigan Legislature</div>
+        <div>Official State of Michigan Website</div>
+    </div>
+</footer>
+
+</body>
+</html>
