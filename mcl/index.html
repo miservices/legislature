@@ -237,6 +237,8 @@ footer {
     </div>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <script>
 const { jsPDF } = window.jspdf;
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaZtiF885qU65kN8IttJzYV8NcCiBFYI0Pn8z27HG8owEIiAeI2W4eg0r2Rpd-rdjVmMJXiKINu-gt/pub?output=csv";
@@ -288,28 +290,22 @@ function buildChapters(open=null){
     Object.values(chapters).forEach(ch=>{
         const box=document.createElement("div");
         box.className="chapter";
-
         const h=document.createElement("div");
         h.className="chapter-header";
         h.innerHTML=`Chapter ${ch.cite} — ${ch.title}<span class="toggle">${open==ch.cite?"−":"+"}</span>`;
         h.onclick=()=>location.hash=ch.cite;
-
         const list=document.createElement("div");
         list.className="sections";
-
         if(open==ch.cite){
             list.style.display="block";
-            orderedSections
-                .filter(s=>s.startsWith(ch.cite+"."))
-                .forEach(s=>{
-                    const i=document.createElement("div");
-                    i.className="section-item";
-                    i.innerHTML=`<span>${s}</span> — ${sections[s].title}`;
-                    i.onclick=()=>location.hash=s;
-                    list.appendChild(i);
-                });
+            orderedSections.filter(s=>s.startsWith(ch.cite+".")).forEach(s=>{
+                const i=document.createElement("div");
+                i.className="section-item";
+                i.innerHTML=`<span>${s}</span> — ${sections[s].title}`;
+                i.onclick=()=>location.hash=s;
+                list.appendChild(i);
+            });
         }
-
         box.appendChild(h);
         box.appendChild(list);
         root.appendChild(box);
@@ -321,101 +317,41 @@ function openSection(cite){
     const root=document.getElementById("laws");
     const ch=cite.split(".")[0];
 
-    const container=document.createElement("div");
-    container.className="section-view";
+    const body =
+`${cite} ${s.title}
 
-    container.innerHTML=`
+${s.desc || ""}`.trim();
+
+    const v=document.createElement("div");
+    v.className="section-view";
+    v.innerHTML=`
         <a class="back-btn" href="#${ch}">← Back to Chapter ${ch}</a>
         <h2>MCL ${cite}</h2>
-        <a href="#" onclick="printSection('${cite}');return false;" 
-           style="color:var(--secondary);font-weight:600;">Print as PDF</a>
-        <div class="section-text"></div>
+        <a href="#" onclick="printSection('${cite}');return false;" style="color:var(--secondary);font-weight:600;">Print as PDF</a>
+        <div class="section-text">${body}</div>
     `;
-
-    const textDiv=container.querySelector(".section-text");
-
-    // TITLE (NO 1.1 prefix)
-    const heading=document.createElement("div");
-    heading.className="heading";
-    heading.textContent=s.title;
-    textDiv.appendChild(heading);
-
-    // PROCESS BODY WITH AUTO INDENT
-    const lines=(s.desc||"").split(/\r?\n/).filter(l=>l.trim()!=="");
-
-    lines.forEach(line=>{
-        const p=document.createElement("p");
-        p.style.textAlign="justify";
-        p.style.margin="6px 0";
-
-        const trimmed=line.trim();
-
-        // automatic subsection indentation
-        if(/^\(\d+\)/.test(trimmed)){
-            p.style.paddingLeft="0px";
-        }
-        else if(/^\([a-z]\)/.test(trimmed)){
-            p.style.paddingLeft="25px";
-        }
-        else if(/^\([ivx]+\)/.test(trimmed)){
-            p.style.paddingLeft="45px";
-        }
-        else if(/^\([A-Z]\)/.test(trimmed)){
-            p.style.paddingLeft="65px";
-        }
-        else{
-            p.style.paddingLeft="0px";
-        }
-
-        p.textContent=trimmed;
-        textDiv.appendChild(p);
-    });
-
-    root.appendChild(container);
+    root.appendChild(v);
 }
 
 function printSection(cite){
     const s=sections[cite];
     const d=new jsPDF({unit:"pt",format:"letter"});
     let y=72,m=72,w=d.internal.pageSize.getWidth()-m*2;
-
-    d.setFont("times","bold").setFontSize(14);
-    d.text("Michigan Compiled Laws",m,y);
+    d.setFont("times","bold").setFontSize(14).text("Michigan Compiled Laws",m,y);
     y+=22;
-
-    d.setFontSize(12);
-    d.text(`MCL ${cite} ${s.title}`,m,y);
+    d.setFontSize(12).text(`MCL ${cite} ${s.title}`,m,y);
     y+=20;
-
     d.setFont("times","normal");
-
-    const lines=(s.desc||"").split(/\r?\n/).filter(l=>l.trim()!=="");
-
-    lines.forEach(line=>{
-        let indent=0;
-        const t=line.trim();
-
-        if(/^\(\d+\)/.test(t)) indent=0;
-        else if(/^\([a-z]\)/.test(t)) indent=20;
-        else if(/^\([ivx]+\)/.test(t)) indent=40;
-        else if(/^\([A-Z]\)/.test(t)) indent=60;
-
-        const wrapped=d.splitTextToSize(t,w-indent);
-
-        wrapped.forEach(wl=>{
-            if(y>720){d.addPage();y=m;}
-            d.text(wl,m+indent,y);
-            y+=16;
-        });
+    d.splitTextToSize(s.desc||"",w).forEach(l=>{
+        if(y>720){d.addPage();y=m;}
+        d.text(l,m,y);y+=16;
     });
-
     d.save(`MCL_${cite}.pdf`);
 }
 
 window.addEventListener("hashchange",route);
 window.addEventListener("load",route);
 </script>
-
 
 </body>
 </html>
