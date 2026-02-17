@@ -48,15 +48,23 @@ header {
     letter-spacing: 0.5px;
 }
 
+/* NAVIGATION */
 nav a {
-    color: #fff;
+    color: #ffffffcc;
     text-decoration: none;
     margin-left: 1.5rem;
     font-weight: 500;
+    padding-bottom: 4px;
 }
 
 nav a:hover {
-    text-decoration: underline;
+    color: #fff;
+}
+
+nav a.active {
+    color: #fff;
+    font-weight: 700;
+    border-bottom: 3px solid var(--accent);
 }
 
 /* HERO */
@@ -193,11 +201,12 @@ footer {
     <div class="header-inner">
         <div class="logo">Michigan Legislature</div>
         <nav>
-            <a href="#">Home</a>
+            <a href="#" class="active">Home</a>
+            <a href="#">About</a>
+            <a href="#">Laws</a>
             <a href="#">Bills</a>
-            <a href="#">Committees</a>
-            <a href="#">Senators &amp; Representatives</a>
-            <a href="#">Contact</a>
+            <a href="#">Resolutions</a>
+            <a href="#">Journals</a>
         </nav>
     </div>
 </header>
@@ -214,27 +223,27 @@ footer {
 
 <section class="actions">
     <div class="action-card">
-        <h3>Search Legislation</h3>
-        <p>Find bills, resolutions, and public acts currently before the Legislature.</p>
-        <a href="#">Search Bills →</a>
+        <h3>Michigan Compiled Laws</h3>
+        <p>Browse the official statutory laws of the State of Michigan.</p>
+        <a href="#">View Laws →</a>
     </div>
 
     <div class="action-card">
-        <h3>Committee Hearings</h3>
-        <p>View upcoming hearings, agendas, and archived legislative sessions.</p>
-        <a href="#">View Hearings →</a>
+        <h3>Legislative Bills</h3>
+        <p>Search and track bills introduced in the Senate and House.</p>
+        <a href="#">View Bills →</a>
     </div>
 
     <div class="action-card">
-        <h3>Track a Bill</h3>
-        <p>Monitor legislative progress and receive updates on specific measures.</p>
-        <a href="#">Track Legislation →</a>
+        <h3>Resolutions</h3>
+        <p>Access joint, concurrent, and simple resolutions.</p>
+        <a href="#">View Resolutions →</a>
     </div>
 
     <div class="action-card">
-        <h3>Public Records</h3>
-        <p>Access official legislative documents, journals, and voting records.</p>
-        <a href="#">View Records →</a>
+        <h3>Legislative Journals</h3>
+        <p>Official daily journals documenting legislative proceedings.</p>
+        <a href="#">View Journals →</a>
     </div>
 </section>
 
@@ -243,13 +252,12 @@ footer {
         <h2>About the Michigan Legislature</h2>
         <p>
             The Michigan Legislature consists of the Senate and the House of
-            Representatives. Together, they enact laws, approve budgets,
-            and provide oversight of state government.
+            Representatives. Together, they enact laws, adopt resolutions,
+            and maintain the official journals of legislative proceedings.
         </p>
         <p>
             This website serves as the official public portal for legislative
-            information, ensuring citizens have direct access to the lawmaking
-            process.
+            information and public access to the lawmaking process.
         </p>
     </div>
 
@@ -259,7 +267,7 @@ footer {
             <li>✔ 38 Senators</li>
             <li>✔ 110 Representatives</li>
             <li>✔ Regular &amp; Special Sessions</li>
-            <li>✔ Public Committee Hearings</li>
+            <li>✔ Public Legislative Records</li>
         </ul>
     </aside>
 </section>
@@ -267,10 +275,10 @@ footer {
 <footer>
     <div class="footer-inner">
         <div>
-            © 2026 Michigan Legislature  
+            © 2026 Michigan Legislature
         </div>
         <div>
-            This is an official State of Michigan website
+            Official State of Michigan Website
         </div>
     </div>
 </footer>
