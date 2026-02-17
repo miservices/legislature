@@ -224,8 +224,6 @@ footer {
     </div>
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <script>
 const { jsPDF } = window.jspdf;
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaZtiF885qU65kN8IttJzYV8NcCiBFYI0Pn8z27HG8owEIiAeI2W4eg0r2Rpd-rdjVmMJXiKINu-gt/pub?output=csv";
@@ -254,10 +252,10 @@ function parseCSV(text) {
     if(cell||row.length){row.push(cell);rows.push(row)}
 
     rows.slice(1).forEach(r=>{
-        const [cite,type,title,act,desc]=r.map(v=>v?.trim());
+        const [cite,type,title,act,desc,history]=r.map(v=>v?.trim());
         if(type?.toLowerCase()==="chapter") chapters[cite]={cite,title};
         if(type?.toLowerCase()==="section"){
-            sections[cite]={cite,title,desc};
+            sections[cite]={cite,title,desc,history};
             orderedSections.push(cite);
         }
     });
@@ -326,6 +324,7 @@ function openSection(cite){
 
     const textDiv=view.querySelector(".section-text");
 
+    // Title (no duplicate citation)
     const heading=document.createElement("div");
     heading.className="heading";
     heading.textContent=s.title;
@@ -338,7 +337,8 @@ function openSection(cite){
 
     lines.forEach(line=>{
         const p=document.createElement("div");
-        p.className="statute-paragraph";
+        p.style.textAlign="justify";
+        p.style.margin="6px 0";
 
         let indent=0;
         if(/^\(\d+\)/.test(line)) indent=0;
@@ -347,12 +347,23 @@ function openSection(cite){
         else if(/^\([A-Z]\)/.test(line)) indent=65;
 
         p.style.paddingLeft=indent+"px";
-        p.style.textIndent="-20px";  // hanging indent
+        p.style.textIndent="-20px";
         p.style.marginLeft="20px";
 
         p.textContent=line;
         textDiv.appendChild(p);
     });
+
+    // HISTORY SECTION
+    if(s.history){
+        const historyDiv=document.createElement("div");
+        historyDiv.style.marginTop="20px";
+        historyDiv.style.fontSize="0.9rem";
+        historyDiv.style.textAlign="justify";
+
+        historyDiv.innerHTML=`<strong>History:</strong> ${s.history}`;
+        textDiv.appendChild(historyDiv);
+    }
 
     root.appendChild(view);
 }
@@ -393,6 +404,19 @@ function printSection(cite){
         });
     });
 
+    // Add History to PDF
+    if(s.history){
+        y+=12;
+        doc.setFont("times","italic");
+        doc.setFontSize(10);
+        const wrapped=doc.splitTextToSize("History: " + s.history, w);
+        wrapped.forEach(wl=>{
+            if(y>720){doc.addPage();y=m;}
+            doc.text(wl,m,y);
+            y+=14;
+        });
+    }
+
     doc.save(`MCL_${cite}.pdf`);
 }
 
@@ -400,5 +424,7 @@ window.addEventListener("hashchange",route);
 window.addEventListener("load",route);
 </script>
 
+
 </body>
 </html>
+
