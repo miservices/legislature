@@ -7,12 +7,12 @@
 
 <style>
 :root {
-    --bg: #061423;
-    --bg2: #0b1e33;
-    --primary: #4da3ff;
-    --text: #ffffff;
-    --muted: #b7c6d9;
-    --border: #1e3550;
+    --primary: #0b3c5d;
+    --secondary: #1d6fa5;
+    --accent: #e0b400;
+    --light: #f4f6f8;
+    --dark: #1a1a1a;
+    --border: #d6dde5;
 }
 
 * {
@@ -23,54 +23,101 @@
 }
 
 body {
-    background: linear-gradient(180deg, var(--bg), var(--bg2));
-    color: var(--text);
+    background: var(--light);
+    color: var(--dark);
+    line-height: 1.6;
 }
 
+/* HEADER */
 header {
-    text-align: center;
-    padding: 1.75rem 1rem 1rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    padding: 1.25rem 2rem;
 }
 
-header h1 {
-    font-size: 2.2rem;
+.header-inner {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-header p {
-    margin-top: 0.5rem;
-    font-size: 0.95rem;
-    color: var(--muted);
+.logo {
+    font-size: 1.6rem;
+    font-weight: 700;
 }
 
+nav a {
+    color: #ffffffcc;
+    text-decoration: none;
+    margin-left: 1.5rem;
+    font-weight: 500;
+}
+
+nav a:hover,
+nav a.active {
+    color: #fff;
+    border-bottom: 3px solid var(--accent);
+    padding-bottom: 4px;
+}
+
+/* HERO */
+.hero {
+    background:
+        linear-gradient(rgba(11,60,93,0.85), rgba(11,60,93,0.85)),
+        url("https://upload.wikimedia.org/wikipedia/commons/8/88/Michigan_State_Capitol_exterior.jpg")
+        center/cover no-repeat;
+    color: #fff;
+    padding: 5rem 2rem;
+}
+
+.hero-inner {
+    max-width: 900px;
+    margin: auto;
+}
+
+.hero h1 {
+    font-size: 3rem;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    margin-top: 0.75rem;
+}
+
+/* MAIN */
 main {
-    max-width: 1100px;
-    margin: 2.5rem auto;
+    max-width: 1200px;
+    margin: 3rem auto;
     padding: 0 2rem;
 }
 
+/* CHAPTERS */
 .chapter {
-    border: 1px solid var(--border);
-    margin-bottom: 1rem;
+    background: #fff;
+    border-radius: 10px;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    overflow: hidden;
 }
 
 .chapter-header {
-    padding: 1rem 1.25rem;
+    padding: 1.25rem 1.5rem;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
-}
-
-.chapter-header:hover {
-    background: rgba(255,255,255,0.04);
-}
-
-.chapter-title {
-    font-size: 1.05rem;
+    align-items: center;
     font-weight: 600;
 }
 
+.chapter-header:hover {
+    background: #f1f4f8;
+}
+
 .toggle {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
+    color: var(--secondary);
 }
 
 .sections {
@@ -79,39 +126,37 @@ main {
 }
 
 .section-item {
-    padding: 0.75rem 1.25rem;
+    padding: 0.85rem 1.75rem;
     border-top: 1px solid var(--border);
     cursor: pointer;
 }
 
 .section-item:hover {
-    background: rgba(255,255,255,0.05);
+    background: #f7f9fc;
 }
 
 .section-item span {
-    color: var(--primary);
-    font-weight: 600;
+    font-weight: 700;
+    color: var(--secondary);
 }
 
+/* SECTION VIEW */
 .section-view {
-    margin-top: 3rem;
-    border-top: 2px solid var(--border);
-    padding-top: 2.5rem;
+    margin-top: 4rem;
+    background: #fff;
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.08);
 }
 
 .section-view h2 {
     font-size: 2rem;
-}
-
-.meta {
-    text-align: center;
-    margin: 2rem 0;
+    color: var(--primary);
 }
 
 .section-text {
     margin-top: 2rem;
     white-space: pre-wrap;
-    line-height: 1.75;
 }
 
 .section-text .heading {
@@ -127,22 +172,34 @@ main {
 
 .nav-buttons button {
     background: none;
-    border: 1px solid var(--border);
-    color: var(--primary);
-    padding: 0.75rem 1.25rem;
+    border: 2px solid var(--secondary);
+    color: var(--secondary);
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
     cursor: pointer;
+    border-radius: 6px;
 }
 
 .nav-buttons button:hover {
-    background: rgba(255,255,255,0.05);
+    background: var(--secondary);
+    color: #fff;
 }
 
+/* FOOTER */
 footer {
-    margin-top: 5rem;
+    background: var(--primary);
+    color: #fff;
     padding: 2rem;
-    text-align: center;
-    font-size: 0.85rem;
-    color: var(--muted);
+    margin-top: 5rem;
+}
+
+.footer-inner {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
 }
 </style>
 </head>
@@ -150,17 +207,32 @@ footer {
 <body>
 
 <header>
-    <h1>Michigan Legislature</h1>
-    <p>Michigan Compiled Laws Complete Through PA 2 of 2026</p>
+    <div class="header-inner">
+        <div class="logo">Michigan Legislature</div>
+        <nav>
+            <a href="#" class="active">Laws</a>
+            <a href="#">Bills</a>
+            <a href="#">Resolutions</a>
+            <a href="#">Journals</a>
+        </nav>
+    </div>
 </header>
+
+<section class="hero">
+    <div class="hero-inner">
+        <h1>Michigan Compiled Laws</h1>
+        <p>Complete statutory laws of the State of Michigan, updated through PA 2 of 2026.</p>
+    </div>
+</section>
 
 <main id="laws"></main>
 
 <footer>
-    © 2026 Michigan Legislature — Official State of Michigan Website
+    <div class="footer-inner">
+        <div>© 2026 Michigan Legislature</div>
+        <div>Official State of Michigan Website</div>
+    </div>
 </footer>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -173,10 +245,7 @@ let sections = {};
 let chapters = {};
 let orderedSections = [];
 
-/* Load CSV */
-fetch(CSV_URL)
-    .then(r => r.text())
-    .then(parseCSV);
+fetch(CSV_URL).then(r => r.text()).then(parseCSV);
 
 function parseCSV(text) {
     const rows = [];
@@ -185,186 +254,108 @@ function parseCSV(text) {
     let inQuotes = false;
 
     for (let i = 0; i < text.length; i++) {
-        const c = text[i];
-        const next = text[i + 1];
-
-        if (c === '"' && next === '"') {
-            cell += '"';
-            i++;
-        } else if (c === '"') {
-            inQuotes = !inQuotes;
-        } else if (c === ',' && !inQuotes) {
-            row.push(cell);
-            cell = "";
-        } else if ((c === '\n' || c === '\r') && !inQuotes) {
-            if (cell || row.length) {
-                row.push(cell);
-                rows.push(row);
-                row = [];
-                cell = "";
-            }
-        } else {
-            cell += c;
-        }
+        const c = text[i], n = text[i+1];
+        if (c === '"' && n === '"') { cell += '"'; i++; }
+        else if (c === '"') inQuotes = !inQuotes;
+        else if (c === ',' && !inQuotes) { row.push(cell); cell=""; }
+        else if ((c === '\n' || c === '\r') && !inQuotes) {
+            if (cell || row.length) { row.push(cell); rows.push(row); row=[]; cell=""; }
+        } else cell += c;
     }
-
-    if (cell || row.length) {
-        row.push(cell);
-        rows.push(row);
-    }
+    if (cell || row.length) { row.push(cell); rows.push(row); }
 
     rows.slice(1).forEach(cols => {
-        const [citation, type, title, act, desc] =
-            cols.map(v => v?.trim());
-
-        if (type?.toLowerCase() === "chapter") {
-            chapters[citation] = { citation, title };
-        }
-
+        const [citation, type, title, act, desc] = cols.map(v => v?.trim());
+        if (type?.toLowerCase() === "chapter") chapters[citation] = { citation, title };
         if (type?.toLowerCase() === "section") {
             sections[citation] = { citation, title, act, desc };
             orderedSections.push(citation);
         }
     });
 
-    orderedSections.sort((a, b) => parseFloat(a) - parseFloat(b));
+    orderedSections.sort((a,b)=>parseFloat(a)-parseFloat(b));
     route();
 }
 
-
-/* Routing */
 function route() {
-    document.getElementById("laws").innerHTML = "";
-    const hash = location.hash.replace("#", "");
-
+    const root = document.getElementById("laws");
+    root.innerHTML = "";
+    const hash = location.hash.replace("#","");
     if (!hash) buildChapters();
     else if (hash.includes(".")) openSection(hash);
     else buildChapters(hash);
 }
 
-/* Chapters */
-function buildChapters(openCh = null) {
+function buildChapters(openCh=null) {
     const root = document.getElementById("laws");
-
     Object.values(chapters).forEach(ch => {
-        const chap = document.createElement("div");
-        chap.className = "chapter";
+        const box = document.createElement("div");
+        box.className="chapter";
 
-        const header = document.createElement("div");
-        header.className = "chapter-header";
-        header.innerHTML = `
-            <div class="chapter-title">
-                Chapter ${ch.citation} — ${ch.title}
-            </div>
-            <div class="toggle">+</div>
-        `;
-        header.onclick = () => location.hash = ch.citation;
+        const h = document.createElement("div");
+        h.className="chapter-header";
+        h.innerHTML=`Chapter ${ch.citation} — ${ch.title}<span class="toggle">${openCh===ch.citation?"−":"+"}</span>`;
+        h.onclick=()=>location.hash=ch.citation;
 
-        const list = document.createElement("div");
-        list.className = "sections";
-
-        if (openCh === ch.citation) {
-            list.style.display = "block";
-            header.querySelector(".toggle").textContent = "−";
-
-            orderedSections
-                .filter(s => s.startsWith(ch.citation + "."))
-                .forEach(s => {
-                    const item = document.createElement("div");
-                    item.className = "section-item";
-                    item.innerHTML =
-                        `<span>§ ${s}</span> — ${sections[s].title}`;
-                    item.onclick = () => location.hash = s;
-                    list.appendChild(item);
-                });
+        const list=document.createElement("div");
+        list.className="sections";
+        if (openCh===ch.citation) {
+            list.style.display="block";
+            orderedSections.filter(s=>s.startsWith(ch.citation+".")).forEach(s=>{
+                const i=document.createElement("div");
+                i.className="section-item";
+                i.innerHTML=`<span>§ ${s}</span> — ${sections[s].title}`;
+                i.onclick=()=>location.hash=s;
+                list.appendChild(i);
+            });
         }
 
-        chap.appendChild(header);
-        chap.appendChild(list);
-        root.appendChild(chap);
+        box.appendChild(h);
+        box.appendChild(list);
+        root.appendChild(box);
     });
 }
 
-/* Section View */
 function openSection(cite) {
-    const root = document.getElementById("laws");
-    const s = sections[cite];
-    if (!s) return;
+    const s=sections[cite];
+    if(!s)return;
+    const root=document.getElementById("laws");
+    const i=orderedSections.indexOf(cite);
+    const p=orderedSections[i-1], n=orderedSections[i+1];
 
-    const idx = orderedSections.indexOf(cite);
-    const prev = idx > 0 ? orderedSections[idx - 1] : null;
-    const next = idx < orderedSections.length - 1 ? orderedSections[idx + 1] : null;
-
-    const view = document.createElement("div");
-    view.className = "section-view";
-    view.innerHTML = `
-        <h2>MCL – Section ${s.citation}</h2>
-        <div style="margin-top:8px;">
-            <a href="#" onclick="printSection('${cite}'); return false;" style="color: var(--primary); font-size: 0.95rem;">
-                Print this section as PDF
-            </a>
-        </div>
-
+    const v=document.createElement("div");
+    v.className="section-view";
+    v.innerHTML=`
+        <h2>MCL § ${s.citation}</h2>
+        <a href="#" onclick="printSection('${cite}');return false;" style="color:var(--secondary);font-weight:600;">Print as PDF</a>
         <div class="section-text">
             <div class="heading">${s.citation} ${s.title}</div>
-            ${s.desc || ""}
+            ${s.desc||""}
         </div>
-
         <div class="nav-buttons">
-            ${prev ? `<button onclick="location.hash='${prev}'">← § ${prev}</button>` : `<span></span>`}
-            ${next ? `<button onclick="location.hash='${next}'">§ ${next} →</button>` : `<span></span>`}
-        </div>
-    `;
-
-    root.appendChild(view);
+            ${p?`<button onclick="location.hash='${p}'">← § ${p}</button>`:"<span></span>"}
+            ${n?`<button onclick="location.hash='${n}'">§ ${n} →</button>`:"<span></span>"}
+        </div>`;
+    root.appendChild(v);
 }
 
-/* Clean Legal PDF */
-function printSection(cite) {
-    const s = sections[cite];
-    if (!s) return;
-
-    const doc = new jsPDF({
-        unit: "pt",
-        format: "letter"
+function printSection(cite){
+    const s=sections[cite]; if(!s)return;
+    const d=new jsPDF({unit:"pt",format:"letter"});
+    let y=72, m=72, w=d.internal.pageSize.getWidth()-m*2;
+    d.setFont("times","bold").setFontSize(14).text("Michigan Compiled Laws",m,y);
+    y+=24; d.setFontSize(12).text(`${s.citation} ${s.title}`,m,y); y+=20;
+    d.setFont("times","normal");
+    d.splitTextToSize(s.desc||"",w).forEach(l=>{
+        if(y>720){d.addPage();y=m;}
+        d.text(l,m,y); y+=16;
     });
-
-    const margin = 72;
-    const maxWidth = doc.internal.pageSize.getWidth() - margin * 2;
-    let y = margin;
-
-    doc.setFont("times", "bold");
-    doc.setFontSize(14);
-    doc.text("Michigan Compiled Laws", margin, y);
-    y += 25;
-
-    doc.setFontSize(12);
-    doc.setFont("times", "bold");
-    doc.text(`${s.citation} ${s.title}`, margin, y);
-    y += 20;
-
-    doc.setFont("times", "normal");
-
-    const lines = doc.splitTextToSize(s.desc || "", maxWidth);
-
-    lines.forEach(line => {
-        if (y > 720) {
-            doc.addPage();
-            y = margin;
-        }
-        doc.text(line, margin, y);
-        y += 16;
-    });
-
-    doc.save(`MCL_${s.citation}.pdf`);
+    d.save(`MCL_${s.citation}.pdf`);
 }
 
-window.addEventListener("hashchange", route);
-window.addEventListener("load", route);
+window.addEventListener("hashchange",route);
+window.addEventListener("load",route);
 </script>
-
-
-
 
 </body>
 </html>
