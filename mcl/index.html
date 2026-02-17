@@ -160,91 +160,61 @@ footer {
     © 2026 Michigan Legislature — Official State of Michigan Website
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <script>
+const { jsPDF } = window.jspdf;
+
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaZtiF885qU65kN8IttJzYV8NcCiBFYI0Pn8z27HG8owEIiAeI2W4eg0r2Rpd-rdjVmMJXiKINu-gt/pub?output=csv";
 
-let chapters = {};
 let sections = {};
+let chapters = {};
 let orderedSections = [];
 
-/* ========= ROBUST CSV PARSER ========= */
-function parseCSV(text) {
-    const rows = [];
-    let row = [];
-    let cell = "";
-    let inQuotes = false;
-
-    for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        const next = text[i + 1];
-
-        if (char === '"' && next === '"') {
-            cell += '"';
-            i++;
-        } else if (char === '"') {
-            inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-            row.push(cell);
-            cell = "";
-        } else if ((char === '\n' || char === '\r') && !inQuotes) {
-            if (cell || row.length) {
-                row.push(cell);
-                rows.push(row);
-                row = [];
-                cell = "";
-            }
-        } else {
-            cell += char;
-        }
-    }
-
-    if (cell || row.length) {
-        row.push(cell);
-        rows.push(row);
-    }
-
-    return rows;
-}
-
-/* ========= LOAD CSV ========= */
+/* Load CSV */
 fetch(CSV_URL)
     .then(r => r.text())
-    .then(text => {
-        const rows = parseCSV(text);
-        rows.slice(1).forEach(cols => {
-            const [citation, type, title, act, desc] = cols.map(c => c?.trim());
+    .then(parseCSV);
 
-            if (type?.toLowerCase() === "chapter") {
-                chapters[citation] = { citation, title };
-            }
+function parseCSV(text) {
+    const rows = text.split(/\n(?=(?:[^"]*"[^"]*")*[^"]*$)/);
+    rows.slice(1).forEach(r => {
+        const cols = r.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+        if (!cols) return;
 
-            if (type?.toLowerCase() === "section") {
-                sections[citation] = {
-                    citation,
-                    title,
-                    act,
-                    desc
-                };
-                orderedSections.push(citation);
-            }
-        });
+        const [citation, type, title, act, desc] =
+            cols.map(c => c.replace(/^"|"$/g, '').trim());
 
-        orderedSections.sort((a, b) => parseFloat(a) - parseFloat(b));
-        route();
+        if (type?.toLowerCase() === "chapter")
+            chapters[citation] = { citation, title };
+
+        if (type?.toLowerCase() === "section") {
+            sections[citation] = { citation, title, act, desc };
+            orderedSections.push(citation);
+        }
     });
 
-/* ========= ROUTING ========= */
-function route() {
-    const root = document.getElementById("laws");
-    root.innerHTML = "";
+    orderedSections.sort((a, b) => {
+        const [a1, a2] = a.split(".").map(Number);
+        const [b1, b2] = b.split(".").map(Number);
+        if (a1 !== b1) return a1 - b1;
+        return a2 - b2;
+    });
 
+    route();
+}
+
+/* Routing */
+function route() {
+    document.getElementById("laws").innerHTML = "";
     const hash = location.hash.replace("#", "");
+
     if (!hash) buildChapters();
     else if (hash.includes(".")) openSection(hash);
     else buildChapters(hash);
 }
 
-/* ========= CHAPTER LIST ========= */
+/* Chapters */
 function buildChapters(openCh = null) {
     const root = document.getElementById("laws");
 
@@ -258,20 +228,24 @@ function buildChapters(openCh = null) {
             <div class="chapter-title">
                 Chapter ${ch.citation} — ${ch.title}
             </div>
-            <div class="toggle">${openCh === ch.citation ? "−" : "+"}</div>
+            <div class="toggle">+</div>
         `;
         h.onclick = () => location.hash = ch.citation;
 
         const list = document.createElement("div");
         list.className = "sections";
+
         if (openCh === ch.citation) {
             list.style.display = "block";
+            h.querySelector(".toggle").textContent = "−";
+
             orderedSections
                 .filter(s => s.startsWith(ch.citation + "."))
                 .forEach(s => {
                     const item = document.createElement("div");
                     item.className = "section-item";
-                    item.innerHTML = `<span>§ ${s}</span> — ${sections[s].title}`;
+                    item.innerHTML =
+                        `<span>§ ${s}</span> — ${sections[s].title}`;
                     item.onclick = () => location.hash = s;
                     list.appendChild(item);
                 });
@@ -283,15 +257,15 @@ function buildChapters(openCh = null) {
     });
 }
 
-/* ========= SECTION VIEW ========= */
+/* Section View */
 function openSection(cite) {
     const root = document.getElementById("laws");
     const s = sections[cite];
     if (!s) return;
 
     const idx = orderedSections.indexOf(cite);
-    const prev = orderedSections[idx - 1];
-    const next = orderedSections[idx + 1];
+    const prev = orderedSections[idx - 1] || null;
+    const next = orderedSections[idx + 1] || null;
 
     const view = document.createElement("div");
     view.className = "section-view";
@@ -305,6 +279,7 @@ function openSection(cite) {
 
         <div class="nav-buttons">
             ${prev ? `<button onclick="location.hash='${prev}'">← § ${prev}</button>` : `<span></span>`}
+            <button onclick="printSection('${cite}')">Print PDF</button>
             ${next ? `<button onclick="location.hash='${next}'">§ ${next} →</button>` : `<span></span>`}
         </div>
     `;
@@ -312,11 +287,57 @@ function openSection(cite) {
     root.appendChild(view);
 }
 
+/* Clean Legal PDF Export */
+function printSection(cite) {
+    const s = sections[cite];
+    if (!s) return;
+
+    const doc = new jsPDF({
+        unit: "pt",
+        format: "letter"
+    });
+
+    const margin = 72; // 1 inch
+    const pageWidth = doc.internal.pageSize.getWidth() - margin * 2;
+    let y = margin;
+
+    doc.setFont("times", "bold");
+    doc.setFontSize(14);
+    doc.text(`Michigan Compiled Laws`, margin, y);
+    y += 20;
+
+    doc.setFont("times", "normal");
+    doc.setFontSize(12);
+    doc.text(`Section ${s.citation}`, margin, y);
+    y += 25;
+
+    doc.setFont("times", "bold");
+    doc.text(`${s.citation} ${s.title}`, margin, y);
+    y += 20;
+
+    doc.setFont("times", "normal");
+
+    const text = doc.splitTextToSize(s.desc || "", pageWidth);
+
+    text.forEach(line => {
+        if (y > 720) {
+            doc.addPage();
+            y = margin;
+        }
+        doc.text(line, margin, y);
+        y += 16;
+    });
+
+    doc.save(`MCL_${s.citation}.pdf`);
+}
+
 window.addEventListener("hashchange", route);
 window.addEventListener("load", route);
 </script>
 
 
+
 </body>
 </html>
+
 
