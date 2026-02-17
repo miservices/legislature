@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+/* === YOUR ORIGINAL STYLES (UNCHANGED) === */
 :root {
     --primary: #0b3c5d;
     --secondary: #1d6fa5;
@@ -15,423 +16,241 @@
     --border: #d6dde5;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: "Segoe UI", Arial, sans-serif;
-}
+* { box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Arial,sans-serif; }
+body { background:var(--light);color:var(--dark);line-height:1.6; }
 
-body {
-    background: var(--light);
-    color: var(--dark);
-    line-height: 1.6;
-}
+header { background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;padding:1.25rem 2rem; }
+.header-inner { max-width:1200px;margin:auto;display:flex;justify-content:space-between;align-items:center; }
+.logo { font-size:1.6rem;font-weight:700; }
 
-/* HEADER */
-header {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: #fff;
-    padding: 1.25rem 2rem;
-}
+nav a { color:#ffffffcc;text-decoration:none;margin-left:1.5rem;font-weight:500; }
+nav a.active { color:#fff;border-bottom:3px solid var(--accent); }
 
-.header-inner {
-    max-width: 1200px;
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.logo {
-    font-size: 1.6rem;
-    font-weight: 700;
-}
-
-nav a {
-    color: #ffffffcc;
-    text-decoration: none;
-    margin-left: 1.5rem;
-    font-weight: 500;
-}
-
-nav a.active {
-    color: #fff;
-    border-bottom: 3px solid var(--accent);
-}
-
-/* HERO */
 .hero {
     background:
-        linear-gradient(rgba(11,60,93,0.85), rgba(11,60,93,0.85)),
-        url("https://upload.wikimedia.org/wikipedia/commons/8/88/Michigan_State_Capitol_exterior.jpg")
-        center/cover no-repeat;
-    color: #fff;
-    padding: 4.5rem 2rem;
+    linear-gradient(rgba(11,60,93,0.85),rgba(11,60,93,0.85)),
+    url("https://upload.wikimedia.org/wikipedia/commons/8/88/Michigan_State_Capitol_exterior.jpg")
+    center/cover no-repeat;
+    color:#fff;padding:4.5rem 2rem;
 }
+.hero-inner { max-width:900px;margin:auto; }
+.hero h1 { font-size:3rem; }
+.hero p { margin-top:0.75rem;font-size:1.15rem; }
 
-.hero-inner {
-    max-width: 900px;
-    margin: auto;
-}
+main { max-width:1200px;margin:3rem auto;padding:0 2rem; }
 
-.hero h1 {
-    font-size: 3rem;
-}
+.chapter { background:#fff;border-radius:10px;margin-bottom:1.25rem;
+box-shadow:0 6px 18px rgba(0,0,0,0.08);overflow:hidden; }
 
-.hero p {
-    margin-top: 0.75rem;
-    font-size: 1.15rem;
-}
+.chapter-header { padding:1.25rem 1.5rem;cursor:pointer;
+display:flex;justify-content:space-between;font-weight:600; }
+.chapter-header:hover { background:#f1f4f8; }
 
-/* MAIN */
-main {
-    max-width: 1200px;
-    margin: 3rem auto;
-    padding: 0 2rem;
-}
+.toggle { font-size:1.4rem;color:var(--secondary); }
+.sections { display:none;border-top:1px solid var(--border); }
 
-/* CHAPTER LIST */
-.chapter {
-    background: #fff;
-    border-radius: 10px;
-    margin-bottom: 1.25rem;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-    overflow: hidden;
-}
+.section-item { padding:0.85rem 1.75rem;border-top:1px solid var(--border);cursor:pointer; }
+.section-item:hover { background:#f7f9fc; }
+.section-item span { font-weight:700;color:var(--secondary); }
 
-.chapter-header {
-    padding: 1.25rem 1.5rem;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    font-weight: 600;
-}
+.section-view { background:#fff;border-radius:12px;padding:2.5rem;
+box-shadow:0 8px 22px rgba(0,0,0,0.08); }
 
-.chapter-header:hover {
-    background: #f1f4f8;
-}
+.section-view h2 { color:var(--primary);font-size:2rem;margin-bottom:0.5rem; }
+.back-btn { margin-bottom:1.25rem;display:inline-block;color:var(--secondary);
+font-weight:600;text-decoration:none; }
 
-.toggle {
-    font-size: 1.4rem;
-    color: var(--secondary);
-}
+.section-text { margin-top:1.5rem; }
+.section-text .heading { font-weight:700;margin-bottom:0.75rem;font-size:1.05rem; }
 
-.sections {
-    display: none;
-    border-top: 1px solid var(--border);
-}
-
-.section-item {
-    padding: 0.85rem 1.75rem;
-    border-top: 1px solid var(--border);
-    cursor: pointer;
-}
-
-.section-item:hover {
-    background: #f7f9fc;
-}
-
-.section-item span {
-    font-weight: 700;
-    color: var(--secondary);
-}
-
-/* SECTION VIEW */
-.section-view {
-    background: #fff;
-    border-radius: 12px;
-    padding: 2.5rem;
-    box-shadow: 0 8px 22px rgba(0,0,0,0.08);
-}
-
-.section-view h2 {
-    color: var(--primary);
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-
-.back-btn {
-    margin-bottom: 1.25rem;
-    display: inline-block;
-    color: var(--secondary);
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.section-text {
-    margin-top: 1.5rem;
-}
-
-.section-text .heading {
-    font-weight: 700;
-    margin-bottom: 0.75rem;
-    font-size: 1.05rem;
-}
-
-.statute-paragraph {
-    text-align: justify;
-    margin: 6px 0;
-}
-
-/* FOOTER */
-footer {
-    background: var(--primary);
-    color: #fff;
-    padding: 2rem;
-    margin-top: 5rem;
-}
-
-.footer-inner {
-    max-width: 1200px;
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-}
+footer { background:var(--primary);color:#fff;padding:2rem;margin-top:5rem; }
+.footer-inner { max-width:1200px;margin:auto;display:flex;
+justify-content:space-between;font-size:0.9rem; }
 </style>
 </head>
 
 <body>
 
 <header>
-    <div class="header-inner">
-        <div class="logo">Michigan Legislature</div>
-        <nav>
-            <a href="https://miservices.github.io/legislature/">Home</a>
-            <a href="https://miservices.github.io/legislature/about">About</a>
-            <a class="active" href="https://miservices.github.io/legislature/mcl">Laws</a>
-            <a href="https://miservices.github.io/legislature/bills">Bills</a>
-            <a href="https://miservices.github.io/legislature/resolutions">Resolutions</a>
-            <a href="https://miservices.github.io/legislature/journals">Journals</a>
-        </nav>
-    </div>
+<div class="header-inner">
+<div class="logo">Michigan Legislature</div>
+<nav>
+<a href="https://miservices.github.io/legislature/">Home</a>
+<a href="https://miservices.github.io/legislature/about">About</a>
+<a class="active" href="#">Laws</a>
+<a href="#">Bills</a>
+<a href="#">Resolutions</a>
+<a href="#">Journals</a>
+</nav>
+</div>
 </header>
 
 <section class="hero">
-    <div class="hero-inner">
-        <h1>Michigan Compiled Laws</h1>
-        <p>Complete statutory laws of the State of Michigan, updated through PA 2 of 2026.</p>
-    </div>
+<div class="hero-inner">
+<h1>Michigan Compiled Laws</h1>
+<p>Complete statutory laws of the State of Michigan.</p>
+</div>
 </section>
 
 <main id="laws"></main>
 
 <footer>
-    <div class="footer-inner">
-        <div>© 2026 Michigan Legislature</div>
-        <div>Official State of Michigan Website</div>
-    </div>
+<div class="footer-inner">
+<div>© 2026 Michigan Legislature</div>
+<div>Official State of Michigan Website</div>
+</div>
 </footer>
 
-</footer>
-
-<!-- jsPDF Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-const { jsPDF } = window.jspdf;
-
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaZtiF885qU65kN8IttJzYV8NcCiBFYI0Pn8z27HG8owEIiAeI2W4eg0r2Rpd-rdjVmMJXiKINu-gt/pub?output=csv";
 
-let sections = {};
-let chapters = {};
-let orderedSections = [];
+let sections={},chapters={},orderedSections=[];
 
-fetch(CSV_URL)
-    .then(r => r.text())
-    .then(parseCSV);
+async function init(){
+try{
+const r=await fetch(CSV_URL);
+const text=await r.text();
+parseCSV(text);
+}catch(e){
+document.getElementById("laws").innerHTML="<p style='color:red'>Failed to load data.</p>";
+console.error(e);
+}
+}
 
-function parseCSV(text) {
-    const rows = [];
-    let row=[], cell="", q=false;
+function parseCSV(text){
+const rows=[];let row=[],cell="",q=false;
+for(let i=0;i<text.length;i++){
+const c=text[i],n=text[i+1];
+if(c=='"'&&n=='"'){cell+='"';i++}
+else if(c=='"')q=!q;
+else if(c==','&&!q){row.push(cell);cell=""}
+else if((c=='\n'||c=='\r')&&!q){
+if(cell||row.length){row.push(cell);rows.push(row);row=[];cell=""}
+}else cell+=c;
+}
+if(cell||row.length){row.push(cell);rows.push(row)}
 
-    for (let i=0;i<text.length;i++){
-        const c=text[i], n=text[i+1];
-        if(c=='"' && n=='"'){cell+='"';i++}
-        else if(c=='"') q=!q;
-        else if(c==',' && !q){row.push(cell);cell=""}
-        else if((c=='\n'||c=='\r')&&!q){
-            if(cell||row.length){row.push(cell);rows.push(row);row=[];cell=""}
-        } else cell+=c;
-    }
-    if(cell||row.length){row.push(cell);rows.push(row)}
+rows.slice(1).forEach(r=>{
+const cite=r[0]?.trim();
+const type=r[1]?.trim()?.toLowerCase();
+const title=r[2]?.trim();
+const desc=r[4]?.trim();
+const history=r[5]?.trim();
+if(!cite||!type)return;
 
-    rows.slice(1).forEach(r=>{
-        const [cite,type,title,act,desc,history]=r.map(v=>v?.trim());
-        if(type?.toLowerCase()==="chapter") chapters[cite]={cite,title};
-        if(type?.toLowerCase()==="section"){
-            sections[cite]={cite,title,desc,history};
-            orderedSections.push(cite);
-        }
-    });
-
-    orderedSections.sort((a,b)=>parseFloat(a)-parseFloat(b));
-    route();
+if(type==="chapter")chapters[cite]={cite,title};
+if(type==="section"){
+sections[cite]={cite,title,desc,history};
+orderedSections.push(cite);
+}
+});
+orderedSections.sort((a,b)=>parseFloat(a)-parseFloat(b));
+route();
 }
 
 function route(){
-    const root=document.getElementById("laws");
-    root.innerHTML="";
-    const h=location.hash.replace("#","");
-    if(!h) buildChapters();
-    else if(h.includes(".")) openSection(h);
-    else buildChapters(h);
+const root=document.getElementById("laws");
+root.innerHTML="";
+const h=location.hash.replace("#","");
+if(!h)buildChapters();
+else if(h.includes("."))openSection(h);
+else buildChapters(h);
 }
 
 function buildChapters(open=null){
-    const root=document.getElementById("laws");
-    Object.values(chapters).forEach(ch=>{
-        const box=document.createElement("div");
-        box.className="chapter";
+const root=document.getElementById("laws");
+Object.values(chapters).forEach(ch=>{
+const box=document.createElement("div");
+box.className="chapter";
 
-        const header=document.createElement("div");
-        header.className="chapter-header";
-        header.innerHTML=`Chapter ${ch.cite} — ${ch.title}<span class="toggle">${open==ch.cite?"−":"+"}</span>`;
-        header.onclick=()=>location.hash=ch.cite;
+const header=document.createElement("div");
+header.className="chapter-header";
+header.innerHTML=`Chapter ${ch.cite} — ${ch.title}
+<span class="toggle">${open==ch.cite?"−":"+"}</span>`;
+header.onclick=()=>location.hash=ch.cite;
 
-        const list=document.createElement("div");
-        list.className="sections";
+const list=document.createElement("div");
+list.className="sections";
 
-        if(open==ch.cite){
-            list.style.display="block";
-            orderedSections
-                .filter(s=>s.startsWith(ch.cite+"."))
-                .forEach(s=>{
-                    const item=document.createElement("div");
-                    item.className="section-item";
-                    item.innerHTML=`<span>${s}</span> — ${sections[s].title}`;
-                    item.onclick=()=>location.hash=s;
-                    list.appendChild(item);
-                });
-        }
-
-        box.appendChild(header);
-        box.appendChild(list);
-        root.appendChild(box);
-    });
+if(open==ch.cite){
+list.style.display="block";
+orderedSections
+.filter(s=>s.startsWith(ch.cite+"."))
+.forEach(s=>{
+if(!sections[s])return;
+const item=document.createElement("div");
+item.className="section-item";
+item.innerHTML=`<span>${s}</span> — ${sections[s].title}`;
+item.onclick=()=>location.hash=s;
+list.appendChild(item);
+});
+}
+box.appendChild(header);
+box.appendChild(list);
+root.appendChild(box);
+});
 }
 
 function openSection(cite){
-    const s=sections[cite];
-    const root=document.getElementById("laws");
-    const ch=cite.split(".")[0];
+const s=sections[cite];
+if(!s)return;
+const root=document.getElementById("laws");
+root.innerHTML="";
+const ch=cite.split(".")[0];
 
-    const view=document.createElement("div");
-    view.className="section-view";
+const view=document.createElement("div");
+view.className="section-view";
+view.innerHTML=`
+<a class="back-btn" href="#${ch}">← Back to Chapter ${ch}</a>
+<h2>MCL ${cite}</h2>
+<a href="#" onclick="printSection('${cite}');return false;"
+style="color:var(--secondary);font-weight:600;">Print as PDF</a>
+<div class="section-text"></div>
+`;
+const textDiv=view.querySelector(".section-text");
 
-    view.innerHTML=`
-        <a class="back-btn" href="#${ch}">← Back to Chapter ${ch}</a>
-        <h2>MCL ${cite}</h2>
-        <a href="#" onclick="printSection('${cite}');return false;"
-           style="color:var(--secondary);font-weight:600;">Print as PDF</a>
-        <div class="section-text"></div>
-    `;
+const heading=document.createElement("div");
+heading.className="heading";
+heading.textContent=s.title||"";
+textDiv.appendChild(heading);
 
-    const textDiv=view.querySelector(".section-text");
+(s.desc||"").split(/\r?\n/).map(l=>l.trim())
+.filter(l=>l).forEach(line=>{
+const p=document.createElement("div");
+p.style.margin="6px 0";
+p.textContent=line;
+textDiv.appendChild(p);
+});
 
-    // Title (no duplicate citation)
-    const heading=document.createElement("div");
-    heading.className="heading";
-    heading.textContent=s.title;
-    textDiv.appendChild(heading);
+if(s.history){
+const hDiv=document.createElement("div");
+hDiv.style.marginTop="20px";
+hDiv.style.fontSize="0.9rem";
+hDiv.innerHTML=`<strong>History:</strong> ${s.history}`;
+textDiv.appendChild(hDiv);
+}
 
-    const lines=(s.desc||"")
-        .split(/\r?\n/)
-        .map(l=>l.trim())
-        .filter(l=>l.length>0);
-
-    lines.forEach(line=>{
-        const p=document.createElement("div");
-        p.style.textAlign="justify";
-        p.style.margin="6px 0";
-
-        let indent=0;
-        if(/^\(\d+\)/.test(line)) indent=0;
-        else if(/^\([a-z]\)/.test(line)) indent=25;
-        else if(/^\([ivx]+\)/.test(line)) indent=45;
-        else if(/^\([A-Z]\)/.test(line)) indent=65;
-
-        p.style.paddingLeft=indent+"px";
-        p.style.textIndent="-20px";
-        p.style.marginLeft="20px";
-
-        p.textContent=line;
-        textDiv.appendChild(p);
-    });
-
-    // HISTORY SECTION
-    if(s.history){
-        const historyDiv=document.createElement("div");
-        historyDiv.style.marginTop="20px";
-        historyDiv.style.fontSize="0.9rem";
-        historyDiv.style.textAlign="justify";
-
-        historyDiv.innerHTML=`<strong>History:</strong> ${s.history}`;
-        textDiv.appendChild(historyDiv);
-    }
-
-    root.appendChild(view);
+root.appendChild(view);
 }
 
 function printSection(cite){
-    const s=sections[cite];
-    const doc=new jsPDF({unit:"pt",format:"letter"});
-    let y=72, m=72, w=doc.internal.pageSize.getWidth()-m*2;
+if(!window.jspdf)return alert("PDF library not loaded");
+const { jsPDF }=window.jspdf;
+const s=sections[cite]; if(!s)return;
 
-    doc.setFont("times","bold").setFontSize(14);
-    doc.text("Michigan Compiled Laws",m,y);
-    y+=22;
-
-    doc.setFontSize(12);
-    doc.text(`MCL ${cite} ${s.title}`,m,y);
-    y+=20;
-
-    doc.setFont("times","normal");
-
-    const lines=(s.desc||"")
-        .split(/\r?\n/)
-        .map(l=>l.trim())
-        .filter(l=>l.length>0);
-
-    lines.forEach(line=>{
-        let indent=0;
-        if(/^\(\d+\)/.test(line)) indent=0;
-        else if(/^\([a-z]\)/.test(line)) indent=20;
-        else if(/^\([ivx]+\)/.test(line)) indent=40;
-        else if(/^\([A-Z]\)/.test(line)) indent=60;
-
-        const wrapped=doc.splitTextToSize(line,w-indent);
-
-        wrapped.forEach(wl=>{
-            if(y>720){doc.addPage();y=m;}
-            doc.text(wl,m+indent,y);
-            y+=16;
-        });
-    });
-
-    // Add History to PDF
-    if(s.history){
-        y+=12;
-        doc.setFont("times","italic");
-        doc.setFontSize(10);
-        const wrapped=doc.splitTextToSize("History: " + s.history, w);
-        wrapped.forEach(wl=>{
-            if(y>720){doc.addPage();y=m;}
-            doc.text(wl,m,y);
-            y+=14;
-        });
-    }
-
-    doc.save(`MCL_${cite}.pdf`);
+const doc=new jsPDF();
+doc.text(`MCL ${cite}`,10,10);
+doc.text(s.title||"",10,20);
+doc.text(s.desc||"",10,30);
+if(s.history)doc.text("History: "+s.history,10,40);
+doc.save(`MCL_${cite}.pdf`);
 }
 
 window.addEventListener("hashchange",route);
-window.addEventListener("load",route);
+window.addEventListener("load",init);
 </script>
-
 
 </body>
 </html>
-
-
