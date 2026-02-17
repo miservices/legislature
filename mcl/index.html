@@ -103,15 +103,20 @@ main {
     font-size: 2rem;
 }
 
+.meta {
+    text-align: center;
+    margin: 2rem 0;
+}
+
 .section-text {
-    margin-top: 1.5rem;
+    margin-top: 2rem;
     white-space: pre-wrap;
     line-height: 1.75;
 }
 
 .section-text .heading {
     font-weight: 700;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
 }
 
 .nav-buttons {
@@ -124,9 +129,8 @@ main {
     background: none;
     border: 1px solid var(--border);
     color: var(--primary);
-    padding: 0.75rem 1.5rem;
+    padding: 0.75rem 1.25rem;
     cursor: pointer;
-    font-size: 0.95rem;
 }
 
 .nav-buttons button:hover {
@@ -158,6 +162,8 @@ footer {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <script>
 const { jsPDF } = window.jspdf;
 
@@ -167,36 +173,49 @@ let sections = {};
 let chapters = {};
 let orderedSections = [];
 
+/* Load CSV */
 fetch(CSV_URL)
     .then(r => r.text())
     .then(parseCSV);
 
-function cleanText(text) {
-    return text
-        .replace(/\r/g, "")
-        .replace(/^\s+/, "")
-        .replace(/\n\s+/g, "\n")
-        .trim();
-}
-
 function parseCSV(text) {
-    const rows = text.split(/\r?\n/);
+    const rows = [];
+    let row = [];
+    let cell = "";
+    let inQuotes = false;
 
-    rows.slice(1).forEach(row => {
-        if (!row.trim()) return;
+    for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        const next = text[i + 1];
 
-        const cols = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
-        if (!cols) return;
+        if (c === '"' && next === '"') {
+            cell += '"';
+            i++;
+        } else if (c === '"') {
+            inQuotes = !inQuotes;
+        } else if (c === ',' && !inQuotes) {
+            row.push(cell);
+            cell = "";
+        } else if ((c === '\n' || c === '\r') && !inQuotes) {
+            if (cell || row.length) {
+                row.push(cell);
+                rows.push(row);
+                row = [];
+                cell = "";
+            }
+        } else {
+            cell += c;
+        }
+    }
 
-        const cleaned = cols.map(c =>
-            c.replace(/^"|"$/g, "").replace(/""/g, '"').trim()
-        );
+    if (cell || row.length) {
+        row.push(cell);
+        rows.push(row);
+    }
 
-        const citation = cleaned[0];
-        const type = cleaned[1];
-        const title = cleaned[2];
-        const act = cleaned[3];
-        const desc = cleanText(cleaned.slice(4).join(","));
+    rows.slice(1).forEach(cols => {
+        const [citation, type, title, act, desc] =
+            cols.map(v => v?.trim());
 
         if (type?.toLowerCase() === "chapter") {
             chapters[citation] = { citation, title };
@@ -208,28 +227,22 @@ function parseCSV(text) {
         }
     });
 
-    orderedSections.sort((a, b) => {
-        const [aC, aS] = a.split(".").map(Number);
-        const [bC, bS] = b.split(".").map(Number);
-        return aC !== bC ? aC - bC : aS - bS;
-    });
-
+    orderedSections.sort((a, b) => parseFloat(a) - parseFloat(b));
     route();
 }
 
-function route() {
-    const root = document.getElementById("laws");
-    root.innerHTML = "";
 
+/* Routing */
+function route() {
+    document.getElementById("laws").innerHTML = "";
     const hash = location.hash.replace("#", "");
 
     if (!hash) buildChapters();
-    else if (hash.includes(".")) {
-        buildChapters(hash.split(".")[0]);
-        openSection(hash);
-    } else buildChapters(hash);
+    else if (hash.includes(".")) openSection(hash);
+    else buildChapters(hash);
 }
 
+/* Chapters */
 function buildChapters(openCh = null) {
     const root = document.getElementById("laws");
 
@@ -243,7 +256,7 @@ function buildChapters(openCh = null) {
             <div class="chapter-title">
                 Chapter ${ch.citation} — ${ch.title}
             </div>
-            <div class="toggle">${openCh === ch.citation ? "−" : "+"}</div>
+            <div class="toggle">+</div>
         `;
         header.onclick = () => location.hash = ch.citation;
 
@@ -252,13 +265,15 @@ function buildChapters(openCh = null) {
 
         if (openCh === ch.citation) {
             list.style.display = "block";
+            header.querySelector(".toggle").textContent = "−";
 
             orderedSections
                 .filter(s => s.startsWith(ch.citation + "."))
                 .forEach(s => {
                     const item = document.createElement("div");
                     item.className = "section-item";
-                    item.innerHTML = `<span>§ ${s}</span> — ${sections[s].title}`;
+                    item.innerHTML =
+                        `<span>§ ${s}</span> — ${sections[s].title}`;
                     item.onclick = () => location.hash = s;
                     list.appendChild(item);
                 });
@@ -270,6 +285,7 @@ function buildChapters(openCh = null) {
     });
 }
 
+/* Section View */
 function openSection(cite) {
     const root = document.getElementById("laws");
     const s = sections[cite];
@@ -282,34 +298,37 @@ function openSection(cite) {
     const view = document.createElement("div");
     view.className = "section-view";
     view.innerHTML = `
-        <h2>MCL § ${s.citation}</h2>
-
+        <h2>MCL – Section ${s.citation}</h2>
         <div style="margin-top:8px;">
-            <a href="#" onclick="printSection('${cite}'); return false;"
-               style="color: var(--primary); font-size: 0.95rem;">
+            <a href="#" onclick="printSection('${cite}'); return false;" style="color: var(--primary); font-size: 0.95rem;">
                 Print this section as PDF
             </a>
         </div>
 
         <div class="section-text">
             <div class="heading">${s.citation} ${s.title}</div>
-${s.desc}
+            ${s.desc || ""}
         </div>
 
         <div class="nav-buttons">
-            ${prev ? `<button onclick="location.hash='${prev}'">← Previous § ${prev}</button>` : `<span></span>`}
-            ${next ? `<button onclick="location.hash='${next}'">Next § ${next} →</button>` : `<span></span>`}
+            ${prev ? `<button onclick="location.hash='${prev}'">← § ${prev}</button>` : `<span></span>`}
+            ${next ? `<button onclick="location.hash='${next}'">§ ${next} →</button>` : `<span></span>`}
         </div>
     `;
 
     root.appendChild(view);
 }
 
+/* Clean Legal PDF */
 function printSection(cite) {
     const s = sections[cite];
     if (!s) return;
 
-    const doc = new jsPDF({ unit: "pt", format: "letter" });
+    const doc = new jsPDF({
+        unit: "pt",
+        format: "letter"
+    });
+
     const margin = 72;
     const maxWidth = doc.internal.pageSize.getWidth() - margin * 2;
     let y = margin;
@@ -317,22 +336,24 @@ function printSection(cite) {
     doc.setFont("times", "bold");
     doc.setFontSize(14);
     doc.text("Michigan Compiled Laws", margin, y);
-    y += 24;
+    y += 25;
 
+    doc.setFontSize(12);
+    doc.setFont("times", "bold");
     doc.text(`${s.citation} ${s.title}`, margin, y);
     y += 20;
 
     doc.setFont("times", "normal");
-    doc.setFontSize(11);
 
-    const lines = doc.splitTextToSize(s.desc, maxWidth);
+    const lines = doc.splitTextToSize(s.desc || "", maxWidth);
+
     lines.forEach(line => {
         if (y > 720) {
             doc.addPage();
             y = margin;
         }
         doc.text(line, margin, y);
-        y += 15;
+        y += 16;
     });
 
     doc.save(`MCL_${s.citation}.pdf`);
@@ -341,6 +362,9 @@ function printSection(cite) {
 window.addEventListener("hashchange", route);
 window.addEventListener("load", route);
 </script>
+
+
+
 
 </body>
 </html>
