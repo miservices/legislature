@@ -224,8 +224,14 @@ footer {
     </div>
 </footer>
 
+</footer>
+
+<!-- jsPDF Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <script>
 const { jsPDF } = window.jspdf;
+
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaZtiF885qU65kN8IttJzYV8NcCiBFYI0Pn8z27HG8owEIiAeI2W4eg0r2Rpd-rdjVmMJXiKINu-gt/pub?output=csv";
 
 let sections = {};
@@ -427,4 +433,5 @@ window.addEventListener("load",route);
 
 </body>
 </html>
+
 
