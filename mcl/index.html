@@ -162,6 +162,8 @@ footer {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <script>
 const { jsPDF } = window.jspdf;
 
@@ -177,16 +179,28 @@ fetch(CSV_URL)
     .then(parseCSV);
 
 function parseCSV(text) {
-    const rows = text.split(/\n(?=(?:[^"]*"[^"]*")*[^"]*$)/);
-    rows.slice(1).forEach(r => {
-        const cols = r.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+    const rows = text.split(/\r?\n/);
+
+    rows.slice(1).forEach(row => {
+        if (!row.trim()) return;
+
+        // Proper CSV split handling quoted commas
+        const cols = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
         if (!cols) return;
 
-        const [citation, type, title, act, desc] =
-            cols.map(c => c.replace(/^"|"$/g, '').trim());
+        const cleaned = cols.map(c =>
+            c.replace(/^"|"$/g, '').replace(/""/g, '"').trim()
+        );
 
-        if (type?.toLowerCase() === "chapter")
+        const citation = cleaned[0];
+        const type = cleaned[1];
+        const title = cleaned[2];
+        const act = cleaned[3];
+        const desc = cleaned.slice(4).join(","); // FIX: preserve full description
+
+        if (type?.toLowerCase() === "chapter") {
             chapters[citation] = { citation, title };
+        }
 
         if (type?.toLowerCase() === "section") {
             sections[citation] = { citation, title, act, desc };
@@ -194,11 +208,13 @@ function parseCSV(text) {
         }
     });
 
+    // Proper numeric sort
     orderedSections.sort((a, b) => {
-        const [a1, a2] = a.split(".").map(Number);
-        const [b1, b2] = b.split(".").map(Number);
-        if (a1 !== b1) return a1 - b1;
-        return a2 - b2;
+        const [aCh, aSec] = a.split(".").map(Number);
+        const [bCh, bSec] = b.split(".").map(Number);
+
+        if (aCh !== bCh) return aCh - bCh;
+        return aSec - bSec;
     });
 
     route();
@@ -222,22 +238,22 @@ function buildChapters(openCh = null) {
         const chap = document.createElement("div");
         chap.className = "chapter";
 
-        const h = document.createElement("div");
-        h.className = "chapter-header";
-        h.innerHTML = `
+        const header = document.createElement("div");
+        header.className = "chapter-header";
+        header.innerHTML = `
             <div class="chapter-title">
                 Chapter ${ch.citation} — ${ch.title}
             </div>
             <div class="toggle">+</div>
         `;
-        h.onclick = () => location.hash = ch.citation;
+        header.onclick = () => location.hash = ch.citation;
 
         const list = document.createElement("div");
         list.className = "sections";
 
         if (openCh === ch.citation) {
             list.style.display = "block";
-            h.querySelector(".toggle").textContent = "−";
+            header.querySelector(".toggle").textContent = "−";
 
             orderedSections
                 .filter(s => s.startsWith(ch.citation + "."))
@@ -251,7 +267,7 @@ function buildChapters(openCh = null) {
                 });
         }
 
-        chap.appendChild(h);
+        chap.appendChild(header);
         chap.appendChild(list);
         root.appendChild(chap);
     });
@@ -264,13 +280,18 @@ function openSection(cite) {
     if (!s) return;
 
     const idx = orderedSections.indexOf(cite);
-    const prev = orderedSections[idx - 1] || null;
-    const next = orderedSections[idx + 1] || null;
+    const prev = idx > 0 ? orderedSections[idx - 1] : null;
+    const next = idx < orderedSections.length - 1 ? orderedSections[idx + 1] : null;
 
     const view = document.createElement("div");
     view.className = "section-view";
     view.innerHTML = `
         <h2>MCL – Section ${s.citation}</h2>
+        <div style="margin-top:8px;">
+            <a href="#" onclick="printSection('${cite}'); return false;" style="color: var(--primary); font-size: 0.95rem;">
+                Print this section as PDF
+            </a>
+        </div>
 
         <div class="section-text">
             <div class="heading">${s.citation} ${s.title}</div>
@@ -279,7 +300,6 @@ function openSection(cite) {
 
         <div class="nav-buttons">
             ${prev ? `<button onclick="location.hash='${prev}'">← § ${prev}</button>` : `<span></span>`}
-            <button onclick="printSection('${cite}')">Print PDF</button>
             ${next ? `<button onclick="location.hash='${next}'">§ ${next} →</button>` : `<span></span>`}
         </div>
     `;
@@ -287,7 +307,7 @@ function openSection(cite) {
     root.appendChild(view);
 }
 
-/* Clean Legal PDF Export */
+/* Clean Legal PDF */
 function printSection(cite) {
     const s = sections[cite];
     if (!s) return;
@@ -297,29 +317,25 @@ function printSection(cite) {
         format: "letter"
     });
 
-    const margin = 72; // 1 inch
-    const pageWidth = doc.internal.pageSize.getWidth() - margin * 2;
+    const margin = 72;
+    const maxWidth = doc.internal.pageSize.getWidth() - margin * 2;
     let y = margin;
 
     doc.setFont("times", "bold");
     doc.setFontSize(14);
-    doc.text(`Michigan Compiled Laws`, margin, y);
-    y += 20;
-
-    doc.setFont("times", "normal");
-    doc.setFontSize(12);
-    doc.text(`Section ${s.citation}`, margin, y);
+    doc.text("Michigan Compiled Laws", margin, y);
     y += 25;
 
+    doc.setFontSize(12);
     doc.setFont("times", "bold");
     doc.text(`${s.citation} ${s.title}`, margin, y);
     y += 20;
 
     doc.setFont("times", "normal");
 
-    const text = doc.splitTextToSize(s.desc || "", pageWidth);
+    const lines = doc.splitTextToSize(s.desc || "", maxWidth);
 
-    text.forEach(line => {
+    lines.forEach(line => {
         if (y > 720) {
             doc.addPage();
             y = margin;
@@ -337,7 +353,9 @@ window.addEventListener("load", route);
 
 
 
+
 </body>
 </html>
+
 
 
