@@ -216,13 +216,39 @@ heading.className="heading";
 heading.textContent=s.title||"";
 textDiv.appendChild(heading);
 
-(s.desc||"").split(/\r?\n/).map(l=>l.trim())
-.filter(l=>l).forEach(line=>{
-const p=document.createElement("div");
-p.style.margin="6px 0";
-p.textContent=line;
-textDiv.appendChild(p);
+function getIndentLevel(line){
+const trimmed = line.trim();
+
+/* Level 1: (a) */
+if(/^\([a-z]\)/.test(trimmed)) return 1;
+
+/* Level 2: (i) */
+if(/^\([ivxlcdm]+\)/i.test(trimmed)) return 2;
+
+/* Level 3: 1) */
+if(/^\d+\)/.test(trimmed)) return 3;
+
+/* Level 4: a) */
+if(/^[a-z]\)/.test(trimmed)) return 4;
+
+return 0;
+}
+
+(s.desc || "")
+.split(/\r?\n/)
+.map(l => l.trim())
+.filter(l => l)
+.forEach(line => {
+    const level = getIndentLevel(line);
+
+    const p = document.createElement("div");
+    p.style.margin = "6px 0";
+    p.style.marginLeft = (level * 25) + "px";
+    p.textContent = line;
+
+    textDiv.appendChild(p);
 });
+
 
 if(s.history){
 const hDiv=document.createElement("div");
@@ -254,3 +280,4 @@ window.addEventListener("load",init);
 
 </body>
 </html>
+
