@@ -179,24 +179,43 @@ fetch(CSV_URL)
     .then(parseCSV);
 
 function parseCSV(text) {
-    const rows = text.split(/\r?\n/);
+    const rows = [];
+    let row = [];
+    let cell = "";
+    let inQuotes = false;
 
-    rows.slice(1).forEach(row => {
-        if (!row.trim()) return;
+    for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        const next = text[i + 1];
 
-        // Proper CSV split handling quoted commas
-        const cols = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
-        if (!cols) return;
+        if (c === '"' && next === '"') {
+            cell += '"';
+            i++;
+        } else if (c === '"') {
+            inQuotes = !inQuotes;
+        } else if (c === ',' && !inQuotes) {
+            row.push(cell);
+            cell = "";
+        } else if ((c === '\n' || c === '\r') && !inQuotes) {
+            if (cell || row.length) {
+                row.push(cell);
+                rows.push(row);
+                row = [];
+                cell = "";
+            }
+        } else {
+            cell += c;
+        }
+    }
 
-        const cleaned = cols.map(c =>
-            c.replace(/^"|"$/g, '').replace(/""/g, '"').trim()
-        );
+    if (cell || row.length) {
+        row.push(cell);
+        rows.push(row);
+    }
 
-        const citation = cleaned[0];
-        const type = cleaned[1];
-        const title = cleaned[2];
-        const act = cleaned[3];
-        const desc = cleaned.slice(4).join(","); // FIX: preserve full description
+    rows.slice(1).forEach(cols => {
+        const [citation, type, title, act, desc] =
+            cols.map(v => v?.trim());
 
         if (type?.toLowerCase() === "chapter") {
             chapters[citation] = { citation, title };
@@ -208,17 +227,10 @@ function parseCSV(text) {
         }
     });
 
-    // Proper numeric sort
-    orderedSections.sort((a, b) => {
-        const [aCh, aSec] = a.split(".").map(Number);
-        const [bCh, bSec] = b.split(".").map(Number);
-
-        if (aCh !== bCh) return aCh - bCh;
-        return aSec - bSec;
-    });
-
+    orderedSections.sort((a, b) => parseFloat(a) - parseFloat(b));
     route();
 }
+
 
 /* Routing */
 function route() {
@@ -356,6 +368,7 @@ window.addEventListener("load", route);
 
 </body>
 </html>
+
 
 
 
