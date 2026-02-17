@@ -148,6 +148,7 @@ main {
 .section-view h2 {
     color: var(--primary);
     font-size: 2rem;
+    margin-bottom: 0.5rem;
 }
 
 .back-btn {
@@ -160,33 +161,17 @@ main {
 
 .section-text {
     margin-top: 1.5rem;
-    white-space: pre-wrap;
 }
 
 .section-text .heading {
     font-weight: 700;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.05rem;
 }
 
-.nav-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 3rem;
-}
-
-.nav-buttons button {
-    border: 2px solid var(--secondary);
-    background: none;
-    color: var(--secondary);
-    padding: 0.7rem 1.4rem;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.nav-buttons button:hover {
-    background: var(--secondary);
-    color: #fff;
+.statute-paragraph {
+    text-align: justify;
+    margin: 6px 0;
 }
 
 /* FOOTER */
@@ -213,10 +198,12 @@ footer {
     <div class="header-inner">
         <div class="logo">Michigan Legislature</div>
         <nav>
-            <a class="active">Laws</a>
-            <a>Bills</a>
-            <a>Resolutions</a>
-            <a>Journals</a>
+            <a href="https://miservices.github.io/legislature/">Home</a>
+            <a href="https://miservices.github.io/legislature/about">About</a>
+            <a class="active" href="https://miservices.github.io/legislature/mcl">Laws</a>
+            <a href="https://miservices.github.io/legislature/bills">Bills</a>
+            <a href="https://miservices.github.io/legislature/resolutions">Resolutions</a>
+            <a href="https://miservices.github.io/legislature/journals">Journals</a>
         </nav>
     </div>
 </header>
@@ -247,26 +234,29 @@ let sections = {};
 let chapters = {};
 let orderedSections = [];
 
-fetch(CSV_URL).then(r => r.text()).then(parseCSV);
+fetch(CSV_URL)
+    .then(r => r.text())
+    .then(parseCSV);
 
 function parseCSV(text) {
     const rows = [];
     let row=[], cell="", q=false;
+
     for (let i=0;i<text.length;i++){
-        const c=text[i],n=text[i+1];
-        if(c=='"'&&n=='"'){cell+='"';i++}
-        else if(c=='"')q=!q;
-        else if(c==','&&!q){row.push(cell);cell=""}
+        const c=text[i], n=text[i+1];
+        if(c=='"' && n=='"'){cell+='"';i++}
+        else if(c=='"') q=!q;
+        else if(c==',' && !q){row.push(cell);cell=""}
         else if((c=='\n'||c=='\r')&&!q){
             if(cell||row.length){row.push(cell);rows.push(row);row=[];cell=""}
         } else cell+=c;
     }
     if(cell||row.length){row.push(cell);rows.push(row)}
 
-    rows.slice(1).forEach(c=>{
-        const [cite,type,title,act,desc]=c.map(v=>v?.trim());
-        if(type?.toLowerCase()=="chapter") chapters[cite]={cite,title};
-        if(type?.toLowerCase()=="section"){
+    rows.slice(1).forEach(r=>{
+        const [cite,type,title,act,desc]=r.map(v=>v?.trim());
+        if(type?.toLowerCase()==="chapter") chapters[cite]={cite,title};
+        if(type?.toLowerCase()==="section"){
             sections[cite]={cite,title,desc};
             orderedSections.push(cite);
         }
@@ -290,23 +280,29 @@ function buildChapters(open=null){
     Object.values(chapters).forEach(ch=>{
         const box=document.createElement("div");
         box.className="chapter";
-        const h=document.createElement("div");
-        h.className="chapter-header";
-        h.innerHTML=`Chapter ${ch.cite} — ${ch.title}<span class="toggle">${open==ch.cite?"−":"+"}</span>`;
-        h.onclick=()=>location.hash=ch.cite;
+
+        const header=document.createElement("div");
+        header.className="chapter-header";
+        header.innerHTML=`Chapter ${ch.cite} — ${ch.title}<span class="toggle">${open==ch.cite?"−":"+"}</span>`;
+        header.onclick=()=>location.hash=ch.cite;
+
         const list=document.createElement("div");
         list.className="sections";
+
         if(open==ch.cite){
             list.style.display="block";
-            orderedSections.filter(s=>s.startsWith(ch.cite+".")).forEach(s=>{
-                const i=document.createElement("div");
-                i.className="section-item";
-                i.innerHTML=`<span>${s}</span> — ${sections[s].title}`;
-                i.onclick=()=>location.hash=s;
-                list.appendChild(i);
-            });
+            orderedSections
+                .filter(s=>s.startsWith(ch.cite+"."))
+                .forEach(s=>{
+                    const item=document.createElement("div");
+                    item.className="section-item";
+                    item.innerHTML=`<span>${s}</span> — ${sections[s].title}`;
+                    item.onclick=()=>location.hash=s;
+                    list.appendChild(item);
+                });
         }
-        box.appendChild(h);
+
+        box.appendChild(header);
         box.appendChild(list);
         root.appendChild(box);
     });
@@ -317,36 +313,87 @@ function openSection(cite){
     const root=document.getElementById("laws");
     const ch=cite.split(".")[0];
 
-    const body =
-`${cite} ${s.title}
+    const view=document.createElement("div");
+    view.className="section-view";
 
-${s.desc || ""}`.trim();
-
-    const v=document.createElement("div");
-    v.className="section-view";
-    v.innerHTML=`
+    view.innerHTML=`
         <a class="back-btn" href="#${ch}">← Back to Chapter ${ch}</a>
         <h2>MCL ${cite}</h2>
-        <a href="#" onclick="printSection('${cite}');return false;" style="color:var(--secondary);font-weight:600;">Print as PDF</a>
-        <div class="section-text">${body}</div>
+        <a href="#" onclick="printSection('${cite}');return false;"
+           style="color:var(--secondary);font-weight:600;">Print as PDF</a>
+        <div class="section-text"></div>
     `;
-    root.appendChild(v);
+
+    const textDiv=view.querySelector(".section-text");
+
+    const heading=document.createElement("div");
+    heading.className="heading";
+    heading.textContent=s.title;
+    textDiv.appendChild(heading);
+
+    const lines=(s.desc||"")
+        .split(/\r?\n/)
+        .map(l=>l.trim())
+        .filter(l=>l.length>0);
+
+    lines.forEach(line=>{
+        const p=document.createElement("div");
+        p.className="statute-paragraph";
+
+        let indent=0;
+        if(/^\(\d+\)/.test(line)) indent=0;
+        else if(/^\([a-z]\)/.test(line)) indent=25;
+        else if(/^\([ivx]+\)/.test(line)) indent=45;
+        else if(/^\([A-Z]\)/.test(line)) indent=65;
+
+        p.style.paddingLeft=indent+"px";
+        p.style.textIndent="-20px";  // hanging indent
+        p.style.marginLeft="20px";
+
+        p.textContent=line;
+        textDiv.appendChild(p);
+    });
+
+    root.appendChild(view);
 }
 
 function printSection(cite){
     const s=sections[cite];
-    const d=new jsPDF({unit:"pt",format:"letter"});
-    let y=72,m=72,w=d.internal.pageSize.getWidth()-m*2;
-    d.setFont("times","bold").setFontSize(14).text("Michigan Compiled Laws",m,y);
+    const doc=new jsPDF({unit:"pt",format:"letter"});
+    let y=72, m=72, w=doc.internal.pageSize.getWidth()-m*2;
+
+    doc.setFont("times","bold").setFontSize(14);
+    doc.text("Michigan Compiled Laws",m,y);
     y+=22;
-    d.setFontSize(12).text(`MCL ${cite} ${s.title}`,m,y);
+
+    doc.setFontSize(12);
+    doc.text(`MCL ${cite} ${s.title}`,m,y);
     y+=20;
-    d.setFont("times","normal");
-    d.splitTextToSize(s.desc||"",w).forEach(l=>{
-        if(y>720){d.addPage();y=m;}
-        d.text(l,m,y);y+=16;
+
+    doc.setFont("times","normal");
+
+    const lines=(s.desc||"")
+        .split(/\r?\n/)
+        .map(l=>l.trim())
+        .filter(l=>l.length>0);
+
+    lines.forEach(line=>{
+        let indent=0;
+        if(/^\(\d+\)/.test(line)) indent=0;
+        else if(/^\([a-z]\)/.test(line)) indent=20;
+        else if(/^\([ivx]+\)/.test(line)) indent=40;
+        else if(/^\([A-Z]\)/.test(line)) indent=60;
+
+        const wrapped=doc.splitTextToSize(line,w-indent);
+
+        wrapped.forEach(wl=>{
+            if(y>720){doc.addPage();y=m;}
+            doc.text(wl,m+indent,y);
+            y+=16;
+        });
     });
-    d.save(`MCL_${cite}.pdf`);
+
+    doc.save(`MCL_${cite}.pdf`);
 }
 
 window.addEventListener("hashchange",route);
