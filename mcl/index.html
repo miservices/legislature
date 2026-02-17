@@ -163,47 +163,88 @@ footer {
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaZtiF885qU65kN8IttJzYV8NcCiBFYI0Pn8z27HG8owEIiAeI2W4eg0r2Rpd-rdjVmMJXiKINu-gt/pub?output=csv";
 
-let sections = {};
 let chapters = {};
+let sections = {};
 let orderedSections = [];
 
-/* Load CSV */
-fetch(CSV_URL)
-    .then(r => r.text())
-    .then(parseCSV);
-
+/* ========= ROBUST CSV PARSER ========= */
 function parseCSV(text) {
-    const rows = text.split(/\n(?=(?:[^"]*"[^"]*")*[^"]*$)/);
-    rows.slice(1).forEach(r => {
-        const cols = r.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
-        if (!cols) return;
+    const rows = [];
+    let row = [];
+    let cell = "";
+    let inQuotes = false;
 
-        const [citation, type, title, act, desc] = cols.map(c => c.replace(/^"|"$/g, '').trim());
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
 
-        if (type?.toLowerCase() === "chapter")
-            chapters[citation] = { citation, title };
-
-        if (type?.toLowerCase() === "section") {
-            sections[citation] = { citation, title, act, desc };
-            orderedSections.push(citation);
+        if (char === '"' && next === '"') {
+            cell += '"';
+            i++;
+        } else if (char === '"') {
+            inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+            row.push(cell);
+            cell = "";
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+            if (cell || row.length) {
+                row.push(cell);
+                rows.push(row);
+                row = [];
+                cell = "";
+            }
+        } else {
+            cell += char;
         }
-    });
+    }
 
-    orderedSections.sort((a, b) => parseFloat(a) - parseFloat(b));
-    route();
+    if (cell || row.length) {
+        row.push(cell);
+        rows.push(row);
+    }
+
+    return rows;
 }
 
-/* Routing */
-function route() {
-    document.getElementById("laws").innerHTML = "";
-    const hash = location.hash.replace("#", "");
+/* ========= LOAD CSV ========= */
+fetch(CSV_URL)
+    .then(r => r.text())
+    .then(text => {
+        const rows = parseCSV(text);
+        rows.slice(1).forEach(cols => {
+            const [citation, type, title, act, desc] = cols.map(c => c?.trim());
 
+            if (type?.toLowerCase() === "chapter") {
+                chapters[citation] = { citation, title };
+            }
+
+            if (type?.toLowerCase() === "section") {
+                sections[citation] = {
+                    citation,
+                    title,
+                    act,
+                    desc
+                };
+                orderedSections.push(citation);
+            }
+        });
+
+        orderedSections.sort((a, b) => parseFloat(a) - parseFloat(b));
+        route();
+    });
+
+/* ========= ROUTING ========= */
+function route() {
+    const root = document.getElementById("laws");
+    root.innerHTML = "";
+
+    const hash = location.hash.replace("#", "");
     if (!hash) buildChapters();
     else if (hash.includes(".")) openSection(hash);
     else buildChapters(hash);
 }
 
-/* Chapters */
+/* ========= CHAPTER LIST ========= */
 function buildChapters(openCh = null) {
     const root = document.getElementById("laws");
 
@@ -213,16 +254,18 @@ function buildChapters(openCh = null) {
 
         const h = document.createElement("div");
         h.className = "chapter-header";
-        h.innerHTML = `<div class="chapter-title">Chapter ${ch.citation} — ${ch.title}</div><div class="toggle">+</div>`;
+        h.innerHTML = `
+            <div class="chapter-title">
+                Chapter ${ch.citation} — ${ch.title}
+            </div>
+            <div class="toggle">${openCh === ch.citation ? "−" : "+"}</div>
+        `;
         h.onclick = () => location.hash = ch.citation;
 
         const list = document.createElement("div");
         list.className = "sections";
-
         if (openCh === ch.citation) {
             list.style.display = "block";
-            h.querySelector(".toggle").textContent = "−";
-
             orderedSections
                 .filter(s => s.startsWith(ch.citation + "."))
                 .forEach(s => {
@@ -240,7 +283,7 @@ function buildChapters(openCh = null) {
     });
 }
 
-/* Section View (NO chapter/section nav) */
+/* ========= SECTION VIEW ========= */
 function openSection(cite) {
     const root = document.getElementById("laws");
     const s = sections[cite];
@@ -273,5 +316,7 @@ window.addEventListener("hashchange", route);
 window.addEventListener("load", route);
 </script>
 
+
 </body>
 </html>
+
