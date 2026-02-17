@@ -103,19 +103,28 @@ main {
     font-size: 2rem;
 }
 
-.download {
-    margin-top: 0.25rem;
+.nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin: 2rem 0;
+}
+
+.nav-buttons button {
+    background: none;
+    border: 1px solid var(--border);
     color: var(--primary);
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+}
+
+.nav-buttons button:disabled {
+    opacity: 0.4;
+    cursor: default;
 }
 
 .meta {
     text-align: center;
     margin: 2rem 0;
-}
-
-.meta a {
-    color: var(--primary);
-    text-decoration: none;
 }
 
 .meta .act {
@@ -163,48 +172,37 @@ footer {
 </footer>
 
 <script>
-const BASE_PATH = "/legislature/mcl";
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaZtiF885qU65kN8IttJzYV8NcCiBFYI0Pn8z27HG8owEIiAeI2W4eg0r2Rpd-rdjVmMJXiKINu-gt/pub?output=csv";
 
 let sections = {};
 let chapters = {};
+let orderedSections = [];
 
-// Load CSV and parse
-fetch(CSV_URL)
-    .then(r => r.text())
-    .then(parseCSV);
+fetch(CSV_URL).then(r => r.text()).then(parseCSV);
 
 function parseCSV(text) {
-    const rows = [];
-    let cur = '', inQ = false;
+    const rows = text.split(/\n(?![^"]*")/).slice(1);
 
-    for (let c of text) {
-        if (c === '"') inQ = !inQ;
-        if (c === '\n' && !inQ) { rows.push(cur); cur = ''; } 
-        else cur += c;
-    }
-    rows.push(cur);
+    rows.forEach(r => {
+        const cols = r.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+        if (!cols) return;
 
-    rows.slice(1).forEach(r => {
-        let cols = [], v = '', q = false;
-        for (let c of r) {
-            if (c === '"') { q = !q; continue; }
-            if (c === ',' && !q) { cols.push(v.trim()); v = ''; }
-            else v += c;
-        }
-        cols.push(v.trim());
+        const [citation, type, title, act, desc] = cols.map(c => c.replace(/^"|"$/g,""));
 
-        const [citation, type, title, act, desc] = cols;
+        if (type?.toLowerCase() === "chapter")
+            chapters[citation] = { citation, title };
 
-        if (type?.toLowerCase() === "chapter") chapters[citation] = { citation, title };
-        if (type?.toLowerCase() === "section") sections[citation] = { citation, title, act, desc };
+        if (type?.toLowerCase() === "section")
+            sections[citation] = { citation, title, act, desc };
     });
+
+    orderedSections = Object.keys(sections)
+        .sort((a,b) => parseFloat(a) - parseFloat(b));
 
     buildChapters();
     route();
 }
 
-// Build chapter list
 function buildChapters() {
     const root = document.getElementById("laws");
     Object.values(chapters).forEach(ch => {
@@ -215,11 +213,10 @@ function buildChapters() {
         const h = document.createElement("div");
         h.className = "chapter-header";
         h.innerHTML = `<div class="chapter-title">Chapter ${ch.citation} — ${ch.title}</div><div class="toggle">+</div>`;
+        h.onclick = () => location.hash = ch.citation;
 
         const list = document.createElement("div");
         list.className = "sections";
-
-        h.onclick = () => navigateChapter(ch.citation);
 
         chap.appendChild(h);
         chap.appendChild(list);
@@ -227,18 +224,6 @@ function buildChapters() {
     });
 }
 
-// Navigation using hash
-function navigateChapter(ch) {
-    location.hash = ch;
-    openChapter(ch);
-}
-
-function navigateSection(sec) {
-    location.hash = sec;
-    openSection(sec);
-}
-
-// Open a chapter and list its sections
 function openChapter(ch) {
     document.querySelectorAll(".sections").forEach(s => s.style.display = "none");
     document.querySelectorAll(".toggle").forEach(t => t.textContent = "+");
@@ -257,21 +242,21 @@ function openChapter(ch) {
                 const item = document.createElement("div");
                 item.className = "section-item";
                 item.innerHTML = `<span>§ ${s.citation}</span> — ${s.title}`;
-                item.onclick = () => navigateSection(s.citation);
+                item.onclick = () => location.hash = s.citation;
                 list.appendChild(item);
             });
     }
 }
 
-// Open a section
 function openSection(cite) {
-    document.querySelector(".section-view")?.remove();
+    document.getElementById("laws").innerHTML = "";
 
     const s = sections[cite];
     if (!s) return;
 
-    const ch = cite.split(".")[0];
-    openChapter(ch);
+    const idx = orderedSections.indexOf(cite);
+    const prev = orderedSections[idx - 1];
+    const next = orderedSections[idx + 1];
 
     let actName = "", actNum = "";
     if (s.act) [actName, actNum] = s.act.split("|").map(x => x.trim());
@@ -279,11 +264,14 @@ function openSection(cite) {
     const view = document.createElement("div");
     view.className = "section-view";
     view.innerHTML = `
-        <h2>MCL – Section ${s.citation}</h2>
-        <div class="download">Download Section</div>
+        <h2>MCL § ${s.citation}</h2>
+
+        <div class="nav-buttons">
+            <button ${!prev ? "disabled" : ""} onclick="location.hash='${prev}'">← Previous</button>
+            <button ${!next ? "disabled" : ""} onclick="location.hash='${next}'">Next →</button>
+        </div>
 
         <div class="meta">
-            <div><a href="#${ch}">Chapter ${ch}</a></div>
             <div class="act">
                 <div>${actName}</div>
                 <div>${actNum}</div>
@@ -299,9 +287,8 @@ function openSection(cite) {
     document.getElementById("laws").appendChild(view);
 }
 
-// Route based on hash
 function route() {
-    const hash = location.hash.replace("#", "");
+    const hash = location.hash.replace("#","");
     if (!hash) return;
 
     if (hash.includes(".")) openSection(hash);
