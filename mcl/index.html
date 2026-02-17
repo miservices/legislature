@@ -133,17 +133,16 @@ if(cell||row.length){row.push(cell);rows.push(row);row=[];cell=""}
 if(cell||row.length){row.push(cell);rows.push(row)}
 
 rows.slice(1).forEach(r=>{
-const cite = r[0]?.trim();
-const type = r[1]?.trim()?.toLowerCase();
-const title = r[2]?.trim();
-const act = r[3]?.trim();        // COLUMN D (Act)
-const desc = r[4]?.trim();
-const history = r[5]?.trim();
+const cite=r[0]?.trim();
+const type=r[1]?.trim()?.toLowerCase();
+const title=r[2]?.trim();
+const desc=r[4]?.trim();
+const history=r[5]?.trim();
 if(!cite||!type)return;
 
 if(type==="chapter")chapters[cite]={cite,title};
 if(type==="section"){
-sections[cite] = { cite, title, act, desc, history };
+sections[cite]={cite,title,desc,history};
 orderedSections.push(cite);
 }
 });
@@ -212,19 +211,10 @@ style="color:var(--secondary);font-weight:600;">Print as PDF</a>
 `;
 const textDiv=view.querySelector(".section-text");
 
-const heading = document.createElement("div");
-heading.className = "heading";
-heading.textContent = s.title || "";
+const heading=document.createElement("div");
+heading.className="heading";
+heading.textContent=s.title||"";
 textDiv.appendChild(heading);
-
-if(s.act){
-    const actDiv = document.createElement("div");
-    actDiv.style.marginTop = "6px";
-    actDiv.style.fontWeight = "600";
-    actDiv.style.color = "var(--secondary)";
-    actDiv.textContent = s.act.toUpperCase();
-    textDiv.appendChild(actDiv);
-}
 
 (s.desc||"").split(/\r?\n/).map(l=>l.trim())
 .filter(l=>l).forEach(line=>{
@@ -264,4 +254,3 @@ window.addEventListener("load",init);
 
 </body>
 </html>
-
