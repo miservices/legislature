@@ -118,32 +118,110 @@ header .logo{font-size:1.4rem;font-weight:700}
     color:var(--secondary);
 }
 
+/* === FULLSCREEN DETAIL PANEL === */
 .drawer{
     position:fixed;
-    top:0;
-    right:-100%;
-    width:420px;
-    height:100%;
+    bottom:-100%;
+    left:0;
+    width:100%;
+    height:90%;
     background:#fff;
-    box-shadow:-10px 0 30px rgba(0,0,0,0.15);
-    transition:right 0.3s ease;
+    border-top-left-radius:24px;
+    border-top-right-radius:24px;
+    box-shadow:0 -10px 40px rgba(0,0,0,0.2);
+    transition:bottom 0.4s ease;
     padding:2rem;
     overflow-y:auto;
     z-index:1000;
 }
-.drawer.open{right:0}
-
-.drawer h2{
-    margin-bottom:1rem;
-    color:var(--primary);
-}
+.drawer.open{ bottom:0 }
 
 .drawer-close{
     position:absolute;
-    top:15px;
-    right:20px;
-    font-size:20px;
+    top:18px;
+    right:24px;
+    font-size:22px;
     cursor:pointer;
+    font-weight:700;
+}
+
+/* HEADER */
+.detail-header{
+    margin-bottom:1.5rem;
+}
+.detail-id{
+    font-size:1.4rem;
+    font-weight:700;
+    color:var(--primary);
+}
+.detail-title{
+    font-size:1.1rem;
+    margin-top:6px;
+    font-weight:600;
+}
+
+/* PROGRESS BAR */
+.progress-container{
+    margin:1.5rem 0 2rem 0;
+}
+.progress-track{
+    width:100%;
+    height:10px;
+    background:#e5e7eb;
+    border-radius:999px;
+    overflow:hidden;
+}
+.progress-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,var(--secondary),var(--accent));
+    transition:width 0.8s ease;
+}
+
+/* TIMELINE */
+.timeline{
+    position:relative;
+    margin-top:1rem;
+    padding-left:30px;
+}
+.timeline::before{
+    content:"";
+    position:absolute;
+    left:10px;
+    top:0;
+    width:3px;
+    height:100%;
+    background:#e5e7eb;
+}
+
+.timeline-item{
+    position:relative;
+    margin-bottom:20px;
+    padding-left:15px;
+    font-size:0.95rem;
+}
+
+.timeline-item::before{
+    content:"";
+    position:absolute;
+    left:-6px;
+    top:4px;
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:#ccc;
+    transition:all 0.3s ease;
+}
+
+.timeline-item.active::before{
+    background:var(--secondary);
+    box-shadow:0 0 0 4px rgba(29,111,165,0.2);
+}
+
+.timeline-date{
+    font-size:0.8rem;
+    color:var(--muted);
+    margin-bottom:3px;
 }
 
 .skeleton{
@@ -291,25 +369,58 @@ function renderResults(data){
 }
 
 function openDrawer(bill){
+
     const drawer=document.getElementById("drawer");
+
+    const historyItems=(bill["History"]||"")
+        .split("|")
+        .filter(h=>h.trim()!=="")
+
+    const progressPercent=getProgressPercent(bill["Status"]);
+
     drawer.innerHTML=`
         <div class="drawer-close" onclick="closeDrawer()">✕</div>
-        <h2>${bill["Bill No"]}</h2>
-        <p><strong>Status:</strong> ${bill["Status"]||"—"}</p>
-        <p><strong>Chamber:</strong> ${bill["Intro Chamber"]||"—"}</p>
-        <p><strong>Sponsors:</strong> ${bill["Sponsors"]||"—"}</p>
-        <hr style="margin:1rem 0">
-        <p>${bill["Description"]||""}</p>
-        <hr style="margin:1rem 0">
-        <h3>History</h3>
-        <p>${(bill["History"]||"No history available").split("|").join("<br>")}</p>
+
+        <div class="detail-header">
+            <div class="detail-id">${bill["Bill No"]}</div>
+            <div class="detail-title">${bill["Name"]||"Untitled"}</div>
+        </div>
+
+        <div><strong>Status:</strong> ${bill["Status"]||"—"}</div>
+        <div><strong>Originating Chamber:</strong> ${bill["Intro Chamber"]||"—"}</div>
+        <div><strong>Sponsors:</strong> ${bill["Sponsors"]||"—"}</div>
+
+        <div class="progress-container">
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <h3>Legislative Timeline</h3>
+        <div class="timeline">
+            ${
+                historyItems.length
+                ? historyItems.map((item,i)=>`
+                    <div class="timeline-item ${i===historyItems.length-1?"active":""}">
+                        <div>${item.trim()}</div>
+                    </div>
+                `).join("")
+                : `<div>No history available.</div>`
+            }
+        </div>
     `;
+
     drawer.classList.add("open");
+
+    setTimeout(()=>{
+        document.getElementById("progressFill").style.width=progressPercent+"%";
+    },100);
 }
 
 function closeDrawer(){
     document.getElementById("drawer").classList.remove("open");
 }
+
 </script>
 
 </body>
