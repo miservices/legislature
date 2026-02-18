@@ -52,49 +52,14 @@ nav a.active{
 .hero-inner{max-width:900px;margin:auto}
 .hero h1{font-size:3rem;margin-bottom:1rem}
 
-/* FILTER BAR DESIGN */
-.filter-bar{
-  max-width:1200px;
-  margin:2rem auto;
-  padding:0 2rem;
-}
-
-.filter-inner{
-  display:flex;
-  flex-wrap:wrap;
-  gap:12px;
-  align-items:center;
-  background:#f4f6f8;
-  padding:14px 16px;
-  border-radius:12px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.08);
-}
-
-.filter-inner input,
-.filter-inner select{
+/* FILTER */
+.filter-bar select,
+.filter-bar input[type="number"]{
   padding:10px 14px;
   border-radius:8px;
   border:1px solid #ccc;
-  font-size:0.95rem;
-  transition:all 0.2s;
+  margin-left:10px;
 }
-
-.filter-inner input:focus,
-.filter-inner select:focus{
-  outline:none;
-  border-color:var(--secondary);
-  box-shadow:0 0 0 2px rgba(29,111,165,0.2);
-}
-
-.filter-inner input[type="number"]{
-  width:100px;
-}
-
-.filter-inner select{
-  background:#fff;
-  cursor:pointer;
-}
-
 
 
 /* RESULTS */
@@ -317,57 +282,30 @@ footer{
 </div>
 </section>
 
-function applyFilters(){
-  const query=document.getElementById("search").value.trim().toLowerCase();
-  const statusFilter=document.getElementById("filterStatus").value.toLowerCase();
-  const chamberFilter=document.getElementById("filterChamber").value.toLowerCase();
-  const yearFilter=document.getElementById("filterYear").value.trim();
+<div class="filter-bar">
+  <input id="search" placeholder="Search bills..." oninput="applyFilters()">
+  
+  <!-- Advanced Filters -->
+  <select id="filterStatus" onchange="applyFilters()">
+    <option value="">All Status</option>
+    <option value="introduced">Introduced</option>
+    <option value="second chamber">Second Chamber</option>
+    <option value="awaiting governor">Awaiting Governor</option>
+    <option value="enacted">Enacted</option>
+    <option value="tabled">Tabled</option>
+    <option value="defeated">Defeated</option>
+    <option value="repealed">Repealed</option>
+  </select>
 
-  const terms=query.split(/\s+/).filter(Boolean);
+  <select id="filterChamber" onchange="applyFilters()">
+    <option value="">All Chambers</option>
+    <option value="senate">Senate</option>
+    <option value="house">House</option>
+  </select>
 
-  const scored=billsData.map(b=>{
-    let score=0;
+  <input type="number" id="filterYear" placeholder="Year" oninput="applyFilters()" style="width:90px">
+</div>
 
-    const billNo=b["Bill No"]||"";
-    const name=b["Name"]||"";
-    const desc=b["Description"]||"";
-    const status=b["Status"]||"";
-    const chamber=b["Intro Chamber"]||"";
-    const year=b["Year"]||""; // assuming your CSV has a Year column
-
-    /* ---- ADVANCED FILTERS ---- */
-    if(statusFilter && status.toLowerCase() !== statusFilter) return {...b, _score:0};
-    if(chamberFilter && !chamber.toLowerCase().includes(chamberFilter)) return {...b, _score:0};
-    if(yearFilter && year.toString() !== yearFilter) return {...b, _score:0};
-
-    const billNorm=normalizeSearch(billNo);
-    const nameNorm=normalizeSearch(name);
-    const descNorm=normalizeSearch(desc);
-
-    /* ---- BILL NUMBER MATCH (HIGHEST PRIORITY) ---- */
-    billNumberVariants(billNo).forEach(v=>{
-      if(normalizeSearch(v).includes(normalizeSearch(query))) score+=100;
-    });
-
-    /* ---- TERM MATCHING ---- */
-    terms.forEach(t=>{
-      const nt=normalizeSearch(t);
-      if(billNorm.includes(nt)) score+=40;
-      if(nameNorm.includes(nt)) score+=20;
-      if(descNorm.includes(nt)) score+=5;
-    });
-
-    /* ---- EXACT PHRASE BONUS ---- */
-    if(normalizeSearch(name).includes(normalizeSearch(query))) score+=30;
-    if(normalizeSearch(desc).includes(normalizeSearch(query))) score+=10;
-
-    return {...b, _score:score};
-  })
-  .filter(b=>b._score>0)
-  .sort((a,b)=>b._score-a._score);
-
-  renderResults(scored);
-}
 
 <div class="results-wrapper">
 <div id="results"></div>
