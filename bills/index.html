@@ -52,14 +52,49 @@ nav a.active{
 .hero-inner{max-width:900px;margin:auto}
 .hero h1{font-size:3rem;margin-bottom:1rem}
 
-/* FILTER */
-.filter-bar select,
-.filter-bar input[type="number"]{
+/* FILTER BAR DESIGN */
+.filter-bar{
+  max-width:1200px;
+  margin:2rem auto;
+  padding:0 2rem;
+}
+
+.filter-inner{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:center;
+  background:#f4f6f8;
+  padding:14px 16px;
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+}
+
+.filter-inner input,
+.filter-inner select{
   padding:10px 14px;
   border-radius:8px;
   border:1px solid #ccc;
-  margin-left:10px;
+  font-size:0.95rem;
+  transition:all 0.2s;
 }
+
+.filter-inner input:focus,
+.filter-inner select:focus{
+  outline:none;
+  border-color:var(--secondary);
+  box-shadow:0 0 0 2px rgba(29,111,165,0.2);
+}
+
+.filter-inner input[type="number"]{
+  width:100px;
+}
+
+.filter-inner select{
+  background:#fff;
+  cursor:pointer;
+}
+
 
 
 /* RESULTS */
@@ -283,27 +318,28 @@ footer{
 </section>
 
 <div class="filter-bar">
-  <input id="search" placeholder="Search bills..." oninput="applyFilters()">
-  
-  <!-- Advanced Filters -->
-  <select id="filterStatus" onchange="applyFilters()">
-    <option value="">All Status</option>
-    <option value="introduced">Introduced</option>
-    <option value="second chamber">Second Chamber</option>
-    <option value="awaiting governor">Awaiting Governor</option>
-    <option value="enacted">Enacted</option>
-    <option value="tabled">Tabled</option>
-    <option value="defeated">Defeated</option>
-    <option value="repealed">Repealed</option>
-  </select>
+  <div class="filter-inner">
+    <input id="search" placeholder="Search bills..." oninput="applyFilters()">
 
-  <select id="filterChamber" onchange="applyFilters()">
-    <option value="">All Chambers</option>
-    <option value="senate">Senate</option>
-    <option value="house">House</option>
-  </select>
+    <select id="filterStatus" onchange="applyFilters()">
+      <option value="">All Status</option>
+      <option value="introduced">Introduced</option>
+      <option value="second chamber">Second Chamber</option>
+      <option value="awaiting governor">Awaiting Governor</option>
+      <option value="enacted">Enacted</option>
+      <option value="tabled">Tabled</option>
+      <option value="defeated">Defeated</option>
+      <option value="repealed">Repealed</option>
+    </select>
 
-  <input type="number" id="filterYear" placeholder="Year" oninput="applyFilters()" style="width:90px">
+    <select id="filterChamber" onchange="applyFilters()">
+      <option value="">All Chambers</option>
+      <option value="senate">Senate</option>
+      <option value="house">House</option>
+    </select>
+
+    <input type="number" id="filterYear" placeholder="Year" oninput="applyFilters()">
+  </div>
 </div>
 
 
