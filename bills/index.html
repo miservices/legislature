@@ -8,116 +8,186 @@
 
 <style>
 :root {
-    --primary: #0b3c5d;
-    --secondary: #1d6fa5;
-    --accent: #e0b400;
-    --light: #f4f6f8;
-    --dark: #1a1a1a;
-    --text: #224882;
+    --primary:#0b3c5d;
+    --secondary:#1d6fa5;
+    --accent:#e0b400;
+    --light:#f4f6f8;
+    --dark:#1a1a1a;
+    --muted:#6b7280;
 }
 
-/* RESET */
-* { box-sizing: border-box; margin:0; padding:0; font-family: "Segoe UI", Arial, sans-serif; }
-body { background: var(--light); color: var(--dark); line-height: 1.6; }
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Arial,sans-serif}
+body{background:var(--light);color:var(--dark)}
 
-/* HEADER */
-header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; padding: 1.25rem 2rem; }
-.header-inner { max-width: 1200px; margin:auto; display:flex; justify-content:space-between; align-items:center; }
-.logo { font-size:1.6rem; font-weight:700; }
-nav a { color:#ffffffcc; text-decoration:none; margin-left:1.5rem; font-weight:500; padding-bottom:4px; transition: all 0.2s; }
-nav a:hover { color:#fff; }
-nav a.active { font-weight:700; border-bottom:3px solid var(--accent); padding-bottom:6px; }
+header{
+    background:var(--primary);
+    color:#fff;
+    padding:1rem 2rem;
+}
+header .logo{font-size:1.4rem;font-weight:700}
 
-/* HERO */
-.hero { background: linear-gradient(rgba(11,60,93,0.85), rgba(11,60,93,0.85)), url("https://upload.wikimedia.org/wikipedia/commons/8/88/Michigan_State_Capitol_exterior.jpg") center/cover no-repeat; color:#fff; padding:6rem 2rem; text-align:center; }
-.hero h1 { font-size:3rem; margin-bottom:1rem; }
-.hero p { font-size:1.25rem; max-width:700px; margin:0 auto; }
+.hero{
+    padding:4rem 2rem;
+    text-align:center;
+    background:linear-gradient(135deg,var(--primary),var(--secondary));
+    color:#fff;
+}
+.hero h1{font-size:2.5rem;margin-bottom:0.5rem}
 
-/* FILTERS */
-.filter-container { max-width:1200px; margin:2rem auto; display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
-.filter-container input, .filter-container select { padding:12px 14px; border-radius:8px; border:1px solid #ccc; font-size:14px; color: var(--dark); width:200px; }
-
-/* BILLS GRID */
-#results { max-width:1200px; margin:0 auto 4rem auto; display:grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap:1.5rem; }
-
-.bill-card { background:#fff; border-radius:12px; padding:20px; box-shadow:0 6px 18px rgba(0,0,0,0.08); cursor:pointer; transition:transform 0.2s, box-shadow 0.2s; position:relative; }
-.bill-card:hover { transform:translateY(-5px); box-shadow:0 10px 30px rgba(0,0,0,0.12); }
-.bill-number { font-weight:bold; font-size:18px; color: var(--primary); margin-bottom:6px; }
-.bill-name { font-weight:600; font-size:16px; color: var(--text); margin-bottom:8px; line-height:1.4; }
-.bill-desc { font-size:14px; color: var(--secondary); line-height:1.5; }
-.status-label { position:absolute; top:15px; right:15px; background-color: var(--secondary); color:#fff; font-size:12px; font-weight:bold; padding:4px 8px; border-radius:8px; text-transform:uppercase; }
-
-/* DETAIL OVERLAY */
-.detail-panel {
-    position: fixed;
-    top:0; left:0;
-    width:100%; min-height:100vh;
-    background: rgba(0,0,0,0.4);
-    padding: 40px 20px;
-    display:flex; justify-content:center;
-    z-index:999;
-    overflow-y:auto; /* allows scrolling for very tall cards */
+.filter-bar{
+    max-width:1200px;
+    margin:2rem auto;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+}
+.filter-bar input,
+.filter-bar select{
+    padding:10px 14px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    min-width:180px;
 }
 
-/* DETAIL CARD */
-.detail-container {
-    background:#fff; border-radius:12px; padding:30px;
-    width:100%; max-width:900px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.15);
-    display:flex; flex-direction:column;
+.results-wrapper{
+    max-width:1000px;
+    margin:0 auto 4rem auto;
+    padding:0 1rem;
 }
 
-/* BACK BUTTON */
-.back-button { position:absolute; top:20px; right:20px; background: var(--primary); color:#fff; border:none; border-radius:8px; padding:10px 14px; font-weight:bold; cursor:pointer; }
-.back-button:hover { background: var(--secondary); }
+.results-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:1.5rem;
+    font-weight:600;
+    color:var(--primary);
+}
 
-/* DETAIL CONTENT */
-.detail-number { font-size:22px; font-weight:bold; color: var(--primary); margin-bottom:10px; }
-.detail-meta div { display:inline-block; background: var(--light); color: var(--secondary); padding:5px 10px; border-radius:8px; margin-right:8px; font-size:14px; margin-bottom:10px; }
-.detail-name { font-weight:600; font-size:20px; color: var(--text); margin-bottom:12px; }
-.detail-desc { font-size:15px; color: var(--secondary); margin-bottom:15px; }
-.detail-sponsors { font-size:15px; color: var(--text); margin-bottom:20px; }
-.pdf-links div { margin-bottom:8px; font-size:14px; }
-.pdf-links a { color: var(--primary); text-decoration:none; font-weight:bold; border-bottom:1px dotted var(--primary); }
-.pdf-links a:hover { text-decoration:underline; }
+.bill-row{
+    background:#fff;
+    padding:1.5rem;
+    border-radius:14px;
+    margin-bottom:1.2rem;
+    box-shadow:0 8px 24px rgba(0,0,0,0.06);
+    cursor:pointer;
+    transition:all 0.2s ease;
+}
+.bill-row:hover{
+    transform:translateY(-3px);
+    box-shadow:0 12px 32px rgba(0,0,0,0.12);
+}
 
-/* HISTORY */
-.history-section { background: var(--light); padding:20px; border-radius:12px; margin-top:20px; word-wrap: break-word; }
-.history-header { font-weight:bold; color: var(--primary); font-size:18px; margin-bottom:8px; }
-.history-note { font-size:13px; font-style:italic; margin-bottom:12px; color: var(--secondary); }
-.history-item { margin-left:10px; font-size:14px; padding:6px 0; border-bottom:1px solid rgba(0,0,0,0.08); }
-.history-item:last-child { border-bottom:none; }
+.bill-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:0.5rem;
+}
 
-/* FOOTER */
-footer { background: var(--primary); color:#fff; padding:2rem; margin-top:3rem; text-align:center; font-size:0.9rem; }
+.bill-id{
+    font-weight:700;
+    font-size:1.1rem;
+    color:var(--primary);
+}
+
+.badge{
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+    background:var(--secondary);
+    color:#fff;
+}
+
+.bill-title{
+    font-size:1rem;
+    font-weight:600;
+    margin-bottom:0.4rem;
+}
+
+.bill-desc{
+    font-size:0.9rem;
+    color:var(--muted);
+}
+
+.meta-row{
+    margin-top:0.8rem;
+    font-size:0.85rem;
+    color:var(--secondary);
+}
+
+.drawer{
+    position:fixed;
+    top:0;
+    right:-100%;
+    width:420px;
+    height:100%;
+    background:#fff;
+    box-shadow:-10px 0 30px rgba(0,0,0,0.15);
+    transition:right 0.3s ease;
+    padding:2rem;
+    overflow-y:auto;
+    z-index:1000;
+}
+.drawer.open{right:0}
+
+.drawer h2{
+    margin-bottom:1rem;
+    color:var(--primary);
+}
+
+.drawer-close{
+    position:absolute;
+    top:15px;
+    right:20px;
+    font-size:20px;
+    cursor:pointer;
+}
+
+.skeleton{
+    background:linear-gradient(
+        90deg,
+        #e5e7eb 25%,
+        #f3f4f6 50%,
+        #e5e7eb 75%
+    );
+    background-size:200% 100%;
+    animation:shimmer 1.4s infinite;
+    border-radius:8px;
+}
+@keyframes shimmer{
+    0%{background-position:200% 0}
+    100%{background-position:-200% 0}
+}
+.skel-card{
+    height:120px;
+    margin-bottom:1rem;
+}
+
+footer{
+    background:var(--primary);
+    color:#fff;
+    padding:2rem;
+    text-align:center;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-  <div class="header-inner">
-    <div class="logo">Michigan Legislature</div>
-    <nav>
-      <a href="https://miservices.github.io/legislature/" target="_self">Home</a>
-      <a href="https://miservices.github.io/legislature/about" target="_self">About</a>
-      <a href="https://miservices.github.io/legislature/mcl" target="_self">Laws</a>
-      <a href="https://miservices.github.io/legislature/bills" target="_self">Bills</a>
-      <a href="https://miservices.github.io/legislature/resolutions" target="_self">Resolutions</a>
-      <a href="https://miservices.github.io/legislature/journals" target="_self">Journals</a>
-    </nav>
-  </div>
+  <div class="logo">Michigan Legislature</div>
 </header>
 
 <section class="hero">
-  <div class="hero-inner">
-    <h1>Legislative Bills</h1>
-    <p>Browse, search, and track bills introduced in the Michigan Senate and House of Representatives.</p>
-  </div>
+  <h1>Legislative Bills</h1>
+  <p>Search and explore legislation introduced in the Michigan Legislature.</p>
 </section>
 
-<div class="filter-container">
-  <input id="search" placeholder="Search bills…" oninput="applyFilters()">
+<div class="filter-bar">
+  <input id="search" placeholder="Search bills..." oninput="applyFilters()">
   <select id="chamberFilter" onchange="applyFilters()">
     <option value="">All Chambers</option>
     <option value="House">House</option>
@@ -128,117 +198,118 @@ footer { background: var(--primary); color:#fff; padding:2rem; margin-top:3rem; 
   </select>
 </div>
 
-<div id="results">Loading bills…</div>
+<div class="results-wrapper">
+  <div class="results-header">
+      <div id="resultCount">Loading...</div>
+  </div>
+  <div id="results"></div>
+</div>
 
-<footer>© 2026 Michigan Legislature | Official State of Michigan Website</footer>
+<div id="drawer" class="drawer"></div>
+
+<footer>© 2026 Michigan Legislature</footer>
 
 <script>
-let billsData = [];
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ31EfUU7mCQYrcQAhNTKXey6ep6f6rACOykAkPa2FIfQtAN3iRgPxumI-3AdcyYKZUVoIpuI0NDnJL/pub?gid=0&single=true&output=csv";
+let billsData=[];
+const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ31EfUU7mCQYrcQAhNTKXey6ep6f6rACOykAkPa2FIfQtAN3iRgPxumI-3AdcyYKZUVoIpuI0NDnJL/pub?gid=0&single=true&output=csv";
 
-document.addEventListener("DOMContentLoaded", ()=>{
-  Papa.parse(CSV_URL, {download:true, header:true, skipEmptyLines:true, complete: results=>{
-      billsData = results.data.filter(b=>b["Bill No"]);
-      populateStatusFilter();
-      renderResults(billsData);
-  }});
+document.addEventListener("DOMContentLoaded",()=>{
+    showSkeleton();
+    Papa.parse(CSV_URL,{
+        download:true,
+        header:true,
+        skipEmptyLines:true,
+        complete:res=>{
+            billsData=res.data.filter(b=>b["Bill No"]);
+            populateStatusFilter();
+            renderResults(billsData);
+        }
+    });
 });
 
-function populateStatusFilter(){
-  const statusSet = new Set(billsData.map(b=>b["Status"]).filter(Boolean));
-  const select = document.getElementById("statusFilter");
-  statusSet.forEach(s=>{ const opt=document.createElement("option"); opt.value=s; opt.innerText=s; select.appendChild(opt); });
+function showSkeleton(){
+    const container=document.getElementById("results");
+    container.innerHTML="";
+    for(let i=0;i<6;i++){
+        const div=document.createElement("div");
+        div.className="skeleton skel-card";
+        container.appendChild(div);
+    }
 }
 
-function formatBillHeader(bill){
-  const billNo = bill["Bill No"] ? bill["Bill No"].trim() : "—";
-  if(bill["PA No"]) return `${bill["PA No"]} | ${formatBillNo(billNo)}`;
-  return formatBillNo(billNo);
-}
-function formatBillNo(billNo){
-  if(!billNo) return "—";
-  if(billNo.startsWith("SB")) return "Senate Bill "+billNo.replace("SB","").trim();
-  if(billNo.startsWith("HB")) return "House Bill "+billNo.replace("HB","").trim();
-  return billNo;
+function populateStatusFilter(){
+    const statuses=[...new Set(billsData.map(b=>b["Status"]).filter(Boolean))];
+    const select=document.getElementById("statusFilter");
+    statuses.forEach(s=>{
+        const opt=document.createElement("option");
+        opt.value=s;
+        opt.textContent=s;
+        select.appendChild(opt);
+    });
 }
 
 function applyFilters(){
-  const q=document.getElementById("search").value.toLowerCase();
-  const chamber=document.getElementById("chamberFilter").value;
-  const status=document.getElementById("statusFilter").value;
+    const q=document.getElementById("search").value.toLowerCase();
+    const chamber=document.getElementById("chamberFilter").value;
+    const status=document.getElementById("statusFilter").value;
 
-  renderResults(billsData.filter(b=>{
-    const matchesSearch=(b["Bill No"]||"").toLowerCase().includes(q) ||
-                        (b["PA No"]||"").toLowerCase().includes(q) ||
-                        (b["Name"]||"").toLowerCase().includes(q) ||
-                        (b["Description"]||"").toLowerCase().includes(q);
+    const filtered=billsData.filter(b=>{
+        const text=(b["Name"]+b["Description"]+b["Bill No"]).toLowerCase();
+        return (!q||text.includes(q)) &&
+               (!chamber||b["Intro Chamber"]===chamber) &&
+               (!status||b["Status"]===status);
+    });
 
-    const matchesChamber=!chamber || (b["Intro Chamber"]||"").toLowerCase().includes(chamber.toLowerCase());
-    const matchesStatus=!status || (b["Status"]||"")===status;
-    return matchesSearch && matchesChamber && matchesStatus;
-  }));
+    renderResults(filtered);
 }
 
 function renderResults(data){
-  const container=document.getElementById("results");
-  container.innerHTML="";
-  if(!data.length){ container.innerText="No bills found."; return; }
-  data.forEach((bill,i)=>{
-    const div=document.createElement("div");
-    div.className="bill-card";
-    div.onclick=()=>showDetail(i);
-    div.innerHTML=`
-      <div class="bill-number">${formatBillHeader(bill)}</div>
-      <div class="bill-name">${bill["Name"]||"Untitled"}</div>
-      <div class="bill-desc">${bill["Description"]||""}</div>
-      <div class="status-label">${bill["Status"]||"—"}</div>
+    const container=document.getElementById("results");
+    container.innerHTML="";
+    document.getElementById("resultCount").innerText=`${data.length} Bills`;
+
+    if(!data.length){
+        container.innerHTML="<p>No bills found.</p>";
+        return;
+    }
+
+    data.forEach((bill,index)=>{
+        const row=document.createElement("div");
+        row.className="bill-row";
+        row.onclick=()=>openDrawer(bill);
+        row.innerHTML=`
+            <div class="bill-top">
+                <div class="bill-id">${bill["Bill No"]}</div>
+                <div class="badge">${bill["Status"]||"—"}</div>
+            </div>
+            <div class="bill-title">${bill["Name"]||"Untitled"}</div>
+            <div class="bill-desc">${bill["Description"]||""}</div>
+            <div class="meta-row">Originating Chamber: ${bill["Intro Chamber"]||"—"}</div>
+        `;
+        container.appendChild(row);
+    });
+}
+
+function openDrawer(bill){
+    const drawer=document.getElementById("drawer");
+    drawer.innerHTML=`
+        <div class="drawer-close" onclick="closeDrawer()">✕</div>
+        <h2>${bill["Bill No"]}</h2>
+        <p><strong>Status:</strong> ${bill["Status"]||"—"}</p>
+        <p><strong>Chamber:</strong> ${bill["Intro Chamber"]||"—"}</p>
+        <p><strong>Sponsors:</strong> ${bill["Sponsors"]||"—"}</p>
+        <hr style="margin:1rem 0">
+        <p>${bill["Description"]||""}</p>
+        <hr style="margin:1rem 0">
+        <h3>History</h3>
+        <p>${(bill["History"]||"No history available").split("|").join("<br>")}</p>
     `;
-    container.appendChild(div);
-  });
+    drawer.classList.add("open");
 }
 
-function showDetail(index){
-  const bill=billsData[index];
-  const detailOverlay=document.createElement("div");
-  detailOverlay.className="detail-panel";
-  detailOverlay.innerHTML=`
-    <div class="detail-container">
-      <button class="back-button" onclick="this.parentElement.parentElement.remove()">× Close</button>
-      <div class="detail-number">${formatBillHeader(bill)}</div>
-      <div class="detail-meta">
-        <div>Originating: ${bill["Intro Chamber"]||"—"}</div>
-        <div>Status: ${bill["Status"]||"—"}</div>
-      </div>
-      <div class="detail-name">${bill["Name"]||"Untitled"}</div>
-      <div class="detail-desc">${bill["Description"]||""}</div>
-      <div class="detail-sponsors"><strong>Sponsors:</strong> ${bill["Sponsors"]||"—"}</div>
-      <div class="pdf-links">
-        <div>${bill["Intro PDF"]?`<a href="${bill["Intro PDF"]}" target="_blank">Introduced Bill.pdf</a>`:""}</div>
-        <div>${bill["Concurred PDF"]?`<a href="${bill["Concurred PDF"]}" target="_blank">Concurred Bill.pdf</a>`:""}</div>
-        <div>${bill["PA PDF"]?`<a href="${bill["PA PDF"]}" target="_blank">Public Act.pdf</a>`:""}</div>
-      </div>
-      <div class="history-section">
-        <div class="history-header">History</div>
-        <div class="history-note">Note: House actions are in lowercase, Senate actions are in UPPERCASE.</div>
-        ${renderHistory(bill["History"])}
-      </div>
-    </div>
-  `;
-  document.body.appendChild(detailOverlay);
+function closeDrawer(){
+    document.getElementById("drawer").classList.remove("open");
 }
-
-function renderHistory(history){
-  if(!history) return "<div>No history available.</div>";
-  return history.split("|").map(e=>`<div class="history-item">${e.trim()}</div>`).join("");
-}
-
-// Active nav link
-document.addEventListener("DOMContentLoaded", function(){
-  const current=window.location.href;
-  document.querySelectorAll("nav a").forEach(link=>{
-      if(current===link.href || (link.href.endsWith("/") && current.endsWith("/"))) link.classList.add("active");
-  });
-});
 </script>
 
 </body>
