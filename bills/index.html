@@ -269,11 +269,12 @@ return b["Bill No"];
 }
 
 function applyFilters(){
-const q=search.value.toLowerCase();
+const q=document.getElementById("search").value.toLowerCase();
 renderResults(billsData.filter(b=>
 (b["Bill No"]+b["Name"]+b["Description"]).toLowerCase().includes(q)
 ));
 }
+
 
 function renderResults(data){
 results.innerHTML="";
