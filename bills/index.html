@@ -432,13 +432,15 @@ else if(status==="enacted"){
 completedUpTo=4;
 }
 
+
 const steps=[
 "Introduced",
 `Passed ${origin}`,
 secondLabel,
 "Awaiting Governor",
-"Became Law"
+status==="enacted" ? "Is Law" : "Became Law"
 ];
+
 
 return `
 <div class="tracker">
