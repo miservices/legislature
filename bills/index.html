@@ -263,6 +263,13 @@ function applyFilters(){
     renderResults(filtered);
 }
 
+function formatBillNumber(bill){
+    const a = (bill["Bill No"] || "").trim();
+    const b = (bill["Alt Bill No"] || "").trim(); // 👈 Column B header
+
+    return b ? `${b} | ${a}` : a;
+}
+
 function renderResults(data){
     const container=document.getElementById("results");
     container.innerHTML="";
@@ -279,7 +286,7 @@ function renderResults(data){
         row.onclick=()=>openDrawer(bill);
         row.innerHTML=`
             <div class="bill-top">
-                <div class="bill-id">${bill["Bill No"]}</div>
+                div class="bill-id">${formatBillNumber(bill)}</div>
                 <div class="badge">${bill["Status"]||"—"}</div>
             </div>
             <div class="bill-title">${bill["Name"]||"Untitled"}</div>
@@ -294,7 +301,7 @@ function openDrawer(bill){
     const drawer=document.getElementById("drawer");
     drawer.innerHTML=`
         <div class="drawer-close" onclick="closeDrawer()">✕</div>
-        <h2>${bill["Bill No"]}</h2>
+        <h2>${formatBillNumber(bill)}</h2>
         <p><strong>Status:</strong> ${bill["Status"]||"—"}</p>
         <p><strong>Chamber:</strong> ${bill["Intro Chamber"]||"—"}</p>
         <p><strong>Sponsors:</strong> ${bill["Sponsors"]||"—"}</p>
