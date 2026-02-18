@@ -76,6 +76,9 @@ nav a.active{
     transform:translateY(-3px);
     box-shadow:0 12px 28px rgba(0,0,0,0.1);
 }
+.bill-row.active{
+    border:2px solid var(--secondary);
+}
 
 .bill-top{
     display:flex;justify-content:space-between;
@@ -83,6 +86,7 @@ nav a.active{
 }
 .bill-id{
     font-weight:700;color:var(--primary);
+    font-size:1rem;
 }
 .badge{
     background:var(--secondary);color:#fff;
@@ -92,58 +96,41 @@ nav a.active{
 .bill-title{font-weight:600;margin-bottom:4px}
 .bill-desc{color:var(--muted);font-size:0.9rem}
 
-/* DETAIL VIEW */
+/* DETAIL */
 .detail-section{
-    display:none;
-    background:#fff;
-    padding:2rem;
-    border-radius:12px;
+    margin-top:2rem;background:#fff;
+    padding:2rem;border-radius:12px;
     box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    display:none;position:relative;
 }
-.detail-section.active{
-    display:block;
-    animation:fadeIn .25s ease;
-}
-@keyframes fadeIn{
-    from{opacity:0;transform:translateY(10px)}
-    to{opacity:1;transform:none}
-}
+.detail-section.active{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-.back-btn{
-    margin-bottom:1.5rem;
-    display:inline-block;
-    cursor:pointer;
-    font-weight:600;
-    color:var(--secondary);
+.close-btn{
+    position:absolute;top:20px;right:20px;
+    cursor:pointer;font-weight:600;color:var(--muted);
 }
 
 .detail-number{
-    font-size:1.5rem;
-    font-weight:700;
+    font-size:1.4rem;font-weight:700;
     color:var(--primary);
 }
 .detail-name{
-    font-size:1.1rem;
-    font-weight:600;
-    margin:6px 0 1.5rem 0;
+    font-size:1.1rem;font-weight:600;
+    margin-top:4px;margin-bottom:1rem;
 }
 
-.field{
-    margin-bottom:10px;
+.detail-meta{
+    display:flex;gap:2.5rem;
+    margin-bottom:1.5rem;
+    font-weight:600;color:var(--secondary);
 }
-.field strong{
-    color:var(--primary);
-}
+.detail-description{margin-bottom:1.5rem}
 
-.detail-description{
-    margin:1.5rem 0;
-}
-
+/* DOCUMENTS */
 .documents a{
-    display:block;
-    margin-bottom:6px;
-    font-weight:600;
-    color:var(--secondary);
+    display:block;margin-bottom:6px;
+    font-weight:600;color:var(--secondary);
     text-decoration:none;
 }
 .documents a:hover{text-decoration:underline}
@@ -161,22 +148,14 @@ nav a.active{
 .timeline-item::before{
     content:"";
     position:absolute;
-    left:-23px;
-    top:6px;
-    width:12px;
-    height:12px;
+    left:-23px;top:6px;
+    width:12px;height:12px;
     border-radius:50%;
     background:#cbd5e1;
 }
 .timeline-item.recent::before{
     background:var(--secondary);
     box-shadow:0 0 0 4px rgba(29,111,165,0.15);
-}
-
-.timeline-legend{
-    margin-top:1rem;
-    font-size:0.85rem;
-    color:var(--muted);
 }
 
 footer{
@@ -223,7 +202,7 @@ footer{
 
 <script>
 let billsData=[];
-const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ31EfUU7mCQYrcQAhNTKXey6ep6f6rACOykAkPa2FIfQtAN3iRgPxumI-3AdcyYKZUVoIpuI0NDnJL/pub?gid=0&single=true&output=csv";
+const CSV_URL="YOUR CSV URL HERE";
 
 document.addEventListener("DOMContentLoaded",()=>{
 Papa.parse(CSV_URL,{
@@ -258,12 +237,11 @@ renderResults(billsData.filter(b=>
 function renderResults(data){
 const container=document.getElementById("results");
 container.innerHTML="";
-document.getElementById("detailSection").classList.remove("active");
-
 data.forEach(b=>{
 const row=document.createElement("div");
 row.className="bill-row";
 row.onclick=()=>location.hash=normalizeId(b["Bill No"]);
+row.dataset.id=normalizeId(b["Bill No"]);
 row.innerHTML=`
 <div class="bill-top">
 <div class="bill-id">${formatNumber(b)}</div>
@@ -278,27 +256,30 @@ container.appendChild(row);
 
 function handleHash(){
 const id=location.hash.replace("#","");
-if(!id){ showList(); return; }
-
+if(!id) return;
 const bill=billsData.find(b=>normalizeId(b["Bill No"])===id);
 if(bill) showDetail(bill);
 }
 
 function showDetail(b){
-document.getElementById("results").style.display="none";
-
-const history=b["History"]?b["History"].split("|").map(h=>h.trim()).filter(Boolean):[];
+document.querySelectorAll(".bill-row").forEach(r=>r.classList.remove("active"));
+const active=document.querySelector(`[data-id="${normalizeId(b["Bill No"])}"]`);
+if(active) active.classList.add("active");
 
 const section=document.getElementById("detailSection");
+const history=b["History"]?b["History"].split("|").map(h=>h.trim()).filter(Boolean):[];
+
 section.innerHTML=`
-<div class="back-btn" onclick="goBack()">← Back to Bills</div>
+<div class="close-btn" onclick="closeDetail()">Close</div>
 
 <div class="detail-number">${formatNumber(b)}</div>
 <div class="detail-name">${b["Name"]||""}</div>
 
-<div class="field"><strong>Status:</strong> ${b["Status"]||"—"}</div>
-<div class="field"><strong>Originating Chamber:</strong> ${b["Intro Chamber"]||"—"}</div>
-<div class="field"><strong>Sponsors:</strong> ${b["Sponsors"]||"—"}</div>
+<div class="detail-meta">
+<div>${b["Status"]||"—"}</div>
+<div>${b["Intro Chamber"]||"—"}</div>
+<div>${b["Sponsors"]||"—"}</div>
+</div>
 
 <div class="detail-description">${b["Description"]||""}</div>
 
@@ -312,10 +293,6 @@ ${renderDocs(b)}
 ${history.length?history.map((h,i)=>`
 <div class="timeline-item ${i===history.length-1?"recent":""}">${h}</div>
 `).join(""):"No history available."}
-</div>
-
-<div class="timeline-legend">
-SENATE ACTIONS ARE DISPLAYED IN ALL CAPS. House actions appear in lowercase.
 </div>
 `;
 
@@ -331,14 +308,9 @@ if(b["PA PDF"]) links.push(`<a href="${b["PA PDF"]}" target="_blank">Public Act.
 return links.length?links.join(""):"No documents available.";
 }
 
-function goBack(){
-history.pushState("",document.title,window.location.pathname);
-showList();
-}
-
-function showList(){
-document.getElementById("results").style.display="block";
+function closeDetail(){
 document.getElementById("detailSection").classList.remove("active");
+history.pushState("",document.title,window.location.pathname+window.location.search);
 }
 </script>
 
