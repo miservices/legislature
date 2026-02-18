@@ -337,8 +337,6 @@ footer{
       <option value="senate">Senate</option>
       <option value="house">House</option>
     </select>
-
-    <input type="number" id="filterYear" placeholder="Year" oninput="applyFilters()">
   </div>
 </div>
 
@@ -396,7 +394,6 @@ function applyFilters(){
   const query=document.getElementById("search").value.trim().toLowerCase();
   const statusFilter=document.getElementById("filterStatus").value.toLowerCase();
   const chamberFilter=document.getElementById("filterChamber").value.toLowerCase();
-  const yearFilter=document.getElementById("filterYear").value.trim();
 
   const terms=query.split(/\s+/).filter(Boolean);
 
@@ -408,12 +405,10 @@ function applyFilters(){
     const desc=b["Description"]||"";
     const status=b["Status"]||"";
     const chamber=b["Intro Chamber"]||"";
-    const year=b["Year"]||""; // assuming your CSV has a Year column
 
     /* ---- ADVANCED FILTERS ---- */
     if(statusFilter && status.toLowerCase() !== statusFilter) return {...b, _score:0};
     if(chamberFilter && !chamber.toLowerCase().includes(chamberFilter)) return {...b, _score:0};
-    if(yearFilter && year.toString() !== yearFilter) return {...b, _score:0};
 
     const billNorm=normalizeSearch(billNo);
     const nameNorm=normalizeSearch(name);
