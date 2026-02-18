@@ -222,124 +222,200 @@ footer{
 <footer>© 2026 Michigan Legislature</footer>
 
 <script>
-let billsData=[];
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ31EfUU7mCQYrcQAhNTKXey6ep6f6rACOykAkPa2FIfQtAN3iRgPxumI-3AdcyYKZUVoIpuI0NDnJL/pub?gid=0&single=true&output=csv";
+let billsData=[];
 
 
-document.addEventListener("DOMContentLoaded",()=>{
-Papa.parse(CSV_URL,{
-download:true,header:true,skipEmptyLines:true,
-complete:res=>{
-billsData=res.data.filter(b=>b["Bill No"]);
-renderResults(billsData);
-handleHash();
-}
-});
-window.addEventListener("hashchange",handleHash);
-});
+<script>
+let billsData = [];
 
-function normalizeId(text){
-return text.toLowerCase().replace(/\s+/g,'');
-}
+/* ===========================
+   LOAD CSV
+=========================== */
+fetch("bills.csv")
+  .then(res => res.text())
+  .then(text => {
+    const rows = text.split("\n").map(r => r.split(","));
+    const headers = rows.shift();
 
-function formatNumber(b){
-const status=(b["Status"]||"").toLowerCase();
-if((status.includes("enacted")||status.includes("repealed"))&&b["PA No"])
-return `PA ${b["PA No"]} | ${b["Bill No"]}`;
-return b["Bill No"];
-}
+    billsData = rows.map(r => {
+      let obj = {};
+      headers.forEach((h,i)=> obj[h.trim()] = (r[i]||"").trim());
+      return obj;
+    });
 
-function applyFilters(){
-const q=document.getElementById("search").value.toLowerCase();
-renderResults(billsData.filter(b=>
-(b["Bill No"]+b["Name"]+b["Description"]).toLowerCase().includes(q)
-));
-}
+    renderCards();
+    checkHash();
+  });
 
-function renderResults(data){
-const container=document.getElementById("results");
-container.innerHTML="";
-document.getElementById("detailSection").classList.remove("active");
+/* ===========================
+   CARD VIEW
+=========================== */
+function renderCards(){
+  const container = document.getElementById("billContainer");
+  container.innerHTML = "";
 
-data.forEach(b=>{
-const row=document.createElement("div");
-row.className="bill-row";
-row.onclick=()=>location.hash=normalizeId(b["Bill No"]);
-row.innerHTML=`
-<div class="bill-top">
-<div class="bill-id">${formatNumber(b)}</div>
-<div class="badge">${b["Status"]||"—"}</div>
-</div>
-<div class="bill-title">${b["Name"]||""}</div>
-<div class="bill-desc">${b["Description"]||""}</div>
-`;
-container.appendChild(row);
-});
-}
+  billsData.forEach(bill=>{
+    const card = document.createElement("div");
+    card.className = "bill-card";
 
-function handleHash(){
-const id=location.hash.replace("#","");
-if(!id){ showList(); return; }
+    const billNo = bill["A"]; // Bill #
+    const paNo = bill["B"];   // PA #
+    const tracker = bill["Tracker"];
 
-const bill=billsData.find(b=>normalizeId(b["Bill No"])===id);
-if(bill) showDetail(bill);
+    let displayNumber = billNo;
+    if((tracker === "Enacted" || tracker === "Repealed") && paNo){
+      displayNumber = `PA ${paNo} | ${billNo}`;
+    }
+
+    card.innerHTML = `
+      <div class="bill-number">${displayNumber}</div>
+      <div class="bill-title">${bill["Title"]}</div>
+    `;
+
+    card.onclick = ()=>{
+      window.location.hash = billNo.toLowerCase();
+    };
+
+    container.appendChild(card);
+  });
 }
 
-function showDetail(b){
-document.getElementById("results").style.display="none";
+/* ===========================
+   HASH NAVIGATION
+=========================== */
+window.addEventListener("hashchange", checkHash);
 
-const history=b["History"]?b["History"].split("|").map(h=>h.trim()).filter(Boolean):[];
+function checkHash(){
+  const hash = window.location.hash.replace("#","").toUpperCase();
+  if(!hash){
+    document.getElementById("detailView").innerHTML = "";
+    renderCards();
+    return;
+  }
 
-const section=document.getElementById("detailSection");
-section.innerHTML=`
-<div class="back-btn" onclick="goBack()">← Back to Bills</div>
-
-<div class="detail-number">${formatNumber(b)}</div>
-<div class="detail-name">${b["Name"]||""}</div>
-
-<div class="field"><strong>Status:</strong> ${b["Status"]||"—"}</div>
-<div class="field"><strong>Originating Chamber:</strong> ${b["Intro Chamber"]||"—"}</div>
-<div class="field"><strong>Sponsors:</strong> ${b["Sponsors"]||"—"}</div>
-
-<div class="detail-description">${b["Description"]||""}</div>
-
-<h3>Documents</h3>
-<div class="documents">
-${renderDocs(b)}
-</div>
-
-<h3 style="margin-top:2rem;">Legislative Timeline</h3>
-<div class="timeline">
-${history.length?history.map((h,i)=>`
-<div class="timeline-item ${i===history.length-1?"recent":""}">${h}</div>
-`).join(""):"No history available."}
-</div>
-
-<div class="timeline-legend">
-SENATE ACTIONS ARE DISPLAYED IN ALL CAPS. House actions appear in lowercase.
-</div>
-`;
-
-section.classList.add("active");
-section.scrollIntoView({behavior:"smooth"});
+  const bill = billsData.find(b=>b["A"].toUpperCase()===hash);
+  if(bill){
+    openDetail(bill);
+  }
 }
 
-function renderDocs(b){
-const links=[];
-if(b["Intro PDF"]) links.push(`<a href="${b["Intro PDF"]}" target="_blank">Introduced Bill.pdf</a>`);
-if(b["Concurred PDF"]) links.push(`<a href="${b["Concurred PDF"]}" target="_blank">Concurred Bill.pdf</a>`);
-if(b["PA PDF"]) links.push(`<a href="${b["PA PDF"]}" target="_blank">Public Act.pdf</a>`);
-return links.length?links.join(""):"No documents available.";
+/* ===========================
+   DETAIL VIEW
+=========================== */
+function openDetail(bill){
+
+  const container = document.getElementById("billContainer");
+  container.innerHTML = ""; // hide all other bills
+
+  const detail = document.getElementById("detailView");
+
+  const billNo = bill["A"];
+  const paNo = bill["B"];
+  const tracker = bill["Tracker"];
+
+  let displayNumber = billNo;
+  if((tracker==="Enacted" || tracker==="Repealed") && paNo){
+    displayNumber = `PA ${paNo} | ${billNo}`;
+  }
+
+  const timeline = buildTimeline(bill);
+  const progress = getProgressPercent(tracker);
+
+  detail.innerHTML = `
+    <div class="detail-wrapper">
+      <div class="detail-header">
+        <div class="detail-number">${displayNumber}</div>
+        <div class="detail-title">${bill["Title"]}</div>
+      </div>
+
+      <div class="detail-fields">
+        <div><strong>Tracker:</strong> ${tracker}</div>
+        <div><strong>Sponsors:</strong> ${bill["Sponsors"]}</div>
+      </div>
+
+      <div class="tracker-section">
+        <h3>Legislative Timeline</h3>
+        <div class="timeline-note">
+          SENATE ACTION IS IN ALL CAPS · house action is in lowercase
+        </div>
+        <div class="timeline">
+          ${timeline}
+        </div>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:${progress}%"></div>
+      </div>
+
+      <div class="pdf-links">
+        ${buildPDFLinks(bill)}
+      </div>
+
+      <button onclick="window.location.hash=''">← Back to All Bills</button>
+    </div>
+  `;
 }
 
-function goBack(){
-history.pushState("",document.title,window.location.pathname);
-showList();
+/* ===========================
+   TRACKER PROGRESS %
+=========================== */
+function getProgressPercent(status){
+  switch(status){
+    case "Introduced": return 15;
+    case "Second Chamber": return 45;
+    case "Awaiting Governor": return 75;
+    case "Enacted": return 100;
+    case "Repealed": return 100;
+    case "Tabled": return 100;
+    case "Defeated": return 100;
+    default: return 20;
+  }
 }
 
-function showList(){
-document.getElementById("results").style.display="block";
-document.getElementById("detailSection").classList.remove("active");
+/* ===========================
+   TIMELINE BUILDER
+=========================== */
+function buildTimeline(bill){
+
+  const actions = bill["Actions"]
+    ? bill["Actions"].split("|")
+    : [];
+
+  return actions.map((a,i)=>{
+    const isLast = i === actions.length-1;
+
+    const isSenate = a.toLowerCase().includes("senate");
+    const text = isSenate ? a.toUpperCase() : a.toLowerCase();
+
+    return `
+      <div class="timeline-item ${isLast ? "latest" : ""}">
+        <div class="timeline-dot"></div>
+        <div class="timeline-text">${text}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+/* ===========================
+   PDF LINKS
+=========================== */
+function buildPDFLinks(bill){
+  let html = "";
+
+  if(bill["IntroducedPDF"]){
+    html += `<div><a href="${bill["IntroducedPDF"]}" target="_blank">Introduced Bill.pdf</a></div>`;
+  }
+
+  if(bill["EnrolledPDF"]){
+    html += `<div><a href="${bill["EnrolledPDF"]}" target="_blank">Enrolled Bill.pdf</a></div>`;
+  }
+
+  if(bill["PublicActPDF"]){
+    html += `<div><a href="${bill["PublicActPDF"]}" target="_blank">Public Act.pdf</a></div>`;
+  }
+
+  return html;
 }
 </script>
 
