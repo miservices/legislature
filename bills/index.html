@@ -1,421 +1,377 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Legislative Bills</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<title>Legislative Tracker</title>
 
 <style>
-:root{
-    --primary:#0b3c5d;
-    --secondary:#1d6fa5;
-    --accent:#e0b400;
-    --light:#f4f6f8;
-    --dark:#1a1a1a;
-    --muted:#6b7280;
+body{
+    font-family: Arial, sans-serif;
+    margin:0;
+    background:#f4f6f9;
 }
 
-*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Arial,sans-serif}
-body{background:var(--light);color:var(--dark);line-height:1.6}
+/* -------------------
+   BILL CARDS
+------------------- */
 
-/* HEADER */
-header{
-    background:linear-gradient(135deg,var(--primary),var(--secondary));
-    color:#fff;
-    padding:1.25rem 2rem;
-}
-.header-inner{
-    max-width:1200px;margin:auto;
-    display:flex;justify-content:space-between;align-items:center;
-}
-.logo{font-size:1.6rem;font-weight:700}
-nav a{
-    color:#ffffffcc;text-decoration:none;
-    margin-left:1.5rem;font-weight:500;
-}
-nav a.active{
-    color:#fff;font-weight:700;
-    border-bottom:3px solid var(--accent);
-    padding-bottom:6px;
+#billContainer{
+    max-width:1100px;
+    margin:40px auto;
+    padding:0 20px;
 }
 
-/* HERO */
-.hero{
-    background:linear-gradient(rgba(11,60,93,0.85),rgba(11,60,93,0.85)),
-    url("https://upload.wikimedia.org/wikipedia/commons/8/88/Michigan_State_Capitol_exterior.jpg")
-    center/cover no-repeat;
-    color:#fff;padding:6rem 2rem;
-}
-.hero-inner{max-width:900px;margin:auto}
-.hero h1{font-size:3rem;margin-bottom:1rem}
-
-/* FILTER */
-.filter-bar{
-    max-width:1200px;margin:2rem auto;
-    padding:0 2rem;
-}
-.filter-bar input{
-    padding:10px 14px;border-radius:8px;
-    border:1px solid #ccc;width:100%;max-width:350px;
-}
-
-/* RESULTS */
-.results-wrapper{
-    max-width:1200px;margin:auto;
-    padding:0 2rem 3rem 2rem;
-}
-
-.bill-row{
-    background:#fff;padding:1.5rem;
-    border-radius:12px;margin-bottom:1rem;
-    box-shadow:0 8px 20px rgba(0,0,0,0.06);
-    cursor:pointer;transition:0.2s;
-}
-.bill-row:hover{
-    transform:translateY(-3px);
-    box-shadow:0 12px 28px rgba(0,0,0,0.1);
-}
-
-.bill-top{
-    display:flex;justify-content:space-between;
-    margin-bottom:0.5rem;
-}
-.bill-id{
-    font-weight:700;color:var(--primary);
-}
-.badge{
-    background:var(--secondary);color:#fff;
-    padding:4px 10px;border-radius:999px;
-    font-size:12px;
-}
-.bill-title{font-weight:600;margin-bottom:4px}
-.bill-desc{color:var(--muted);font-size:0.9rem}
-
-/* DETAIL VIEW */
-.detail-section{
-    display:none;
+.bill-card{
     background:#fff;
-    padding:2rem;
-    border-radius:12px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.08);
-}
-.detail-section.active{
-    display:block;
-    animation:fadeIn .25s ease;
-}
-@keyframes fadeIn{
-    from{opacity:0;transform:translateY(10px)}
-    to{opacity:1;transform:none}
-}
-
-.back-btn{
-    margin-bottom:1.5rem;
-    display:inline-block;
+    padding:20px;
+    margin-bottom:15px;
+    border-radius:8px;
     cursor:pointer;
-    font-weight:600;
-    color:var(--secondary);
+    transition:0.2s;
+    border-left:5px solid #1b3a6f;
 }
 
-.detail-number{
-    font-size:1.5rem;
-    font-weight:700;
-    color:var(--primary);
+.bill-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 6px 18px rgba(0,0,0,0.1);
 }
-.detail-name{
-    font-size:1.1rem;
-    font-weight:600;
-    margin:6px 0 1.5rem 0;
+
+.bill-number{
+    font-weight:bold;
+    font-size:18px;
+    color:#1b3a6f;
+}
+
+.bill-title{
+    font-size:16px;
+    margin-top:4px;
+}
+
+/* -------------------
+   DETAIL VIEW
+------------------- */
+
+#detailView{
+    display:none;
+    max-width:1100px;
+    margin:40px auto;
+    padding:0 20px;
+}
+
+.detail-card{
+    background:#fff;
+    padding:30px;
+    border-radius:10px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.1);
+}
+
+.detail-header{
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+.detail-subheader{
+    color:#555;
+    margin-bottom:20px;
 }
 
 .field{
-    margin-bottom:10px;
-}
-.field strong{
-    color:var(--primary);
+    margin-bottom:12px;
 }
 
-.detail-description{
-    margin:1.5rem 0;
+.field-title{
+    font-weight:bold;
+    display:inline-block;
+    width:180px;
+    color:#1b3a6f;
 }
 
-.documents a{
+.pdf-links a{
     display:block;
-    margin-bottom:6px;
-    font-weight:600;
-    color:var(--secondary);
+    margin-bottom:5px;
     text-decoration:none;
+    color:#0056b3;
 }
-.documents a:hover{text-decoration:underline}
 
-/* TIMELINE */
-.timeline{
-    margin-top:1rem;
-    border-left:3px solid #e5e7eb;
-    padding-left:35px;
+.pdf-links a:hover{
+    text-decoration:underline;
 }
-.timeline-item{
-    margin-bottom:18px;
+
+/* -------------------
+   TRACKER BAR
+------------------- */
+
+.tracker-bar{
+    display:flex;
+    justify-content:space-between;
+    margin:30px 0 10px 0;
     position:relative;
 }
-.timeline-item::before{
+
+.tracker-bar::before{
     content:"";
     position:absolute;
-    left:-23px;
-    top:6px;
-    width:12px;
-    height:12px;
+    top:18px;
+    left:0;
+    right:0;
+    height:4px;
+    background:#ddd;
+    z-index:0;
+}
+
+.tracker-step{
+    position:relative;
+    z-index:1;
+    text-align:center;
+    width:14%;
+}
+
+.tracker-circle{
+    width:36px;
+    height:36px;
     border-radius:50%;
-    background:#cbd5e1;
-}
-.timeline-item.recent::before{
-    background:var(--secondary);
-    box-shadow:0 0 0 4px rgba(29,111,165,0.15);
+    background:#ccc;
+    margin:0 auto 8px auto;
+    transition:0.4s;
 }
 
-.timeline-legend{
-    margin-top:1rem;
-    font-size:0.85rem;
-    color:var(--muted);
+.tracker-step.active .tracker-circle{
+    background:#1b3a6f;
 }
 
-footer{
-    background:var(--primary);
-    color:#fff;padding:2rem;
-    margin-top:3rem;text-align:center;
+.tracker-step.complete .tracker-circle{
+    background:#2e8b57;
+}
+
+.tracker-label{
+    font-size:12px;
+}
+
+/* -------------------
+   TIMELINE
+------------------- */
+
+.timeline{
+    margin-top:30px;
+    border-left:3px solid #1b3a6f;
+    padding-left:30px;
+}
+
+.timeline-item{
+    position:relative;
+    margin-bottom:25px;
+}
+
+.timeline-dot{
+    position:absolute;
+    left:-39px;
+    top:4px;
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:#999;
+}
+
+.timeline-item.latest .timeline-dot{
+    background:#d9534f;
+    transform:scale(1.3);
+}
+
+.timeline-text{
+    font-size:14px;
+}
+
+.legend{
+    font-size:12px;
+    margin-top:5px;
+    color:#555;
+}
+
+.back-button{
+    margin-bottom:20px;
+    display:inline-block;
+    cursor:pointer;
+    color:#0056b3;
 }
 </style>
 </head>
-
 <body>
 
-<header>
-<div class="header-inner">
-<div class="logo">Michigan Legislature</div>
-<nav>
-<a href="https://miservices.github.io/legislature/">Home</a>
-<a href="https://miservices.github.io/legislature/about">About</a>
-<a href="https://miservices.github.io/legislature/mcl">Laws</a>
-<a href="https://miservices.github.io/legislature/bills" class="active">Bills</a>
-<a href="https://miservices.github.io/legislature/resolutions">Resolutions</a>
-<a href="https://miservices.github.io/legislature/journals">Journals</a>
-</nav>
-</div>
-</header>
+<div id="billContainer"></div>
 
-<section class="hero">
-<div class="hero-inner">
-<h1>Legislative Bills</h1>
-<p>Search and explore legislation introduced in the Michigan Legislature.</p>
-</div>
-</section>
-
-<div class="filter-bar">
-<input id="search" placeholder="Search bills..." oninput="applyFilters()">
+<div id="detailView">
+    <div class="back-button" onclick="closeDetail()">← Back to Bills</div>
+    <div class="detail-card" id="detailContent"></div>
 </div>
 
-<div class="results-wrapper">
-<div id="results"></div>
-<div id="detailSection" class="detail-section"></div>
-</div>
-
-<footer>© 2026 Michigan Legislature</footer>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
 
 <script>
-const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ31EfUU7mCQYrcQAhNTKXey6ep6f6rACOykAkPa2FIfQtAN3iRgPxumI-3AdcyYKZUVoIpuI0NDnJL/pub?gid=0&single=true&output=csv";
-let billsData=[];
+const CSV_URL = "bills.csv"; // adjust path
 
-
-<script>
 let billsData = [];
 
-/* ===========================
-   LOAD CSV
-=========================== */
-fetch("bills.csv")
-  .then(res => res.text())
-  .then(text => {
-    const rows = text.split("\n").map(r => r.split(","));
-    const headers = rows.shift();
-
-    billsData = rows.map(r => {
-      let obj = {};
-      headers.forEach((h,i)=> obj[h.trim()] = (r[i]||"").trim());
-      return obj;
-    });
-
-    renderCards();
-    checkHash();
-  });
-
-/* ===========================
-   CARD VIEW
-=========================== */
-function renderCards(){
-  const container = document.getElementById("billContainer");
-  container.innerHTML = "";
-
-  billsData.forEach(bill=>{
-    const card = document.createElement("div");
-    card.className = "bill-card";
-
-    const billNo = bill["A"]; // Bill #
-    const paNo = bill["B"];   // PA #
-    const tracker = bill["Tracker"];
-
-    let displayNumber = billNo;
-    if((tracker === "Enacted" || tracker === "Repealed") && paNo){
-      displayNumber = `PA ${paNo} | ${billNo}`;
+Papa.parse(CSV_URL,{
+    download:true,
+    header:true,
+    complete:function(results){
+        billsData = results.data;
+        renderBills();
+        openFromHash();
     }
+});
 
-    card.innerHTML = `
-      <div class="bill-number">${displayNumber}</div>
-      <div class="bill-title">${bill["Title"]}</div>
-    `;
+function renderBills(){
+    const container = document.getElementById("billContainer");
+    container.innerHTML="";
 
-    card.onclick = ()=>{
-      window.location.hash = billNo.toLowerCase();
-    };
+    billsData.forEach(bill=>{
+        if(!bill["A"]) return;
 
-    container.appendChild(card);
-  });
+        const card = document.createElement("div");
+        card.className="bill-card";
+
+        card.innerHTML=`
+            <div class="bill-number">${bill["A"]}</div>
+            <div class="bill-title">${bill["Name"] || ""}</div>
+        `;
+
+        card.onclick = () => {
+            const hash = bill["A"].toLowerCase().replace(/\s/g,"");
+            window.location.hash = hash;
+        };
+
+        container.appendChild(card);
+    });
 }
 
-/* ===========================
-   HASH NAVIGATION
-=========================== */
-window.addEventListener("hashchange", checkHash);
+function openFromHash(){
+    const hash = window.location.hash.replace("#","");
+    if(!hash) return;
 
-function checkHash(){
-  const hash = window.location.hash.replace("#","").toUpperCase();
-  if(!hash){
-    document.getElementById("detailView").innerHTML = "";
-    renderCards();
-    return;
-  }
+    const bill = billsData.find(b =>
+        b["A"] &&
+        b["A"].toLowerCase().replace(/\s/g,"") === hash
+    );
 
-  const bill = billsData.find(b=>b["A"].toUpperCase()===hash);
-  if(bill){
-    openDetail(bill);
-  }
+    if(bill) openDetail(bill);
 }
 
-/* ===========================
-   DETAIL VIEW
-=========================== */
+window.addEventListener("hashchange",openFromHash);
+
 function openDetail(bill){
 
-  const container = document.getElementById("billContainer");
-  container.innerHTML = ""; // hide all other bills
+    document.getElementById("billContainer").style.display="none";
+    document.getElementById("detailView").style.display="block";
 
-  const detail = document.getElementById("detailView");
+    const detail = document.getElementById("detailContent");
 
-  const billNo = bill["A"];
-  const paNo = bill["B"];
-  const tracker = bill["Tracker"];
+    const status = bill["Status"] || "";
+    const introChamber = bill["IntroChamber"] || "Senate";
 
-  let displayNumber = billNo;
-  if((tracker==="Enacted" || tracker==="Repealed") && paNo){
-    displayNumber = `PA ${paNo} | ${billNo}`;
-  }
+    const trackerSteps = [
+        "Introduced",
+        introChamber==="Senate"?"Passed Senate":"Passed House",
+        introChamber==="Senate"?"Passed House":"Passed Senate",
+        "Awaiting Governor",
+        "Enacted"
+    ];
 
-  const timeline = buildTimeline(bill);
-  const progress = getProgressPercent(tracker);
+    const currentIndex = getTrackerIndex(status);
 
-  detail.innerHTML = `
-    <div class="detail-wrapper">
-      <div class="detail-header">
-        <div class="detail-number">${displayNumber}</div>
-        <div class="detail-title">${bill["Title"]}</div>
-      </div>
+    const trackerHTML = trackerSteps.map((step,i)=>{
+        let cls="";
+        if(i<currentIndex) cls="complete";
+        else if(i===currentIndex) cls="active";
 
-      <div class="detail-fields">
-        <div><strong>Tracker:</strong> ${tracker}</div>
-        <div><strong>Sponsors:</strong> ${bill["Sponsors"]}</div>
-      </div>
+        return `
+        <div class="tracker-step ${cls}">
+            <div class="tracker-circle"></div>
+            <div class="tracker-label">${step}</div>
+        </div>`;
+    }).join("");
 
-      <div class="tracker-section">
-        <h3>Legislative Timeline</h3>
-        <div class="timeline-note">
-          SENATE ACTION IS IN ALL CAPS · house action is in lowercase
+    const timelineHTML = generateTimeline(bill);
+
+    const pa = (status==="Enacted" || status==="Repealed") && bill["B"]
+        ? `${bill["B"]} | `
+        : "";
+
+    detail.innerHTML=`
+        <div class="detail-header">${pa}${bill["A"]}</div>
+        <div class="detail-subheader">${bill["Name"] || ""}</div>
+
+        <div class="field">
+            <span class="field-title">Tracker:</span>
+            ${status}
         </div>
+
+        <div class="field">
+            <span class="field-title">Sponsors:</span>
+            ${bill["Sponsors"] || "N/A"}
+        </div>
+
+        <div class="field pdf-links">
+            <span class="field-title">Documents:</span>
+            ${bill["IntroducedPDF"] ? `<a href="${bill["IntroducedPDF"]}" target="_blank">Introduced Bill.pdf</a>` : ""}
+            ${bill["EnrolledPDF"] ? `<a href="${bill["EnrolledPDF"]}" target="_blank">Enrolled Bill.pdf</a>` : ""}
+        </div>
+
+        <div class="tracker-bar">${trackerHTML}</div>
+
+        <div class="legend">
+            SENATE ACTION IS IN ALL CAPS · house action is in lowercase
+        </div>
+
         <div class="timeline">
-          ${timeline}
+            ${timelineHTML}
         </div>
-      </div>
-
-      <div class="progress-bar">
-        <div class="progress-fill" style="width:${progress}%"></div>
-      </div>
-
-      <div class="pdf-links">
-        ${buildPDFLinks(bill)}
-      </div>
-
-      <button onclick="window.location.hash=''">← Back to All Bills</button>
-    </div>
-  `;
-}
-
-/* ===========================
-   TRACKER PROGRESS %
-=========================== */
-function getProgressPercent(status){
-  switch(status){
-    case "Introduced": return 15;
-    case "Second Chamber": return 45;
-    case "Awaiting Governor": return 75;
-    case "Enacted": return 100;
-    case "Repealed": return 100;
-    case "Tabled": return 100;
-    case "Defeated": return 100;
-    default: return 20;
-  }
-}
-
-/* ===========================
-   TIMELINE BUILDER
-=========================== */
-function buildTimeline(bill){
-
-  const actions = bill["Actions"]
-    ? bill["Actions"].split("|")
-    : [];
-
-  return actions.map((a,i)=>{
-    const isLast = i === actions.length-1;
-
-    const isSenate = a.toLowerCase().includes("senate");
-    const text = isSenate ? a.toUpperCase() : a.toLowerCase();
-
-    return `
-      <div class="timeline-item ${isLast ? "latest" : ""}">
-        <div class="timeline-dot"></div>
-        <div class="timeline-text">${text}</div>
-      </div>
     `;
-  }).join("");
 }
 
-/* ===========================
-   PDF LINKS
-=========================== */
-function buildPDFLinks(bill){
-  let html = "";
+function closeDetail(){
+    window.location.hash="";
+    document.getElementById("detailView").style.display="none";
+    document.getElementById("billContainer").style.display="block";
+}
 
-  if(bill["IntroducedPDF"]){
-    html += `<div><a href="${bill["IntroducedPDF"]}" target="_blank">Introduced Bill.pdf</a></div>`;
-  }
+function getTrackerIndex(status){
+    switch(status){
+        case "Introduced": return 0;
+        case "Second Chamber": return 2;
+        case "Awaiting Governor": return 3;
+        case "Enacted": return 4;
+        default: return 1;
+    }
+}
 
-  if(bill["EnrolledPDF"]){
-    html += `<div><a href="${bill["EnrolledPDF"]}" target="_blank">Enrolled Bill.pdf</a></div>`;
-  }
+function generateTimeline(bill){
 
-  if(bill["PublicActPDF"]){
-    html += `<div><a href="${bill["PublicActPDF"]}" target="_blank">Public Act.pdf</a></div>`;
-  }
+    const actions = (bill["Timeline"] || "").split("|");
+    let html="";
 
-  return html;
+    actions.forEach((a,i)=>{
+        if(!a.trim()) return;
+
+        const latest = i===actions.length-1 ? "latest" : "";
+
+        html+=`
+        <div class="timeline-item ${latest}">
+            <div class="timeline-dot"></div>
+            <div class="timeline-text">${formatChamber(a)}</div>
+        </div>`;
+    });
+
+    return html;
+}
+
+function formatChamber(text){
+    if(text.toLowerCase().includes("senate"))
+        return text.toUpperCase();
+    if(text.toLowerCase().includes("house"))
+        return text.toLowerCase();
+    return text;
 }
 </script>
 
