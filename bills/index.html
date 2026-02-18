@@ -157,12 +157,12 @@ nav a.active{
     z-index:2;
     position:relative;
 }
-.step.active .dot{
-    background:var(--secondary);
-    color:#fff;
-}
 .step.complete .dot{
     background:var(--success);
+    color:#fff;
+}
+.step.active .dot{
+    background:var(--secondary);
     color:#fff;
 }
 .step-label{
@@ -246,7 +246,6 @@ footer{
 let billsData=[];
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ31EfUU7mCQYrcQAhNTKXey6ep6f6rACOykAkPa2FIfQtAN3iRgPxumI-3AdcyYKZUVoIpuI0NDnJL/pub?gid=0&single=true&output=csv";
 
-
 document.addEventListener("DOMContentLoaded",()=>{
 Papa.parse(CSV_URL,{
 download:true,header:true,skipEmptyLines:true,
@@ -275,7 +274,6 @@ renderResults(billsData.filter(b=>
 ));
 }
 
-
 function renderResults(data){
 results.innerHTML="";
 data.forEach(b=>{
@@ -296,41 +294,68 @@ results.appendChild(r);
 
 function handleHash(){
 const id=location.hash.slice(1);
-if(!id) return;
+if(!id){
+detailSection.classList.remove("active");
+return;
+}
 const bill=billsData.find(b=>normalizeId(b["Bill No"])===id);
 if(bill) showDetail(bill);
 }
 
 function trackerHTML(b){
-const chamber=b["Intro Chamber"]||"Origin";
-const status=b["Status"]||"";
+const status=(b["Status"]||"").toLowerCase();
+const intro=(b["Intro Chamber"]||"").toLowerCase();
+
+const origin=intro.includes("senate")?"Senate":"House";
+const second=origin==="Senate"?"House":"Senate";
+
 const steps=[
-`Introduced (${chamber})`,
-"Second Chamber",
+"Introduced",
+`Passed ${origin}`,
+`Passed ${second}`,
 "Awaiting Governor",
-"Enacted"
+"Became Law"
 ];
 
-let activeIndex=steps.findIndex(s=>status==="Introduced");
-if(status==="Second Chamber") activeIndex=1;
-if(status==="Awaiting Governor") activeIndex=2;
-if(status==="Enacted") activeIndex=3;
+let active=-1;
+let terminal=null;
+
+if(status==="introduced") active=0;
+else if(status==="second chamber") active=1;
+else if(status==="awaiting governor") active=3;
+else if(status==="enacted") active=4;
+
+if(["tabled","defeated","repealed"].includes(status)){
+terminal=status.charAt(0).toUpperCase()+status.slice(1);
+}
 
 return `
 <div class="tracker">
-${steps.map((s,i)=>`
-<div class="step ${i<activeIndex?"complete":i===activeIndex?"active":""}">
+${steps.map((s,i)=>{
+let cls="step";
+if(i<active) cls+=" complete";
+if(i===active && status!=="enacted") cls+=" active";
+if(i===4 && status==="enacted") cls+=" complete";
+return `
+<div class="${cls}">
 <div class="dot">${i+1}</div>
 <div class="step-label">${s}</div>
-</div>`).join("")}
 </div>`;
+}).join("")}
+</div>
+${terminal?`<div style="margin-top:1rem;font-weight:700;color:var(--danger);">
+Bill ${terminal}
+</div>`:""}
+`;
 }
 
 function showDetail(b){
 document.querySelectorAll(".bill-row").forEach(r=>r.classList.remove("active"));
 document.querySelector(`[data-id="${normalizeId(b["Bill No"])}"]`)?.classList.add("active");
 
-const history=b["History"]?b["History"].split("|").map(h=>h.trim()).filter(Boolean):[];
+const historyItems=b["History"]
+?b["History"].split("|").map(h=>h.trim()).filter(Boolean)
+:[];
 
 detailSection.innerHTML=`
 <div class="close-btn" onclick="closeDetail()">Close</div>
@@ -339,7 +364,6 @@ detailSection.innerHTML=`
 <div class="detail-name">${b["Name"]||""}</div>
 
 <div class="detail-meta">
-<div>${b["Status"]||"—"}</div>
 <div>${b["Sponsors"]||"—"}</div>
 </div>
 
@@ -352,8 +376,8 @@ ${trackerHTML(b)}
 
 <h3 style="margin-top:2rem;">Legislative Timeline</h3>
 <div class="timeline">
-${history.length?history.map((h,i)=>`
-<div class="timeline-item ${i===history.length-1?"recent":""}">${h}</div>
+${historyItems.length?historyItems.map((h,i)=>`
+<div class="timeline-item ${i===historyItems.length-1?"recent":""}">${h}</div>
 `).join(""):"No history available."}
 </div>`;
 detailSection.classList.add("active");
@@ -370,7 +394,7 @@ return l.length?l.join(""):"No documents available.";
 
 function closeDetail(){
 detailSection.classList.remove("active");
-history.pushState("",document.title,location.pathname);
+window.history.pushState("",document.title,location.pathname);
 }
 </script>
 
