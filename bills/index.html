@@ -361,9 +361,8 @@ const origin=intro.includes("senate")?"Senate":"House";
 const second=origin==="Senate"?"House":"Senate";
 
 /* ---------- TERMINAL STATES ---------- */
-if(["tabled","defeated","repealed"].includes(status)){
-const label=status.charAt(0).toUpperCase()+status.slice(1);
 
+if(status==="tabled"){
 return `
 <div class="terminal-tracker">
 <div class="terminal-step complete">
@@ -371,14 +370,41 @@ return `
 <div class="terminal-label">Introduced</div>
 </div>
 
+<div class="terminal-step">
+<div class="terminal-dot">✖</div>
+<div class="terminal-label">Tabled</div>
+</div>
+</div>
+`;
+}
+
+if(status==="defeated"){
+return `
+<div class="terminal-tracker">
 <div class="terminal-step complete">
 <div class="terminal-dot">✓</div>
-<div class="terminal-label">Passed ${origin}</div>
+<div class="terminal-label">Introduced</div>
 </div>
 
 <div class="terminal-step">
 <div class="terminal-dot">✖</div>
-<div class="terminal-label">${label}</div>
+<div class="terminal-label">Defeated</div>
+</div>
+</div>
+`;
+}
+
+if(status==="repealed"){
+return `
+<div class="terminal-tracker">
+<div class="terminal-step complete">
+<div class="terminal-dot">✓</div>
+<div class="terminal-label">Became Law</div>
+</div>
+
+<div class="terminal-step">
+<div class="terminal-dot">✖</div>
+<div class="terminal-label">Repealed</div>
 </div>
 </div>
 `;
@@ -429,6 +455,7 @@ return `
 </div>
 `;
 }
+
 
 
 
