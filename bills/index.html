@@ -319,7 +319,7 @@ footer{
 
 <div class="filter-bar">
   <div class="filter-inner">
-    <input id="search" placeholder="Search bills..." oninput="applyFilters()">
+    <input id="search" placeholder="Search by Bill No, PA No, Name, Status, or Chamber..." oninput="applyFilters()">
 
     <select id="filterStatus" onchange="applyFilters()">
       <option value="">All Status</option>
@@ -339,6 +339,7 @@ footer{
     </select>
   </div>
 </div>
+
 
 
 <div class="results-wrapper">
@@ -390,56 +391,73 @@ n.replace("house bill","hb")
 }
 
 
-function applyFilters(){
-  const query=document.getElementById("search").value.trim().toLowerCase();
-  const statusFilter=document.getElementById("filterStatus").value.toLowerCase();
-  const chamberFilter=document.getElementById("filterChamber").value.toLowerCase();
-
-  const terms=query.split(/\s+/).filter(Boolean);
-
-  const scored=billsData.map(b=>{
-    let score=0;
-
-    const billNo=b["Bill No"]||"";
-    const name=b["Name"]||"";
-    const desc=b["Description"]||"";
-    const status=b["Status"]||"";
-    const chamber=b["Intro Chamber"]||"";
-
-    /* ---- ADVANCED FILTERS ---- */
-    if(statusFilter && status.toLowerCase() !== statusFilter) return {...b, _score:0};
-    if(chamberFilter && !chamber.toLowerCase().includes(chamberFilter)) return {...b, _score:0};
-
-    const billNorm=normalizeSearch(billNo);
-    const nameNorm=normalizeSearch(name);
-    const descNorm=normalizeSearch(desc);
-
-    /* ---- BILL NUMBER MATCH (HIGHEST PRIORITY) ---- */
-    billNumberVariants(billNo).forEach(v=>{
-      if(normalizeSearch(v).includes(normalizeSearch(query))) score+=100;
-    });
-
-    /* ---- TERM MATCHING ---- */
-    terms.forEach(t=>{
-      const nt=normalizeSearch(t);
-      if(billNorm.includes(nt)) score+=40;
-      if(nameNorm.includes(nt)) score+=20;
-      if(descNorm.includes(nt)) score+=5;
-    });
-
-    /* ---- EXACT PHRASE BONUS ---- */
-    if(normalizeSearch(name).includes(normalizeSearch(query))) score+=30;
-    if(normalizeSearch(desc).includes(normalizeSearch(query))) score+=10;
-
-    return {...b, _score:score};
-  })
-  .filter(b=>b._score>0)
-  .sort((a,b)=>b._score-a._score);
-
-  renderResults(scored);
+function normalizeSearch(text=""){
+    return (text||"").toLowerCase().replace(/[^a-z0-9]/g,"");
 }
 
+function billNumberVariants(billNo=""){
+    const n=billNo.toLowerCase();
+    return [
+        n,
+        n.replace(/\s+/g,""),
+        n.replace("senate bill","sb"),
+        n.replace("house bill","hb")
+    ];
+}
 
+function applyFilters(){
+    const query=document.getElementById("search").value.trim().toLowerCase();
+    const statusFilter=document.getElementById("filterStatus").value.toLowerCase();
+    const chamberFilter=document.getElementById("filterChamber").value.toLowerCase();
+
+    const terms=query.split(/\s+/).filter(Boolean);
+
+    const scored=billsData.map(b=>{
+        let score=0;
+
+        const billNo=b["Bill No"]||"";
+        const paNo=b["PA No"]||"";
+        const name=b["Name"]||"";
+        const status=b["Status"]||"";
+        const chamber=b["Intro Chamber"]||"";
+
+        /* ---- ADVANCED FILTERS ---- */
+        if(statusFilter && status.toLowerCase() !== statusFilter) return {...b, _score:0};
+        if(chamberFilter && !chamber.toLowerCase().includes(chamberFilter)) return {...b, _score:0};
+
+        const billNorm=normalizeSearch(billNo);
+        const paNorm=normalizeSearch(paNo);
+        const nameNorm=normalizeSearch(name);
+        const statusNorm=normalizeSearch(status);
+        const chamberNorm=normalizeSearch(chamber);
+
+        /* ---- BILL NUMBER & PA NUMBER MATCH (HIGHEST PRIORITY) ---- */
+        billNumberVariants(billNo).forEach(v=>{
+            if(normalizeSearch(v).includes(normalizeSearch(query))) score+=100;
+        });
+        if(paNorm.includes(normalizeSearch(query))) score+=90;
+
+        /* ---- TERM MATCHING ---- */
+        terms.forEach(t=>{
+            const nt=normalizeSearch(t);
+            if(billNorm.includes(nt)) score+=50;
+            if(paNorm.includes(nt)) score+=40;
+            if(nameNorm.includes(nt)) score+=25;
+            if(statusNorm.includes(nt)) score+=15;
+            if(chamberNorm.includes(nt)) score+=10;
+        });
+
+        /* ---- EXACT PHRASE BONUS ---- */
+        if(nameNorm.includes(normalizeSearch(query))) score+=20;
+        if(paNorm.includes(normalizeSearch(query))) score+=15;
+
+        return {...b, _score:score};
+    })
+    .filter(b=>b._score>0)
+    .sort((a,b)=>b._score-a._score);
+
+    renderResults(scored);
+}
 
 function renderResults(data){
 results.innerHTML="";
