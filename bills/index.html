@@ -309,33 +309,65 @@ const intro=(b["Intro Chamber"]||"").toLowerCase();
 const origin=intro.includes("senate")?"Senate":"House";
 const second=origin==="Senate"?"House":"Senate";
 
-const steps=[
-"Introduced",
-`Passed ${origin}`,
-`Passed ${second}`,
-"Awaiting Governor",
-"Became Law"
-];
+/*
+Step meaning:
+0 = Introduced
+1 = Passed origin chamber
+2 = In / Passed second chamber
+3 = Awaiting Governor
+4 = Became Law
+*/
 
-let active=-1;
+let activeStep = -1;
+let completedUpTo = -1;
+let secondLabel = `Passed ${second}`;
+
+/* ---- STATUS LOGIC ---- */
+
+// INTRODUCED
+if(status === "introduced"){
+activeStep = 0;
+}
+
+// PASSED ORIGIN / IN SECOND CHAMBER
+else if(status === "second chamber"){
+completedUpTo = 1;
+activeStep = 2;
+secondLabel = `In ${second}`;
+}
+
+// AWAITING GOVERNOR
+else if(status === "awaiting governor"){
+completedUpTo = 2;
+activeStep = 3;
+}
+
+// ENACTED
+else if(status === "enacted"){
+completedUpTo = 4;
+}
+
+// TERMINAL STATES
 let terminal=null;
-
-if(status==="introduced") active=0;
-else if(status==="second chamber") active=1;
-else if(status==="awaiting governor") active=3;
-else if(status==="enacted") active=4;
-
 if(["tabled","defeated","repealed"].includes(status)){
 terminal=status.charAt(0).toUpperCase()+status.slice(1);
 }
+
+/* ---- STEP LABELS ---- */
+const steps=[
+"Introduced",
+`Passed ${origin}`,
+secondLabel,
+"Awaiting Governor",
+"Became Law"
+];
 
 return `
 <div class="tracker">
 ${steps.map((s,i)=>{
 let cls="step";
-if(i<active) cls+=" complete";
-if(i===active && status!=="enacted") cls+=" active";
-if(i===4 && status==="enacted") cls+=" complete";
+if(i<=completedUpTo) cls+=" complete";
+if(i===activeStep) cls+=" active";
 return `
 <div class="${cls}">
 <div class="dot">${i+1}</div>
@@ -348,6 +380,7 @@ Bill ${terminal}
 </div>`:""}
 `;
 }
+
 
 function showDetail(b){
 document.querySelectorAll(".bill-row").forEach(r=>r.classList.remove("active"));
