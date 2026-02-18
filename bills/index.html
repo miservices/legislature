@@ -47,11 +47,33 @@ nav a.active { color: #fff; font-weight: 700; border-bottom: 3px solid var(--acc
 .bill-desc { font-size: 14px; color: var(--secondary); line-height: 1.5; }
 .status-label { position: absolute; top: 15px; right: 15px; background-color: var(--secondary); color: #fff; font-size: 12px; font-weight: bold; padding: 4px 8px; border-radius: 8px; text-transform: uppercase; }
 
-/* DETAIL PANEL OVERLAY */
-.detail-panel { position: fixed; top:0; left:0; width:100%; min-height:100%; background: rgba(0,0,0,0.4); padding: 50px 20px; display: flex; justify-content: center; z-index: 999; overflow-y: auto; }
+/* DETAIL PANEL - overlay scrollable */
+.detail-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100vh;
+    background: rgba(0,0,0,0.4);
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    z-index: 999;
+    overflow-y: auto; /* important: allow scrolling if card is taller than viewport */
+}
 
-/* DETAIL CARD - auto height */
-.detail-container { background: #fff; border-radius: 12px; padding: 30px; max-width: 900px; width: 100%; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; flex-direction: column; }
+/* DETAIL CARD */
+.detail-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    width: 100%;
+    max-width: 900px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+}
+
 
 /* BACK BUTTON */
 .back-button { position: absolute; top: 20px; right: 20px; background: var(--primary); color: #fff; border:none; border-radius:8px; padding: 10px 14px; font-weight:bold; cursor:pointer; }
