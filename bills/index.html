@@ -14,6 +14,8 @@
     --light:#f4f6f8;
     --dark:#1a1a1a;
     --muted:#6b7280;
+    --success:#16a34a;
+    --danger:#dc2626;
 }
 
 *{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Arial,sans-serif}
@@ -86,14 +88,13 @@ nav a.active{
 }
 .bill-id{
     font-weight:700;color:var(--primary);
-    font-size:1rem;
 }
 .badge{
     background:var(--secondary);color:#fff;
     padding:4px 10px;border-radius:999px;
     font-size:12px;
 }
-.bill-title{font-weight:600;margin-bottom:4px}
+.bill-title{font-weight:600}
 .bill-desc{color:var(--muted);font-size:0.9rem}
 
 /* DETAIL */
@@ -104,7 +105,7 @@ nav a.active{
     display:none;position:relative;
 }
 .detail-section.active{display:block;animation:fadeIn .25s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
 
 .close-btn{
     position:absolute;top:20px;right:20px;
@@ -117,7 +118,7 @@ nav a.active{
 }
 .detail-name{
     font-size:1.1rem;font-weight:600;
-    margin-top:4px;margin-bottom:1rem;
+    margin:6px 0 1.25rem;
 }
 
 .detail-meta{
@@ -125,7 +126,50 @@ nav a.active{
     margin-bottom:1.5rem;
     font-weight:600;color:var(--secondary);
 }
-.detail-description{margin-bottom:1.5rem}
+
+/* TRACKER */
+.tracker{
+    display:flex;
+    justify-content:space-between;
+    margin:2rem 0;
+    position:relative;
+}
+.tracker::before{
+    content:"";
+    position:absolute;
+    top:18px;left:0;right:0;
+    height:3px;background:#e5e7eb;
+}
+.step{
+    position:relative;
+    text-align:center;
+    flex:1;
+}
+.step .dot{
+    width:36px;height:36px;
+    border-radius:50%;
+    background:#e5e7eb;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    z-index:2;
+    position:relative;
+}
+.step.active .dot{
+    background:var(--secondary);
+    color:#fff;
+}
+.step.complete .dot{
+    background:var(--success);
+    color:#fff;
+}
+.step-label{
+    margin-top:8px;
+    font-size:0.85rem;
+    font-weight:600;
+}
 
 /* DOCUMENTS */
 .documents a{
@@ -133,7 +177,6 @@ nav a.active{
     font-weight:600;color:var(--secondary);
     text-decoration:none;
 }
-.documents a:hover{text-decoration:underline}
 
 /* TIMELINE */
 .timeline{
@@ -155,7 +198,6 @@ nav a.active{
 }
 .timeline-item.recent::before{
     background:var(--secondary);
-    box-shadow:0 0 0 4px rgba(29,111,165,0.15);
 }
 
 footer{
@@ -216,60 +258,79 @@ handleHash();
 window.addEventListener("hashchange",handleHash);
 });
 
-function normalizeId(text){
-return text.toLowerCase().replace(/\s+/g,'');
-}
+function normalizeId(t){return t.toLowerCase().replace(/\s+/g,"")}
 
 function formatNumber(b){
-const status=(b["Status"]||"").toLowerCase();
-if((status.includes("enacted")||status.includes("repealed"))&&b["PA No"])
+const s=(b["Status"]||"").toLowerCase();
+if((s.includes("enacted")||s.includes("repealed"))&&b["PA No"])
 return `PA ${b["PA No"]} | ${b["Bill No"]}`;
 return b["Bill No"];
 }
 
 function applyFilters(){
-const q=document.getElementById("search").value.toLowerCase();
+const q=search.value.toLowerCase();
 renderResults(billsData.filter(b=>
 (b["Bill No"]+b["Name"]+b["Description"]).toLowerCase().includes(q)
 ));
 }
 
 function renderResults(data){
-const container=document.getElementById("results");
-container.innerHTML="";
+results.innerHTML="";
 data.forEach(b=>{
-const row=document.createElement("div");
-row.className="bill-row";
-row.onclick=()=>location.hash=normalizeId(b["Bill No"]);
-row.dataset.id=normalizeId(b["Bill No"]);
-row.innerHTML=`
+const r=document.createElement("div");
+r.className="bill-row";
+r.dataset.id=normalizeId(b["Bill No"]);
+r.onclick=()=>location.hash=r.dataset.id;
+r.innerHTML=`
 <div class="bill-top">
 <div class="bill-id">${formatNumber(b)}</div>
 <div class="badge">${b["Status"]||"—"}</div>
 </div>
 <div class="bill-title">${b["Name"]||""}</div>
-<div class="bill-desc">${b["Description"]||""}</div>
-`;
-container.appendChild(row);
+<div class="bill-desc">${b["Description"]||""}</div>`;
+results.appendChild(r);
 });
 }
 
 function handleHash(){
-const id=location.hash.replace("#","");
+const id=location.hash.slice(1);
 if(!id) return;
 const bill=billsData.find(b=>normalizeId(b["Bill No"])===id);
 if(bill) showDetail(bill);
 }
 
+function trackerHTML(b){
+const chamber=b["Intro Chamber"]||"Origin";
+const status=b["Status"]||"";
+const steps=[
+`Introduced (${chamber})`,
+"Second Chamber",
+"Awaiting Governor",
+"Enacted"
+];
+
+let activeIndex=steps.findIndex(s=>status==="Introduced");
+if(status==="Second Chamber") activeIndex=1;
+if(status==="Awaiting Governor") activeIndex=2;
+if(status==="Enacted") activeIndex=3;
+
+return `
+<div class="tracker">
+${steps.map((s,i)=>`
+<div class="step ${i<activeIndex?"complete":i===activeIndex?"active":""}">
+<div class="dot">${i+1}</div>
+<div class="step-label">${s}</div>
+</div>`).join("")}
+</div>`;
+}
+
 function showDetail(b){
 document.querySelectorAll(".bill-row").forEach(r=>r.classList.remove("active"));
-const active=document.querySelector(`[data-id="${normalizeId(b["Bill No"])}"]`);
-if(active) active.classList.add("active");
+document.querySelector(`[data-id="${normalizeId(b["Bill No"])}"]`)?.classList.add("active");
 
-const section=document.getElementById("detailSection");
 const history=b["History"]?b["History"].split("|").map(h=>h.trim()).filter(Boolean):[];
 
-section.innerHTML=`
+detailSection.innerHTML=`
 <div class="close-btn" onclick="closeDetail()">Close</div>
 
 <div class="detail-number">${formatNumber(b)}</div>
@@ -277,40 +338,37 @@ section.innerHTML=`
 
 <div class="detail-meta">
 <div>${b["Status"]||"—"}</div>
-<div>${b["Intro Chamber"]||"—"}</div>
 <div>${b["Sponsors"]||"—"}</div>
 </div>
+
+${trackerHTML(b)}
 
 <div class="detail-description">${b["Description"]||""}</div>
 
 <h3>Documents</h3>
-<div class="documents">
-${renderDocs(b)}
-</div>
+<div class="documents">${renderDocs(b)}</div>
 
 <h3 style="margin-top:2rem;">Legislative Timeline</h3>
 <div class="timeline">
 ${history.length?history.map((h,i)=>`
 <div class="timeline-item ${i===history.length-1?"recent":""}">${h}</div>
 `).join(""):"No history available."}
-</div>
-`;
-
-section.classList.add("active");
-section.scrollIntoView({behavior:"smooth"});
+</div>`;
+detailSection.classList.add("active");
+detailSection.scrollIntoView({behavior:"smooth"});
 }
 
 function renderDocs(b){
-const links=[];
-if(b["Intro PDF"]) links.push(`<a href="${b["Intro PDF"]}" target="_blank">Introduced Bill.pdf</a>`);
-if(b["Concurred PDF"]) links.push(`<a href="${b["Concurred PDF"]}" target="_blank">Concurred Bill.pdf</a>`);
-if(b["PA PDF"]) links.push(`<a href="${b["PA PDF"]}" target="_blank">Public Act.pdf</a>`);
-return links.length?links.join(""):"No documents available.";
+const l=[];
+if(b["Intro PDF"]) l.push(`<a href="${b["Intro PDF"]}" target="_blank">Introduced Bill.pdf</a>`);
+if(b["Concurred PDF"]) l.push(`<a href="${b["Concurred PDF"]}" target="_blank">Concurred Bill.pdf</a>`);
+if(b["PA PDF"]) l.push(`<a href="${b["PA PDF"]}" target="_blank">Public Act.pdf</a>`);
+return l.length?l.join(""):"No documents available.";
 }
 
 function closeDetail(){
-document.getElementById("detailSection").classList.remove("active");
-history.pushState("",document.title,window.location.pathname+window.location.search);
+detailSection.classList.remove("active");
+history.pushState("",document.title,location.pathname);
 }
 </script>
 
