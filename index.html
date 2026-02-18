@@ -2,177 +2,195 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Legislative Bills</title>
+<title>Michigan Legislature</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
 <style>
 :root {
-    --primary:#0b3c5d;
-    --secondary:#1d6fa5;
-    --accent:#e0b400;
-    --light:#f4f6f8;
-    --dark:#1a1a1a;
-    --muted:#6b7280;
+    --primary: #0b3c5d;
+    --secondary: #1d6fa5;
+    --accent: #e0b400;
+    --light: #f4f6f8;
+    --dark: #1a1a1a;
 }
 
-*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Arial,sans-serif}
-body{background:var(--light);color:var(--dark);line-height:1.6}
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+    background: var(--light);
+    color: var(--dark);
+    line-height: 1.6;
+}
 
 /* HEADER */
-header{
-    background:linear-gradient(135deg,var(--primary),var(--secondary));
-    color:#fff;
-    padding:1.25rem 2rem;
+header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    padding: 1.25rem 2rem;
 }
-.header-inner{
-    max-width:1200px;
-    margin:auto;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+
+.header-inner {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
-.logo{font-size:1.6rem;font-weight:700}
-nav a{
-    color:#ffffffcc;
-    text-decoration:none;
-    margin-left:1.5rem;
-    font-weight:500;
+
+.logo {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
-nav a.active{
-    color:#fff;
-    font-weight:700;
-    border-bottom:3px solid var(--accent);
-    padding-bottom:6px;
+
+/* NAVIGATION */
+nav a {
+    color: #ffffffcc;
+    text-decoration: none;
+    margin-left: 1.5rem;
+    font-weight: 500;
+    padding-bottom: 4px;
+}
+
+nav a:hover {
+    color: #fff;
+}
+
+nav a.active {
+    color: #fff;
+    font-weight: 700;
+    border-bottom: 3px solid var(--accent);
 }
 
 /* HERO */
-.hero{
-    background:linear-gradient(rgba(11,60,93,0.85), rgba(11,60,93,0.85)),
-    url("https://upload.wikimedia.org/wikipedia/commons/8/88/Michigan_State_Capitol_exterior.jpg")
-    center/cover no-repeat;
-    color:#fff;
-    padding:6rem 2rem;
-}
-.hero-inner{max-width:900px;margin:auto}
-.hero h1{font-size:3rem;margin-bottom:1rem}
-
-/* FILTERS */
-.filter-bar{
-    max-width:1200px;
-    margin:2rem auto;
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    padding:0 2rem;
-}
-.filter-bar input,
-.filter-bar select{
-    padding:10px 14px;
-    border-radius:8px;
-    border:1px solid #ccc;
-    min-width:180px;
+.hero {
+    background:
+        linear-gradient(rgba(11,60,93,0.85), rgba(11,60,93,0.85)),
+        url("https://upload.wikimedia.org/wikipedia/commons/8/88/Michigan_State_Capitol_exterior.jpg")
+        center/cover no-repeat;
+    color: #fff;
+    padding: 6rem 2rem;
 }
 
-/* RESULTS */
-.results-wrapper{
-    max-width:1200px;
-    margin:auto;
-    padding:0 2rem 3rem 2rem;
+.hero-inner {
+    max-width: 900px;
+    margin: auto;
 }
 
-.bill-row{
-    background:#fff;
-    padding:1.5rem;
-    border-radius:12px;
-    margin-bottom:1rem;
-    box-shadow:0 8px 20px rgba(0,0,0,0.06);
-    cursor:pointer;
-    transition:0.2s;
-}
-.bill-row:hover{
-    transform:translateY(-3px);
-    box-shadow:0 12px 28px rgba(0,0,0,0.1);
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
 }
 
-.bill-top{
-    display:flex;
-    justify-content:space-between;
-    margin-bottom:0.5rem;
-}
-.bill-id{
-    font-weight:700;
-    color:var(--primary);
-}
-.badge{
-    background:var(--secondary);
-    color:#fff;
-    padding:4px 10px;
-    border-radius:999px;
-    font-size:12px;
+.hero p {
+    font-size: 1.25rem;
+    max-width: 700px;
 }
 
-.bill-title{font-weight:600;margin-bottom:4px}
-.bill-desc{color:var(--muted);font-size:0.9rem}
-
-/* DETAIL SECTION */
-.detail-section{
-    margin-top:2rem;
-    background:#fff;
-    padding:2rem;
-    border-radius:12px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.08);
-    display:none;
+/* QUICK ACTIONS */
+.actions {
+    max-width: 1200px;
+    margin: -3rem auto 3rem;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
 }
 
-.detail-section.active{display:block}
-
-.detail-section h2{
-    color:var(--primary);
-    margin-bottom:0.5rem;
+.action-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 1.75rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.meta{
-    margin-bottom:1rem;
-    color:var(--secondary);
+.action-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
 }
 
-.documents a{
-    display:block;
-    margin-bottom:6px;
-    font-weight:600;
-    color:var(--secondary);
-    text-decoration:none;
-}
-.documents a:hover{text-decoration:underline}
-
-/* TIMELINE */
-.timeline{
-    margin-top:1rem;
-    border-left:3px solid #e5e7eb;
-    padding-left:20px;
-}
-.timeline-item{
-    margin-bottom:12px;
-    position:relative;
-}
-.timeline-item::before{
-    content:"";
-    position:absolute;
-    left:-10px;
-    top:5px;
-    width:10px;
-    height:10px;
-    border-radius:50%;
-    background:var(--secondary);
+.action-card h3 {
+    margin-bottom: 0.5rem;
+    color: var(--primary);
 }
 
-footer{
-    background:var(--primary);
-    color:#fff;
-    padding:2rem;
-    margin-top:3rem;
-    text-align:center;
+.action-card p {
+    font-size: 0.95rem;
+}
+
+.action-card a {
+    display: inline-block;
+    margin-top: 1rem;
+    font-weight: 600;
+    color: var(--secondary);
+    text-decoration: none;
+}
+
+/* INFO SECTION */
+.info {
+    max-width: 1200px;
+    margin: auto;
+    padding: 3rem 2rem;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+.info h2 {
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.info p {
+    margin-bottom: 1rem;
+}
+
+/* SIDEBAR */
+.sidebar {
+    background: #fff;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+}
+
+.sidebar h3 {
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar li {
+    margin-bottom: 0.75rem;
+}
+
+/* FOOTER */
+footer {
+    background: var(--primary);
+    color: #fff;
+    padding: 2rem;
+    margin-top: 3rem;
+}
+
+.footer-inner {
+    max-width: 1200px;
+    margin: auto;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.footer-inner div {
+    margin-bottom: 0.5rem;
 }
 </style>
 </head>
@@ -183,127 +201,87 @@ footer{
     <div class="header-inner">
         <div class="logo">Michigan Legislature</div>
         <nav>
-            <a href="https://miservices.github.io/legislature/">Home</a>
-            <a href="https://miservices.github.io/legislature/about">About</a>
-            <a href="https://miservices.github.io/legislature/mcl">Laws</a>
-            <a href="https://miservices.github.io/legislature/bills" class="active">Bills</a>
-            <a href="https://miservices.github.io/legislature/resolutions">Resolutions</a>
-            <a href="https://miservices.github.io/legislature/journals">Journals</a>
+<a href="https://miservices.github.io/legislature/" target="_self">Home</a>
+<a href="https://miservices.github.io/legislature/about" target="_self">About</a>
+<a href="https://miservices.github.io/legislature/mcl" target="_self">Laws</a>
+<a href="https://miservices.github.io/legislature/bills" target="_self">Bills</a>
+<a href="https://miservices.github.io/legislature/resolutions" target="_self">Resolutions</a>
+<a href="https://miservices.github.io/legislature/journals" target="_self">Journals</a>
         </nav>
     </div>
 </header>
 
 <section class="hero">
     <div class="hero-inner">
-        <h1>Legislative Bills</h1>
-        <p>Search and explore legislation introduced in the Michigan Legislature.</p>
+        <h1>The Legislative Branch of Michigan</h1>
+        <p>
+            Advancing the laws of the State of Michigan through transparency,
+            accountability, and public service.
+        </p>
     </div>
 </section>
 
-<div class="filter-bar">
-  <input id="search" placeholder="Search bills..." oninput="applyFilters()">
-</div>
+<section class="actions">
+    <div class="action-card">
+        <h3>Michigan Compiled Laws</h3>
+        <p>Browse the official statutory laws of the State of Michigan.</p>
+        <a href="https://miservices.github.io/legislature/mcl">View Laws →</a>
+    </div>
 
-<div class="results-wrapper">
-  <div id="results"></div>
+    <div class="action-card">
+        <h3>Legislative Bills</h3>
+        <p>Search and track bills introduced in the Senate and House.</p>
+        <a href="https://miservices.github.io/legislature/bills">View Bills →</a>
+    </div>
 
-  <div id="detailSection" class="detail-section"></div>
-</div>
+    <div class="action-card">
+        <h3>Resolutions</h3>
+        <p>Access joint, concurrent, and simple resolutions.</p>
+        <a href="https://miservices.github.io/legislature/resolutions">View Resolutions →</a>
+    </div>
 
-<footer>© 2026 Michigan Legislature</footer>
+    <div class="action-card">
+        <h3>Legislative Journals</h3>
+        <p>Official daily journals documenting legislative proceedings.</p>
+        <a href="https://miservices.github.io/legislature/journals">View Journals →</a>
+    </div>
+</section>
 
-<script>
-let billsData=[];
-const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ31EfUU7mCQYrcQAhNTKXey6ep6f6rACOykAkPa2FIfQtAN3iRgPxumI-3AdcyYKZUVoIpuI0NDnJL/pub?gid=0&single=true&output=csv";
+<section class="info">
+    <div>
+        <h2>About the Michigan Legislature</h2>
+        <p>
+            The Michigan Legislature consists of the Senate and the House of
+            Representatives. Together, they enact laws, adopt resolutions,
+            and maintain the official journals of legislative proceedings.
+        </p>
+        <p>
+            This website serves as the official public portal for legislative
+            information and public access to the lawmaking process.
+        </p>
+    </div>
 
-document.addEventListener("DOMContentLoaded",()=>{
-    Papa.parse(CSV_URL,{
-        download:true,
-        header:true,
-        skipEmptyLines:true,
-        complete:res=>{
-            billsData=res.data.filter(b=>b["Bill No"]);
-            renderResults(billsData);
-        }
-    });
-});
+    <aside class="sidebar">
+        <h3>Quick Facts</h3>
+        <ul>
+            <li>✔ 38 Senators</li>
+            <li>✔ 110 Representatives</li>
+            <li>✔ Regular &amp; Special Sessions</li>
+            <li>✔ Public Legislative Records</li>
+        </ul>
+    </aside>
+</section>
 
-function applyFilters(){
-    const q=document.getElementById("search").value.toLowerCase();
-    renderResults(
-        billsData.filter(b=>
-            (b["Bill No"]+b["Name"]+b["Description"]).toLowerCase().includes(q)
-        )
-    );
-}
-
-function renderResults(data){
-    const container=document.getElementById("results");
-    container.innerHTML="";
-    data.forEach(bill=>{
-        const row=document.createElement("div");
-        row.className="bill-row";
-        row.onclick=()=>showDetail(bill);
-        row.innerHTML=`
-            <div class="bill-top">
-                <div class="bill-id">${bill["Bill No"]}</div>
-                <div class="badge">${bill["Status"]||"—"}</div>
-            </div>
-            <div class="bill-title">${bill["Name"]||"Untitled"}</div>
-            <div class="bill-desc">${bill["Description"]||""}</div>
-        `;
-        container.appendChild(row);
-    });
-}
-
-function extractDocLabel(text){
-    if(!text) return null;
-    const match=text.match(/\((.*?)\)/);
-    return match?match[1]:text;
-}
-
-function showDetail(bill){
-    const section=document.getElementById("detailSection");
-
-    const docs=[
-        {url:bill["Intro PDF"], label:extractDocLabel(bill["Intro PDF"])},
-        {url:bill["Concurred PDF"], label:extractDocLabel(bill["Concurred PDF"])},
-        {url:bill["PA PDF"], label:extractDocLabel(bill["PA PDF"])}
-    ].filter(d=>d.url);
-
-    section.innerHTML=`
-        <h2>${bill["Bill No"]} — ${bill["Name"]||""}</h2>
-        <div class="meta">
-            Status: ${bill["Status"]||"—"}<br>
-            Originating Chamber: ${bill["Intro Chamber"]||"—"}<br>
-            Sponsors: ${bill["Sponsors"]||"—"}
+<footer>
+    <div class="footer-inner">
+        <div>
+            © 2026 Michigan Legislature
         </div>
-
-        <p style="margin-bottom:1rem">${bill["Description"]||""}</p>
-
-        <h3>Documents</h3>
-        <div class="documents">
-            ${
-                docs.length
-                ? docs.map(d=>`<a href="${d.url}" target="_blank">${d.label}</a>`).join("")
-                : "No documents available."
-            }
+        <div>
+            Official State of Michigan Website
         </div>
-
-        <h3 style="margin-top:1.5rem">Legislative Timeline</h3>
-        <div class="timeline">
-            ${
-                bill["History"]
-                ? bill["History"].split("|").map(h=>`<div class="timeline-item">${h.trim()}</div>`).join("")
-                : "No history available."
-            }
-        </div>
-    `;
-
-    section.classList.add("active");
-    section.scrollIntoView({behavior:"smooth"});
-}
-</script>
+    </div>
+</footer>
 
 </body>
 </html>
