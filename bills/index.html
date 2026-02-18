@@ -367,6 +367,22 @@ function renderResults(data){
         container.appendChild(row);
     });
 }
+function getProgressPercent(status){
+
+    if(!status) return 10;
+
+    const s = status.toLowerCase();
+
+    if(s.includes("introduced")) return 20;
+    if(s.includes("committee")) return 35;
+    if(s.includes("reported")) return 50;
+    if(s.includes("passed house")) return 65;
+    if(s.includes("passed senate")) return 80;
+    if(s.includes("concurred")) return 90;
+    if(s.includes("public act") || s.includes("signed")) return 100;
+
+    return 40;
+}
 
 function openDrawer(bill){
 
@@ -376,7 +392,9 @@ function openDrawer(bill){
         .split("|")
         .filter(h=>h.trim()!=="")
 
-    const progressPercent=getProgressPercent(bill["Status"]);
+    const progressPercent = typeof getProgressPercent === "function"
+    ? getProgressPercent(bill["Status"])
+    : 40;
 
     drawer.innerHTML=`
         <div class="drawer-close" onclick="closeDrawer()">✕</div>
