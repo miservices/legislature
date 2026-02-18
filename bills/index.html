@@ -70,8 +70,10 @@ nav a.active{
   box-shadow:0 4px 12px rgba(0,0,0,0.08);
 }
 
-.filter-inner input,
-.filter-inner select{
+/* Make the search input take remaining space */
+.filter-inner input{
+  flex:1;          /* stretch to fill available width */
+  min-width:250px;  /* don't shrink too small */
   padding:10px 14px;
   border-radius:8px;
   border:1px solid #ccc;
@@ -79,16 +81,23 @@ nav a.active{
   transition:all 0.2s;
 }
 
-.filter-inner input:focus,
-.filter-inner select:focus{
+.filter-inner input:focus{
   outline:none;
   border-color:var(--secondary);
   box-shadow:0 0 0 2px rgba(29,111,165,0.2);
 }
 
-.filter-inner input[type="number"]{
-  width:100px;
+/* Keep dropdowns smaller, aligned right */
+.filter-inner select{
+  padding:10px 14px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:0.95rem;
+  background:#fff;
+  cursor:pointer;
+  flex:0 0 auto; /* don't grow */
 }
+
 
 .filter-inner select{
   background:#fff;
@@ -339,6 +348,7 @@ footer{
     </select>
   </div>
 </div>
+
 
 
 
