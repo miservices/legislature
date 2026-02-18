@@ -318,12 +318,69 @@ return `PA ${b["PA No"]} | ${b["Bill No"]}`;
 return b["Bill No"];
 }
 
-function applyFilters(){
-const q=document.getElementById("search").value.toLowerCase();
-renderResults(billsData.filter(b=>
-(b["Bill No"]+b["Name"]+b["Description"]).toLowerCase().includes(q)
-));
+function normalizeSearch(text=""){
+return text
+.toLowerCase()
+.replace(/[^a-z0-9]/g,"")
 }
+
+function billNumberVariants(billNo=""){
+const n=billNo.toLowerCase();
+return [
+n,
+n.replace(/\s+/g,""),
+n.replace("senate bill","sb"),
+n.replace("house bill","hb")
+];
+}
+
+
+function applyFilters(){
+const query=document.getElementById("search").value.trim().toLowerCase();
+if(!query){
+renderResults(billsData);
+return;
+}
+
+const terms=query.split(/\s+/).filter(Boolean);
+
+const scored=billsData.map(b=>{
+let score=0;
+
+const billNo=b["Bill No"]||"";
+const name=b["Name"]||"";
+const desc=b["Description"]||"";
+
+const billNorm=normalizeSearch(billNo);
+const nameNorm=normalizeSearch(name);
+const descNorm=normalizeSearch(desc);
+
+/* ---- BILL NUMBER MATCH (HIGHEST PRIORITY) ---- */
+billNumberVariants(billNo).forEach(v=>{
+if(normalizeSearch(v).includes(normalizeSearch(query))) score+=100;
+});
+
+/* ---- TERM MATCHING ---- */
+terms.forEach(t=>{
+const nt=normalizeSearch(t);
+
+if(billNorm.includes(nt)) score+=40;
+if(nameNorm.includes(nt)) score+=20;
+if(descNorm.includes(nt)) score+=5;
+});
+
+/* ---- EXACT PHRASE BONUS ---- */
+if(normalizeSearch(name).includes(normalizeSearch(query))) score+=30;
+if(normalizeSearch(desc).includes(normalizeSearch(query))) score+=10;
+
+return {...b, _score:score};
+})
+.filter(b=>b._score>0)
+.sort((a,b)=>b._score-a._score);
+
+renderResults(scored);
+}
+
 
 function renderResults(data){
 results.innerHTML="";
