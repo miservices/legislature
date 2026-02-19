@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>How a Bill Becomes Law – Michigan Legislature</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --primary:#0b3c5d;
+    --secondary:#1d6fa5;
+    --accent:#e0b400;
+    --light:#f4f6f8;
+    --dark:#1a1a1a;
+}
+
+* {
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:"Segoe UI", Arial, sans-serif;
+}
+
+body {
+    background:var(--light);
+    color:var(--dark);
+    line-height:1.6;
+}
+
+/* HEADER */
+header {
+    background:linear-gradient(135deg,var(--primary),var(--secondary));
+    color:#fff;
+    padding:1.25rem 2rem;
+}
+
+.header-inner {
+    max-width:1200px;
+    margin:auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+nav a {
+    color:#ffffffcc;
+    text-decoration:none;
+    margin-left:1.5rem;
+    font-weight:500;
+}
+
+nav a.active {
+    color:#fff;
+    font-weight:700;
+    border-bottom:3px solid var(--accent);
+}
+
+/* HERO */
+.hero {
+    background:linear-gradient(rgba(11,60,93,.9),rgba(11,60,93,.9)),
+               url("https://upload.wikimedia.org/wikipedia/commons/8/88/Michigan_State_Capitol_exterior.jpg")
+               center/cover no-repeat;
+    color:#fff;
+    padding:5rem 2rem;
+}
+
+.hero-inner {
+    max-width:900px;
+    margin:auto;
+}
+
+.hero h1 {
+    font-size:3rem;
+    margin-bottom:1rem;
+}
+
+/* CONTENT */
+.content {
+    max-width:1100px;
+    margin:3rem auto;
+    padding:0 2rem;
+}
+
+/* TIMELINE */
+.timeline {
+    display:grid;
+    gap:1.5rem;
+    margin-top:2.5rem;
+}
+
+.step {
+    background:#fff;
+    border-radius:10px;
+    box-shadow:0 4px 14px rgba(0,0,0,.08);
+    padding:1.75rem;
+    cursor:pointer;
+    transition:.2s ease;
+}
+
+.step:hover {
+    transform:translateY(-3px);
+}
+
+.step-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.step-number {
+    background:var(--primary);
+    color:#fff;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+}
+
+.step h3 {
+    flex:1;
+    margin-left:1rem;
+    color:var(--primary);
+}
+
+.step-content {
+    display:none;
+    margin-top:1rem;
+    color:#444;
+}
+
+.step.open .step-content {
+    display:block;
+}
+
+.step.open {
+    border-left:6px solid var(--accent);
+}
+
+/* FOOTER */
+footer {
+    background:var(--primary);
+    color:#fff;
+    padding:2rem;
+    margin-top:3rem;
+}
+
+.footer-inner {
+    max-width:1200px;
+    margin:auto;
+    font-size:.9rem;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-inner">
+        <strong>Michigan Legislature</strong>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/about" class="active">About</a>
+            <a href="/mcl">Laws</a>
+            <a href="/bills">Bills</a>
+        </nav>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="hero-inner">
+        <h1>How a Bill Becomes Law</h1>
+        <p>
+            Follow the journey of a bill as it moves through the Michigan Legislature—from introduction to enactment.
+            Click each step to explore what happens along the way.
+        </p>
+    </div>
+</section>
+
+<div class="content">
+
+    <div class="timeline">
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <h3>Introduction</h3>
+            </div>
+            <div class="step-content">
+                A bill may be introduced in either chamber. Senate bills are filed with the Secretary of the Senate,
+                and House bills with the Clerk of the House. Bills receive a number and are read by title.
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <h3>Committee Referral & Review</h3>
+            </div>
+            <div class="step-content">
+                The bill is referred to a standing committee, where members debate the bill, may hold public hearings,
+                and decide whether to report the bill to the full chamber.
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <h3>Second & Third Reading</h3>
+            </div>
+            <div class="step-content">
+                The bill is considered by the full chamber. Amendments may be offered, debate occurs,
+                and the bill advances to a final vote at Third Reading.
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">4</div>
+                <h3>Vote in First Chamber</h3>
+            </div>
+            <div class="step-content">
+                A roll call vote is taken. If a majority of members elected and serving vote in favor,
+                the bill passes and moves to the other chamber.
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">5</div>
+                <h3>Second Chamber Consideration</h3>
+            </div>
+            <div class="step-content">
+                The second chamber follows the same committee and floor process. If the bill is amended,
+                both chambers must agree to identical language.
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">6</div>
+                <h3>Conference Committee (If Needed)</h3>
+            </div>
+            <div class="step-content">
+                If the chambers disagree, a conference committee attempts to resolve differences.
+                Both chambers must approve the final compromise.
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">7</div>
+                <h3>Governor’s Action</h3>
+            </div>
+            <div class="step-content">
+                The Governor may sign the bill, veto it, or allow it to become law without a signature.
+                The Legislature may override a veto by a two-thirds vote.
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">8</div>
+                <h3>Becomes Law</h3>
+            </div>
+            <div class="step-content">
+                Once enacted, the law takes effect either after 90 days or immediately if granted
+                immediate effect by a two-thirds vote of both chambers.
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-inner">
+        IMPORTANT NOTICE: This site is not a real legislature and has no legal authority.
+    </div>
+</footer>
+
+<script>
+document.querySelectorAll(".step").forEach(step => {
+    step.addEventListener("click", () => {
+        step.classList.toggle("open");
+    });
+});
+</script>
+
+</body>
+</html>
