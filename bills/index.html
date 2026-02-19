@@ -345,7 +345,21 @@ nav a.active{
     margin-top:8px;
     font-size:0.85rem;
     font-weight:700;
+}
+
+/* Default (defeated - red) */
+.terminal-tracker .terminal-label{
     color:#7f1d1d;
+}
+
+/* Warning (tabled - yellow) */
+.terminal-tracker.warning .terminal-label{
+    color:#92400e;  /* darker amber, readable */
+}
+
+/* Success (repealed or other green state if used) */
+.terminal-tracker.success .terminal-label{
+    color:#166534;
 }
 
 /* WARNING (TABLED) STATE */
