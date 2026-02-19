@@ -481,17 +481,28 @@ window.addEventListener("hashchange",handleHash);
 function normalizeId(t){return t.toLowerCase().replace(/\s+/g,"")}
 
 function formatNumber(b){
-const s=(b["Status"]||"").toLowerCase();
-if((s.includes("enacted")||s.includes("repealed"))&&b["PA No"])
-return `PA ${b["PA No"]} | ${b["Bill No"]}`;
-return b["Bill No"];
+    const status = (b["Status"] || "").toLowerCase();
+    const billNo = b["Bill No"] || "";
+    const paNo = b["PA No"] || "";
+
+    // Convert SB / HB to full names
+    let formattedBill = billNo;
+
+    if(billNo.toLowerCase().startsWith("sb")){
+        formattedBill = billNo.replace(/^sb/i, "Senate Bill");
+    }
+    else if(billNo.toLowerCase().startsWith("hb")){
+        formattedBill = billNo.replace(/^hb/i, "House Bill");
+    }
+
+    // If enacted or repealed, append Public Act number
+    if((status === "enacted" || status === "repealed") && paNo){
+        return `${formattedBill} (Public Act ${paNo})`;
+    }
+
+    return formattedBill;
 }
 
-function normalizeSearch(text=""){
-return text
-.toLowerCase()
-.replace(/[^a-z0-9]/g,"")
-}
 
 function billNumberVariants(billNo=""){
 const n=billNo.toLowerCase();
