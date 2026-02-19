@@ -348,6 +348,24 @@ nav a.active{
     color:#7f1d1d;
 }
 
+/* WARNING (TABLED) STATE */
+
+.terminal-tracker.warning::before{
+    background:#fde68a; /* soft yellow line */
+}
+
+.terminal-dot.caution{
+    background:#facc15; /* yellow */
+    color:#000;
+    font-size:18px;
+}
+
+.terminal-dot.success{
+    background:#16a34a;
+    color:#fff;
+}
+
+
 footer{
     background:var(--primary);
     color:#fff;padding:2rem;
@@ -586,19 +604,20 @@ const second=origin==="Senate"?"House":"Senate";
 
 if(status==="tabled"){
 return `
-<div class="terminal-tracker">
+<div class="terminal-tracker warning">
 <div class="terminal-step complete">
-<div class="terminal-dot">✓</div>
+<div class="terminal-dot success">✓</div>
 <div class="terminal-label">Introduced</div>
 </div>
 
 <div class="terminal-step">
-<div class="terminal-dot">✖</div>
+<div class="terminal-dot caution">⚠</div>
 <div class="terminal-label">Tabled</div>
 </div>
 </div>
 `;
 }
+
 
 if(status==="defeated"){
 return `
