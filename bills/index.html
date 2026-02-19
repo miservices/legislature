@@ -162,6 +162,53 @@ nav a.active{
     cursor:pointer;font-weight:600;color:var(--muted);
 }
 
+/* SKELETON LOADING */
+
+.skeleton {
+    position: relative;
+    overflow: hidden;
+    background: #e5e7eb;
+}
+
+.skeleton::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150px;
+    height: 100%;
+    width: 150px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.6),
+        transparent
+    );
+    animation: shimmer 1.2s infinite;
+}
+
+@keyframes shimmer {
+    100% { transform: translateX(300px); }
+}
+
+.skeleton-card {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+.skeleton-line {
+    height: 14px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.skeleton-line.short { width: 30%; }
+.skeleton-line.medium { width: 60%; }
+.skeleton-line.long { width: 90%; }
+
+
 .detail-number{
     font-size:1.4rem;font-weight:700;
     color:var(--primary);
@@ -372,16 +419,23 @@ let billsData=[];
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ31EfUU7mCQYrcQAhNTKXey6ep6f6rACOykAkPa2FIfQtAN3iRgPxumI-3AdcyYKZUVoIpuI0NDnJL/pub?gid=0&single=true&output=csv";
 
 document.addEventListener("DOMContentLoaded",()=>{
+
+showSkeletons();   // 👈 ADD THIS
+
 Papa.parse(CSV_URL,{
-download:true,header:true,skipEmptyLines:true,
+download:true,
+header:true,
+skipEmptyLines:true,
 complete:res=>{
 billsData=res.data.filter(b=>b["Bill No"]);
 renderResults(billsData);
 handleHash();
 }
 });
+
 window.addEventListener("hashchange",handleHash);
 });
+
 
 function normalizeId(t){return t.toLowerCase().replace(/\s+/g,"")}
 
@@ -476,6 +530,22 @@ function applyFilters(){
 
     renderResults(scored);
 }
+
+function showSkeletons(count = 6) {
+    results.innerHTML = "";
+
+    for (let i = 0; i < count; i++) {
+        const skeleton = document.createElement("div");
+        skeleton.className = "skeleton-card";
+        skeleton.innerHTML = `
+            <div class="skeleton skeleton-line short"></div>
+            <div class="skeleton skeleton-line medium"></div>
+            <div class="skeleton skeleton-line long"></div>
+        `;
+        results.appendChild(skeleton);
+    }
+}
+
 
 function renderResults(data){
 results.innerHTML="";
