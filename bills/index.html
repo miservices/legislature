@@ -42,24 +42,15 @@ nav a.active{
     padding-bottom:6px;
 }
 
-.hero-wrapper{
-  max-width:1200px;   /* same as filter-bar and results */
-  margin:0 auto;       /* center horizontally */
-  padding:0 2rem;      /* match horizontal padding of cards and filters */
+/* HERO */
+.hero{
+    background:linear-gradient(rgba(11,60,93,0.85),rgba(11,60,93,0.85)),
+    url("https://upload.wikimedia.org/wikipedia/commons/8/88/Michigan_State_Capitol_exterior.jpg")
+    center/cover no-repeat;
+    color:#fff;padding:6rem 2rem;
 }
-.hero-inner{
-  max-width:900px;     /* optional, keeps text nicely readable */
-  margin:0 auto;
-}
-.hero h1{
-  font-size:3rem;
-  margin-bottom:1rem;
-}
-.hero p{
-  font-size:1.1rem;
-  color:#f4f6f8;
-}
-
+.hero-inner{max-width:900px;margin:auto}
+.hero h1{font-size:3rem;margin-bottom:1rem}
 
 /* FILTER BAR DESIGN */
 .filter-bar{
@@ -329,14 +320,11 @@ footer{
 </header>
 
 <section class="hero">
-  <div class="hero-wrapper">
-    <div class="hero-inner">
-      <h1>Legislative Bills</h1>
-      <p>Search and explore legislation introduced in the Michigan Legislature.</p>
-    </div>
+  <div class="hero-inner">
+    <h1>Legislative Bills</h1>
+    <p>Search and explore legislation introduced in the Michigan Legislature.</p>
   </div>
 </section>
-
 
 
 <div class="filter-bar">
