@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>About – Michigan Legislature</title>
+<title>About the Michigan Legislature</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -94,18 +94,67 @@ nav a.active {
 
 /* CONTENT */
 .content {
-    max-width: 900px;
+    max-width: 1100px;
     margin: 3rem auto;
     padding: 0 2rem;
 }
 
-.content h2 {
+.section {
+    margin-bottom: 3rem;
+}
+
+.section h2 {
     color: var(--primary);
     margin-bottom: 1rem;
 }
 
-.content p {
+.section p {
+    margin-bottom: 1rem;
+}
+
+/* BUTTON GRID */
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.info-card {
+    background: #fff;
+    padding: 1.75rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    transition: 0.2s ease;
+    text-align: center;
+}
+
+.info-card:hover {
+    transform: translateY(-4px);
+}
+
+.info-card h3 {
+    color: var(--primary);
+    margin-bottom: 0.75rem;
+}
+
+.info-card p {
+    font-size: 0.95rem;
     margin-bottom: 1.25rem;
+}
+
+.info-card a {
+    display: inline-block;
+    background: var(--primary);
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.info-card a:hover {
+    background: var(--secondary);
 }
 
 /* FOOTER */
@@ -120,13 +169,6 @@ footer {
     max-width: 1200px;
     margin: auto;
     font-size: 0.9rem;
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-
-.footer-inner div {
-    margin-bottom: 0.5rem;
 }
 </style>
 </head>
@@ -137,12 +179,12 @@ footer {
     <div class="header-inner">
         <div class="logo">Michigan Legislature</div>
         <nav>
-            <a href="https://miservices.github.io/legislature/" target="_self">Home</a>
-            <a href="https://miservices.github.io/legislature/about" class="active" target="_self">About</a>
-            <a href="https://miservices.github.io/legislature/mcl" target="_self">Laws</a>
-            <a href="https://miservices.github.io/legislature/bills" target="_self">Bills</a>
-            <a href="https://miservices.github.io/legislature/resolutions" target="_self">Resolutions</a>
-            <a href="https://miservices.github.io/legislature/journals" target="_self">Journals</a>
+            <a href="https://miservices.github.io/legislature/">Home</a>
+            <a href="https://miservices.github.io/legislature/about" class="active">About</a>
+            <a href="https://miservices.github.io/legislature/mcl">Laws</a>
+            <a href="https://miservices.github.io/legislature/bills">Bills</a>
+            <a href="https://miservices.github.io/legislature/resolutions">Resolutions</a>
+            <a href="https://miservices.github.io/legislature/journals">Journals</a>
         </nav>
     </div>
 </header>
@@ -151,46 +193,76 @@ footer {
     <div class="hero-inner">
         <h1>About the Michigan Legislature</h1>
         <p>
-            Learn how Michigan's legislative branch serves the public and upholds the law through transparency, accountability, and civic engagement.
+            The Michigan Legislature is the lawmaking branch of state government. It is a bicameral body composed of the Senate and the House of Representatives, meeting at the State Capitol in Lansing.
         </p>
     </div>
 </section>
 
 <div class="content">
-    <h2>Our Mission</h2>
-    <p>
-        The Michigan Legislature exists to enact laws, adopt resolutions, and maintain official records that govern the state. We are committed to ensuring that every action taken reflects the interests and needs of the people of Michigan.
-    </p>
 
-    <h2>Structure</h2>
-    <p>
-        The Legislature consists of two chambers: the Senate, with 38 members, and the House of Representatives, with 110 members. Together, these elected officials debate, propose, and vote on legislation that affects every Michigan resident.
-    </p>
+    <div class="section">
+        <h2>Overview</h2>
+        <p>
+            The Legislature enacts laws, adopts resolutions, and maintains official legislative records for the State of Michigan. Through debate, committee review, and recorded votes, elected members represent the people in shaping public policy.
+        </p>
+    </div>
 
-    <h2>Transparency & Public Access</h2>
-    <p>
-        We provide open access to legislative proceedings, including bills, resolutions, and journals, so citizens can stay informed and engaged in the lawmaking process.
-    </p>
+    <div class="section">
+        <h2>Legislative Structure</h2>
+        <p>
+            The Senate consists of 38 members serving four-year terms. The House of Representatives consists of 110 members serving two-year terms. Together, both chambers must approve legislation before it may be presented to the Governor.
+        </p>
+    </div>
 
-    <h2>History</h2>
-    <p>
-        Established under the Michigan Constitution, the Legislature has evolved over decades to become a transparent and accountable body. Today, it serves as the official voice of Michigan citizens in shaping the laws of the state.
-    </p>
+    <div class="section">
+        <h2>Explore the Legislature</h2>
 
-    <h2>Get Involved</h2>
-    <p>
-        Citizens are encouraged to follow legislative sessions, review proposed bills, and provide feedback. Our goal is to foster an engaged and informed public that can participate meaningfully in governance.
-    </p>
+        <div class="button-grid">
+
+            <div class="info-card">
+                <h3>Senate</h3>
+                <p>View current Senators, leadership, and chamber information.</p>
+                <a href="#">View Senators</a>
+            </div>
+
+            <div class="info-card">
+                <h3>House of Representatives</h3>
+                <p>Explore Representatives, leadership roles, and districts.</p>
+                <a href="#">View Representatives</a>
+            </div>
+
+            <div class="info-card">
+                <h3>Committees</h3>
+                <p>Review standing committees and legislative assignments.</p>
+                <a href="#">View Committees</a>
+            </div>
+
+            <div class="info-card">
+                <h3>Legislative Process</h3>
+                <p>Learn how a bill moves from introduction to enactment.</p>
+                <a href="#">How a Bill Becomes Law</a>
+            </div>
+
+            <div class="info-card">
+                <h3>Michigan Compiled Laws</h3>
+                <p>Access the codified statutes of the State of Michigan.</p>
+                <a href="https://miservices.github.io/legislature/mcl">View Laws</a>
+            </div>
+
+            <div class="info-card">
+                <h3>Legislative Calendar</h3>
+                <p>See upcoming session dates and legislative activity.</p>
+                <a href="#">View Calendar</a>
+            </div>
+
+        </div>
+    </div>
+
 </div>
 
 <footer>
     <div class="footer-inner">
-        <div>
-            IMPORTANT NOTICE
-        </div>
-        <div>
-            This site is not a real legislature, does not have legal authority, and is not affiliated with or endorsed by any real government.
-        </div>
+        IMPORTANT NOTICE: This site is not a real legislature, does not have legal authority, and is not affiliated with or endorsed by any real government.
     </div>
 </footer>
 
