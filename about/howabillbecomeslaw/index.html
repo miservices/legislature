@@ -24,7 +24,7 @@
 body {
     background:var(--light);
     color:var(--dark);
-    line-height:1.6;
+    line-height:1.65;
 }
 
 /* HEADER */
@@ -81,54 +81,48 @@ nav a.active {
     padding:0 2rem;
 }
 
-/* TIMELINE */
-.timeline {
-    display:grid;
-    gap:1.5rem;
-    margin-top:2.5rem;
-}
-
+/* STEPS */
 .step {
     background:#fff;
     border-radius:10px;
     box-shadow:0 4px 14px rgba(0,0,0,.08);
-    padding:1.75rem;
+    padding:2rem;
+    margin-bottom:1.75rem;
     cursor:pointer;
     transition:.2s ease;
 }
 
 .step:hover {
-    transform:translateY(-3px);
+    transform:translateY(-2px);
 }
 
 .step-header {
     display:flex;
-    justify-content:space-between;
     align-items:center;
 }
 
 .step-number {
+    width:38px;
+    height:38px;
     background:var(--primary);
     color:#fff;
-    width:36px;
-    height:36px;
     border-radius:50%;
     display:flex;
     align-items:center;
     justify-content:center;
     font-weight:700;
+    flex-shrink:0;
 }
 
-.step h3 {
-    flex:1;
+.step h2 {
     margin-left:1rem;
     color:var(--primary);
 }
 
 .step-content {
     display:none;
-    margin-top:1rem;
-    color:#444;
+    margin-top:1.5rem;
+    color:#333;
 }
 
 .step.open .step-content {
@@ -137,6 +131,20 @@ nav a.active {
 
 .step.open {
     border-left:6px solid var(--accent);
+}
+
+/* SUBSECTIONS */
+.step-content h3 {
+    margin-top:1.25rem;
+    color:var(--secondary);
+}
+
+.step-content ul {
+    margin:0.75rem 0 0.75rem 1.25rem;
+}
+
+.step-content li {
+    margin-bottom:0.5rem;
 }
 
 /* FOOTER */
@@ -163,7 +171,6 @@ footer {
         <nav>
             <a href="/">Home</a>
             <a href="/about" class="active">About</a>
-            <a href="/mcl">Laws</a>
             <a href="/bills">Bills</a>
         </nav>
     </div>
@@ -173,105 +180,174 @@ footer {
     <div class="hero-inner">
         <h1>How a Bill Becomes Law</h1>
         <p>
-            Follow the journey of a bill as it moves through the Michigan Legislature—from introduction to enactment.
-            Click each step to explore what happens along the way.
+            This page explains, in detail, every major procedural step and decision point
+            a bill may encounter in the Michigan Legislature.
         </p>
     </div>
 </section>
 
 <div class="content">
 
-    <div class="timeline">
-
-        <div class="step">
-            <div class="step-header">
-                <div class="step-number">1</div>
-                <h3>Introduction</h3>
-            </div>
-            <div class="step-content">
-                A bill may be introduced in either chamber. Senate bills are filed with the Secretary of the Senate,
-                and House bills with the Clerk of the House. Bills receive a number and are read by title.
-            </div>
-        </div>
-
-        <div class="step">
-            <div class="step-header">
-                <div class="step-number">2</div>
-                <h3>Committee Referral & Review</h3>
-            </div>
-            <div class="step-content">
-                The bill is referred to a standing committee, where members debate the bill, may hold public hearings,
-                and decide whether to report the bill to the full chamber.
-            </div>
-        </div>
-
-        <div class="step">
-            <div class="step-header">
-                <div class="step-number">3</div>
-                <h3>Second & Third Reading</h3>
-            </div>
-            <div class="step-content">
-                The bill is considered by the full chamber. Amendments may be offered, debate occurs,
-                and the bill advances to a final vote at Third Reading.
-            </div>
-        </div>
-
-        <div class="step">
-            <div class="step-header">
-                <div class="step-number">4</div>
-                <h3>Vote in First Chamber</h3>
-            </div>
-            <div class="step-content">
-                A roll call vote is taken. If a majority of members elected and serving vote in favor,
-                the bill passes and moves to the other chamber.
-            </div>
-        </div>
-
-        <div class="step">
-            <div class="step-header">
-                <div class="step-number">5</div>
-                <h3>Second Chamber Consideration</h3>
-            </div>
-            <div class="step-content">
-                The second chamber follows the same committee and floor process. If the bill is amended,
-                both chambers must agree to identical language.
-            </div>
-        </div>
-
-        <div class="step">
-            <div class="step-header">
-                <div class="step-number">6</div>
-                <h3>Conference Committee (If Needed)</h3>
-            </div>
-            <div class="step-content">
-                If the chambers disagree, a conference committee attempts to resolve differences.
-                Both chambers must approve the final compromise.
-            </div>
-        </div>
-
-        <div class="step">
-            <div class="step-header">
-                <div class="step-number">7</div>
-                <h3>Governor’s Action</h3>
-            </div>
-            <div class="step-content">
-                The Governor may sign the bill, veto it, or allow it to become law without a signature.
-                The Legislature may override a veto by a two-thirds vote.
-            </div>
-        </div>
-
-        <div class="step">
-            <div class="step-header">
-                <div class="step-number">8</div>
-                <h3>Becomes Law</h3>
-            </div>
-            <div class="step-content">
-                Once enacted, the law takes effect either after 90 days or immediately if granted
-                immediate effect by a two-thirds vote of both chambers.
-            </div>
-        </div>
-
+<!-- STEP 1 -->
+<div class="step open">
+    <div class="step-header">
+        <div class="step-number">1</div>
+        <h2>Introduction</h2>
     </div>
+    <div class="step-content">
+        <p>
+            A bill may be introduced in either chamber of the Legislature.
+        </p>
+
+        <ul>
+            <li>Senate bills are filed with the Secretary of the Senate.</li>
+            <li>House bills are filed with the Clerk of the House.</li>
+            <li>Each bill is assigned a number upon introduction.</li>
+        </ul>
+
+        <h3>Bill Numbering</h3>
+        <ul>
+            <li>House Bills begin at House Bill 4001 each biennium.</li>
+            <li>Senate Bills begin at Senate Bill 1.</li>
+            <li>Joint resolutions are assigned letters.</li>
+        </ul>
+
+        <h3>Title Reading & Printing</h3>
+        <ul>
+            <li>The Michigan Constitution requires three readings.</li>
+            <li>This requirement is satisfied by reading the bill’s title.</li>
+            <li>The bill must be printed and in possession of both houses for at least five days.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step">
+    <div class="step-header">
+        <div class="step-number">2</div>
+        <h2>Committee Referral & Action</h2>
+    </div>
+    <div class="step-content">
+
+        <p>
+            Upon introduction, the bill is referred to a standing committee.
+        </p>
+
+        <h3>Committee Review</h3>
+        <ul>
+            <li>Members debate and analyze the bill.</li>
+            <li>Public hearings may be held.</li>
+        </ul>
+
+        <h3>Committee Action Options</h3>
+        <ul>
+            <li>Report the bill favorably.</li>
+            <li>Report the bill favorably with amendments.</li>
+            <li>Report a substitute bill.</li>
+            <li>Report the bill without recommendation.</li>
+            <li>Report the bill with amendments but without recommendation.</li>
+            <li>Recommend referral to another committee.</li>
+            <li>Take no action.</li>
+            <li>Vote to not report the bill.</li>
+        </ul>
+
+        <h3>Failure to Report</h3>
+        <ul>
+            <li>A motion to discharge the committee may be offered.</li>
+            <li>Requires a majority of members elected and serving.</li>
+            <li>In the House, one-day prior notice is required.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step">
+    <div class="step-header">
+        <div class="step-number">3</div>
+        <h2>Second Reading / General Orders</h2>
+    </div>
+    <div class="step-content">
+        <ul>
+            <li>Committee recommendations are considered.</li>
+            <li>Members may offer amendments.</li>
+            <li>Majority vote advances the bill.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step">
+    <div class="step-header">
+        <div class="step-number">4</div>
+        <h2>Third Reading & Floor Vote</h2>
+    </div>
+    <div class="step-content">
+        <ul>
+            <li>Final debate occurs.</li>
+            <li>Roll call vote is taken.</li>
+            <li>Bill may pass, fail, or be delayed.</li>
+        </ul>
+
+        <h3>Delay Options</h3>
+        <ul>
+            <li>Returned to committee.</li>
+            <li>Postponed indefinitely.</li>
+            <li>Postponed to a date certain.</li>
+            <li>Tabled.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- STEP 5 -->
+<div class="step">
+    <div class="step-header">
+        <div class="step-number">5</div>
+        <h2>Second Chamber & Conference Committee</h2>
+    </div>
+    <div class="step-content">
+        <ul>
+            <li>Bill follows the same process in the second chamber.</li>
+            <li>If amended, both chambers must agree.</li>
+            <li>A conference committee may be appointed.</li>
+            <li>Conference reports may not be amended.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- STEP 6 -->
+<div class="step">
+    <div class="step-header">
+        <div class="step-number">6</div>
+        <h2>Governor’s Action</h2>
+    </div>
+    <div class="step-content">
+        <ul>
+            <li>Governor signs the bill.</li>
+            <li>Governor vetoes the bill.</li>
+            <li>No action taken (bill may become law).</li>
+        </ul>
+
+        <h3>Veto Override</h3>
+        <ul>
+            <li>Requires two-thirds vote in both chambers.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- STEP 7 -->
+<div class="step">
+    <div class="step-header">
+        <div class="step-number">7</div>
+        <h2>Effective Date</h2>
+    </div>
+    <div class="step-content">
+        <ul>
+            <li>Most laws take effect 90 days after session adjournment.</li>
+            <li>Immediate effect requires a two-thirds vote in both chambers.</li>
+        </ul>
+    </div>
+</div>
+
 </div>
 
 <footer>
