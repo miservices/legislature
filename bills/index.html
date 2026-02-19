@@ -670,11 +670,18 @@ ${steps.map((s,i)=>{
 let cls="step";
 if(i<=completedUpTo) cls+=" complete";
 if(i===activeStep) cls+=" active";
+let dotContent = i + 1;
+
+if (status === "enacted" && i === steps.length - 1) {
+    dotContent = "✓";
+}
+
 return `
 <div class="${cls}">
-<div class="dot">${i+1}</div>
+<div class="dot">${dotContent}</div>
 <div class="step-label">${s}</div>
 </div>`;
+
 }).join("")}
 </div>
 `;
