@@ -249,7 +249,7 @@ box.className="chapter";
 
 const header=document.createElement("div");
 header.className="chapter-header";
-header.innerHTML=`Chapter ${ch.cite} — ${ch.title}
+header.innerHTML=`CHAPTER ${ch.cite} — ${ch.title}
 <span class="toggle">${open==ch.cite?"−":"+"}</span>`;
 header.onclick=()=>location.hash=ch.cite;
 
@@ -362,6 +362,7 @@ window.addEventListener("load",init);
 
 </body>
 </html>
+
 
 
 
