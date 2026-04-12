@@ -227,30 +227,120 @@ function clearAll(){
 }
 
 function runSearch(){
-  const q=document.getElementById("law-search").value.trim().toLowerCase();
-  if(!q)return;
-  searchMode=true;activeChapter=null;activeSection=null;
-  buildSidebar();
-  const results=orderedSections.filter(cite=>{
-    const s=sections[cite];
-    return s&&((s.cite||"").toLowerCase().includes(q)||(s.title||"").toLowerCase().includes(q)||(s.desc||"").toLowerCase().includes(q));
-  });
-  const c=document.getElementById("content");
-  let html=`<div class="breadcrumb">Search results for "<strong>${escHtml(q)}</strong>"</div>`;
-  html+=`<div class="search-results-header">${results.length} result${results.length!==1?'s':''} found</div>`;
-  if(!results.length){html+=`<div class="empty-state">No sections matched your search.</div>`;}
-  results.slice(0,60).forEach(cite=>{
-    const s=sections[cite];
-    const snippet=highlight((s.desc||"").slice(0,160),q);
-    html+=`<div class="search-result-item" onclick="showSection('${cite}')">
-      <div class="search-result-cite">MCL ${cite}</div>
-      <div class="search-result-title">${highlight(s.title||'',q)}</div>
-      ${snippet?`<div class="search-result-snippet">${snippet}${(s.desc||"").length>160?'&hellip;':''}</div>`:''}
-    </div>`;
-  });
-  c.innerHTML=html;
-}
+  const q = document.getElementById("law-search").value.trim().toLowerCase();
+  if(!q) return;
 
+  searchMode = true;
+  activeChapter = null;
+  activeSection = null;
+  buildSidebar();
+
+  const chapterResults = [];
+  const sectionStrong = [];
+  const sectionWeak = [];
+
+  // 1. CHAPTER MATCHES (highest priority)
+  orderedChapters.forEach(cite => {
+    const ch = chapters[cite];
+    if(!ch) return;
+
+    const title = (ch.title || "").toLowerCase();
+
+    if(cite.toLowerCase().includes(q) || title.includes(q)){
+      chapterResults.push({
+        cite,
+        title: ch.title,
+        type: "chapter"
+      });
+    }
+  });
+
+  // 2 + 3. SECTION MATCHES
+  orderedSections.forEach(cite => {
+    const s = sections[cite];
+    if(!s) return;
+
+    const title = (s.title || "").toLowerCase();
+    const desc = (s.desc || "").toLowerCase();
+
+    const inCite = cite.toLowerCase().includes(q);
+    const inTitle = title.includes(q);
+    const inDesc = desc.includes(q);
+
+    if(inCite || inTitle){
+      // STRONG match (tier 2)
+      sectionStrong.push({
+        cite,
+        s
+      });
+    } else if(inDesc){
+      // WEAK match (tier 3)
+      sectionWeak.push({
+        cite,
+        s
+      });
+    }
+  });
+
+  const c = document.getElementById("content");
+
+  let html = `<div class="breadcrumb">Search results for "<strong>${escHtml(q)}</strong>"</div>`;
+
+  const total = chapterResults.length + sectionStrong.length + sectionWeak.length;
+  html += `<div class="search-results-header">${total} result${total !== 1 ? 's' : ''} found</div>`;
+
+  if(!total){
+    html += `<div class="empty-state">No matches found.</div>`;
+    c.innerHTML = html;
+    return;
+  }
+
+  // ===== 1. CHAPTERS FIRST =====
+  chapterResults.forEach(ch => {
+    html += `
+      <div class="search-result-item" onclick="showChapter('${ch.cite}')">
+        <div class="search-result-cite">CH ${ch.cite}</div>
+        <div class="search-result-title">${highlight(ch.title || '', q)}</div>
+        <div class="search-result-snippet">Chapter match</div>
+      </div>
+    `;
+  });
+
+  // ===== 2. STRONG SECTION MATCHES =====
+  sectionStrong.forEach(item => {
+    const s = item.s;
+    const cite = item.cite;
+
+    const snippet = highlight((s.desc || "").slice(0,160), q);
+
+    html += `
+      <div class="search-result-item" onclick="showSection('${cite}')">
+        <div class="search-result-cite">MCL ${cite}</div>
+        <div class="search-result-title">${highlight(s.title || '', q)}</div>
+        ${snippet ? `<div class="search-result-snippet">${snippet}${(s.desc||"").length>160?'&hellip;':''}</div>` : ''}
+      </div>
+    `;
+  });
+
+  // ===== 3. WEAK SECTION MATCHES =====
+  sectionWeak.forEach(item => {
+    const s = item.s;
+    const cite = item.cite;
+
+    const snippet = highlight((s.desc || "").slice(0,160), q);
+
+    html += `
+      <div class="search-result-item" style="opacity:0.85" onclick="showSection('${cite}')">
+        <div class="search-result-cite">MCL ${cite}</div>
+        <div class="search-result-title">${highlight(s.title || '', q)}</div>
+        ${snippet ? `<div class="search-result-snippet">${snippet}${(s.desc||"").length>160?'&hellip;':''}</div>` : ''}
+      </div>
+    `;
+  });
+
+  c.innerHTML = html;
+}
+  
 function highlight(text,q){
   if(!q||!text)return escHtml(text);
   const escaped=escHtml(text);
