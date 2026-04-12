@@ -1,287 +1,292 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Michigan Legislature</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-:root {
-    --primary: #0b3c5d;
-    --secondary: #1d6fa5;
-    --accent: #e0b400;
-    --light: #f4f6f8;
-    --dark: #1a1a1a;
-}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Source Sans 3', 'Segoe UI', sans-serif; background: #f4f4f0; color: #1a1a1a; font-size: 15px; line-height: 1.6; }
+  a { text-decoration: none; }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: "Segoe UI", Arial, sans-serif;
-}
+  .mi-warning {
+    background: #1a1a2e; color: #adc6e8; padding: 8px 32px;
+    font-size: 12px; display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid #333;
+  }
+  .mi-warning-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; border: 1.5px solid #c04040; border-radius: 50%;
+    color: #c04040; font-size: 10px; font-weight: 700; flex-shrink: 0;
+  }
+  .mi-warning strong { color: #e88; }
 
-body {
-    background: var(--light);
-    color: var(--dark);
-    line-height: 1.6;
-}
+  .mi-header {
+    background: #003366; color: #fff;
+    padding: 18px 32px; display: flex; align-items: center;
+    justify-content: center; border-bottom: 4px solid #c8a951;
+    text-align: center;
+  }
+  .mi-title-block h1 { font-family: 'Merriweather', Georgia, serif; font-size: 22px; font-weight: 700; line-height: 1.2; margin-bottom: 3px; }
+  .mi-title-block p { font-size: 12px; color: #adc6e8; letter-spacing: 0.06em; text-transform: uppercase; }
 
-/* HEADER */
-header {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: #fff;
-    padding: 1.25rem 2rem;
-}
+  .mi-nav { background: #1a1a2e; display: flex; overflow-x: auto; border-bottom: 2px solid #c8a951; }
+  .mi-nav a { color: #d0d8e8; padding: 11px 18px; font-size: 13px; font-weight: 500; white-space: nowrap; border-bottom: 3px solid transparent; transition: background 0.15s, color 0.15s; display: block; }
+  .mi-nav a:hover, .mi-nav a.active { background: rgba(200,169,81,0.15); color: #f0c640; border-bottom: 3px solid #c8a951; }
 
-.header-inner {
-    max-width: 1200px;
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+  .mi-alert { background: #fff8e0; border-left: 4px solid #c8a951; padding: 10px 32px; font-size: 13px; color: #4a3800; display: flex; align-items: center; gap: 10px; }
+  .mi-alert-icon { color: #c8a951; font-weight: 700; font-size: 16px; }
+  .mi-alert a { color: #003366; text-decoration: underline; }
 
-.logo {
-    font-size: 1.6rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-}
+  .mi-search-bar { background: #eaeae4; padding: 14px 32px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #ccc; }
+  .mi-search-bar input { flex: 1; padding: 9px 14px; font-size: 14px; border: 1px solid #bbb; border-radius: 4px; background: #fff; color: #1a1a1a; font-family: inherit; }
+  .mi-search-bar input:focus { outline: 2px solid #003366; border-color: #003366; }
+  .mi-search-bar select { padding: 9px 12px; font-size: 13px; border: 1px solid #bbb; border-radius: 4px; background: #fff; color: #1a1a1a; font-family: inherit; cursor: pointer; }
+  .mi-search-btn { background: #003366; color: #fff; border: none; padding: 9px 22px; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+  .mi-search-btn:hover { background: #00448a; }
 
-/* NAVIGATION */
-nav a {
-    color: #ffffffcc;
-    text-decoration: none;
-    margin-left: 1.5rem;
-    font-weight: 500;
-    padding-bottom: 4px;
-}
+  .mi-hero { background: linear-gradient(135deg, #002244 0%, #003366 60%, #004080 100%); padding: 36px 32px; display: flex; gap: 28px; align-items: flex-start; }
+  .mi-hero-main { flex: 1.4; }
+  .mi-hero-main h2 { font-family: 'Merriweather', Georgia, serif; font-size: 24px; color: #fff; font-weight: 700; margin-bottom: 12px; line-height: 1.3; }
+  .mi-hero-main p { color: #adc6e8; font-size: 14px; margin-bottom: 20px; line-height: 1.7; }
+  .mi-hero-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .mi-btn-gold { background: #c8a951; color: #1a1000; border: none; border-radius: 4px; padding: 10px 22px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-block; transition: background 0.15s; font-family: inherit; }
+  .mi-btn-gold:hover { background: #e0c068; color: #1a1000; }
+  .mi-btn-outline { background: transparent; color: #adc6e8; border: 1.5px solid rgba(173,198,232,0.5); border-radius: 4px; padding: 10px 22px; font-size: 13px; font-weight: 500; cursor: pointer; display: inline-block; transition: border-color 0.15s, color 0.15s; font-family: inherit; }
+  .mi-btn-outline:hover { border-color: #adc6e8; color: #fff; }
 
-nav a:hover {
-    color: #fff;
-}
+  .mi-hero-sidebar { flex: 1; }
+  .mi-session-card { background: rgba(255,255,255,0.07); border: 1px solid rgba(200,169,81,0.35); border-radius: 6px; padding: 18px; }
+  .mi-session-card h3 { color: #c8a951; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; font-weight: 600; }
+  .mi-session-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .mi-session-row span:first-child { color: #adc6e8; font-size: 13px; }
+  .mi-session-row span:last-child { color: #fff; font-size: 13px; font-weight: 500; }
+  .mi-session-divider { height: 0.5px; background: rgba(200,169,81,0.25); margin: 10px 0; }
 
-nav a.active {
-    color: #fff;
-    font-weight: 700;
-    border-bottom: 3px solid var(--accent);
-}
+  .mi-main { display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 3px solid #003366; background: #fff; }
+  .mi-section { padding: 22px; border-right: 1px solid #ddd; }
+  .mi-section:last-child { border-right: none; }
+  .mi-section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid #003366; }
+  .mi-section-header .dot { width: 8px; height: 8px; border-radius: 50%; background: #c8a951; flex-shrink: 0; }
+  .mi-section-header h3 { font-family: 'Merriweather', Georgia, serif; font-size: 14px; color: #1a1a1a; font-weight: 700; }
 
-/* HERO */
-.hero {
-    background:
-        linear-gradient(rgba(11,60,93,0.85), rgba(11,60,93,0.85)),
-        url("https://upload.wikimedia.org/wikipedia/commons/8/88/Michigan_State_Capitol_exterior.jpg")
-        center/cover no-repeat;
-    color: #fff;
-    padding: 6rem 2rem;
-}
+  .mi-news-item { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid #eee; }
+  .mi-news-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .mi-news-date { font-size: 11px; color: #777; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+  .mi-news-title { font-size: 13px; color: #003366; font-weight: 500; line-height: 1.45; display: block; cursor: pointer; transition: color 0.15s; }
+  .mi-news-title:hover { color: #c8a951; }
 
-.hero-inner {
-    max-width: 900px;
-    margin: auto;
-}
+  .mi-bill-item { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid #eee; }
+  .mi-bill-item:last-child { border-bottom: none; }
+  .mi-bill-num { display: inline-block; background: #003366; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 3px; margin-bottom: 4px; font-weight: 600; letter-spacing: 0.04em; }
+  .mi-bill-desc { font-size: 13px; color: #444; line-height: 1.4; }
+  .mi-bill-status { font-size: 11px; color: #b08d20; margin-top: 3px; font-weight: 500; }
 
-.hero h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
+  .mi-chamber-section { display: flex; flex-direction: column; gap: 12px; }
+  .mi-chamber-card { background: #f8f8f5; border: 1px solid #ddd; border-left: 3px solid #c8a951; border-radius: 4px; padding: 13px 15px; }
+  .mi-chamber-name { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 5px; }
+  .mi-chamber-leader { font-size: 12px; color: #666; margin-bottom: 8px; }
+  .mi-party-bar { height: 6px; background: #e0e0e0; border-radius: 3px; overflow: hidden; margin-bottom: 5px; }
+  .mi-party-fill { height: 100%; background: #003366; border-radius: 3px; }
+  .mi-party-label { font-size: 11px; color: #777; display: flex; justify-content: space-between; }
+  .mi-mcl-links { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .mi-mcl-link { display: block; font-size: 13px; color: #003366; padding: 8px 12px; background: #f0f4fa; border: 1px solid #c0cfe8; border-radius: 4px; transition: background 0.15s; }
+  .mi-mcl-link:hover { background: #dce8f8; }
 
-.hero p {
-    font-size: 1.25rem;
-    max-width: 700px;
-}
+  .mi-quicklinks { background: #003366; padding: 20px 32px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .mi-ql-card { background: rgba(255,255,255,0.08); border: 1px solid rgba(200,169,81,0.25); border-radius: 5px; padding: 14px; text-align: center; cursor: pointer; transition: background 0.15s; }
+  .mi-ql-card:hover { background: rgba(200,169,81,0.15); }
+  .mi-ql-icon { width: 20px; height: 20px; margin: 0 auto 6px; border: 1.5px solid #adc6e8; border-radius: 2px; display: flex; align-items: center; justify-content: center; }
+  .mi-ql-icon svg { width: 12px; height: 12px; fill: #adc6e8; }
+  .mi-ql-label { font-size: 12px; color: #adc6e8; font-weight: 500; }
 
-/* QUICK ACTIONS */
-.actions {
-    max-width: 1200px;
-    margin: -3rem auto 3rem;
-    padding: 0 2rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-}
+  .mi-footer { background: #1a1a2e; color: #8899bb; padding: 24px 32px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; font-size: 12px; }
+  .mi-footer strong { color: #fff; }
+  .mi-footer-links { display: flex; flex-wrap: wrap; gap: 4px 0; }
+  .mi-footer-links a { color: #adc6e8; margin-right: 16px; }
+  .mi-footer-links a:hover { color: #fff; }
 
-.action-card {
-    background: #fff;
-    border-radius: 10px;
-    padding: 1.75rem;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.action-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-}
-
-.action-card h3 {
-    margin-bottom: 0.5rem;
-    color: var(--primary);
-}
-
-.action-card p {
-    font-size: 0.95rem;
-}
-
-.action-card a {
-    display: inline-block;
-    margin-top: 1rem;
-    font-weight: 600;
-    color: var(--secondary);
-    text-decoration: none;
-}
-
-/* INFO SECTION */
-.info {
-    max-width: 1200px;
-    margin: auto;
-    padding: 3rem 2rem;
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 2rem;
-}
-
-.info h2 {
-    margin-bottom: 1rem;
-    color: var(--primary);
-}
-
-.info p {
-    margin-bottom: 1rem;
-}
-
-/* SIDEBAR */
-.sidebar {
-    background: #fff;
-    border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.07);
-}
-
-.sidebar h3 {
-    margin-bottom: 1rem;
-    color: var(--primary);
-}
-
-.sidebar ul {
-    list-style: none;
-}
-
-.sidebar li {
-    margin-bottom: 0.75rem;
-}
-
-/* FOOTER */
-footer {
-    background: var(--primary);
-    color: #fff;
-    padding: 2rem;
-    margin-top: 3rem;
-}
-
-.footer-inner {
-    max-width: 1200px;
-    margin: auto;
-    font-size: 0.9rem;
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-
-.footer-inner div {
-    margin-bottom: 0.5rem;
-}
+  @media (max-width: 700px) {
+    .mi-main { grid-template-columns: 1fr; }
+    .mi-section { border-right: none; border-bottom: 1px solid #ddd; }
+    .mi-hero { flex-direction: column; }
+    .mi-quicklinks { grid-template-columns: repeat(2, 1fr); }
+    .mi-search-bar { flex-wrap: wrap; }
+    .mi-footer { flex-direction: column; }
+    .mi-header { padding: 14px 16px; }
+  }
 </style>
-</head>
 
-<body>
+<div class="mi-warning">
+  <span class="mi-warning-icon">!</span>
+  <span><strong>This is not an official government website.</strong> This site is a simulated legislative interface and does not represent any real government body or authority.</span>
+</div>
 
-<header>
-    <div class="header-inner">
-        <div class="logo">Michigan Legislature</div>
-        <nav>
-<a href="https://miservices.github.io/legislature/" target="active">Home</a>
-<a href="https://miservices.github.io/legislature/about" target="_self">About</a>
-<a href="https://miservices.github.io/legislature/mcl" target="_self">Laws</a>
-<a href="https://miservices.github.io/legislature/bills" target="_self">Bills</a>
-<a href="https://miservices.github.io/legislature/resolutions" target="_self">Resolutions</a>
-<a href="https://miservices.github.io/legislature/journals" target="_self">Journals</a>
-        </nav>
-    </div>
+<header class="mi-header">
+  <div class="mi-title-block">
+    <h1>Michigan Legislature</h1>
+    <p>State of Michigan &mdash; 1st Legislature &middot; 2026 Session</p>
+  </div>
 </header>
 
-<section class="hero">
-    <div class="hero-inner">
-        <h1>The Legislative Branch of Michigan</h1>
-        <p>
-            Advancing the laws of the State of Michigan through transparency,
-            accountability, and public service.
-        </p>
+<nav class="mi-nav">
+  <a href="#" class="active">Home</a>
+  <a href="#">Legislature</a>
+  <a href="#">Bills &amp; Resolutions</a>
+  <a href="#">Committees</a>
+  <a href="#">Session Schedule</a>
+  <a href="#">Michigan Compiled Laws</a>
+  <a href="#">MI Legislature TV</a>
+</nav>
+
+<div class="mi-alert">
+  <span class="mi-alert-icon">!</span>
+  <span><strong>Session Notice:</strong> The Legislature is scheduled to reconvene Tuesday, April 15, 2026. View the full <a href="#">session calendar</a>.</span>
+</div>
+
+<div class="mi-search-bar">
+  <input type="text" id="search-input" placeholder="Search bills, legislators, or topics..." />
+  <select id="search-cat">
+    <option>All Categories</option>
+    <option>Bills</option>
+    <option>Legislators</option>
+    <option>Committees</option>
+    <option>Public Acts</option>
+    <option>Compiled Laws</option>
+  </select>
+  <button class="mi-search-btn" onclick="handleSearch()">Search</button>
+</div>
+
+<section class="mi-hero">
+  <div class="mi-hero-main">
+    <h2>Welcome to the Michigan Legislature</h2>
+    <p>The Michigan Legislature is the lawmaking branch of state government. Track legislation, review compiled laws, and participate in the democratic process.</p>
+    <div class="mi-hero-btns">
+      <a class="mi-btn-gold" href="#">Track a Bill</a>
+      <a class="mi-btn-outline" href="#">Public Comment</a>
+      <a class="mi-btn-outline" href="#">Michigan Compiled Laws</a>
     </div>
+  </div>
+  <div class="mi-hero-sidebar">
+    <div class="mi-session-card">
+      <h3>Current Session Info</h3>
+      <div class="mi-session-row"><span>Legislature</span><span>1st</span></div>
+      <div class="mi-session-row"><span>Session</span><span>2026 (Jan 1 &ndash; Dec 31)</span></div>
+      <div class="mi-session-divider"></div>
+      <div class="mi-session-row"><span>Bills Introduced</span><span>312</span></div>
+      <div class="mi-session-row"><span>Public Acts Signed</span><span>41</span></div>
+      <div class="mi-session-divider"></div>
+      <div class="mi-session-row"><span>Next Session Day</span><span>Apr 15, 2026</span></div>
+    </div>
+  </div>
 </section>
 
-<section class="actions">
-    <div class="action-card">
-        <h3>Michigan Compiled Laws</h3>
-        <p>Browse the official statutory laws of the State of Michigan.</p>
-        <a href="https://miservices.github.io/legislature/mcl">View Laws →</a>
+<main class="mi-main">
+  <section class="mi-section">
+    <div class="mi-section-header"><div class="dot"></div><h3>Legislative News</h3></div>
+    <div class="mi-news-item">
+      <div class="mi-news-date">April 9, 2026</div>
+      <a class="mi-news-title" href="#">Legislature passes infrastructure investment package in bipartisan vote</a>
     </div>
-
-    <div class="action-card">
-        <h3>Legislative Bills</h3>
-        <p>Search and track bills introduced in the Senate and House.</p>
-        <a href="https://miservices.github.io/legislature/bills">View Bills →</a>
+    <div class="mi-news-item">
+      <div class="mi-news-date">April 8, 2026</div>
+      <a class="mi-news-title" href="#">Education Committee approves school funding reform bill</a>
     </div>
-
-    <div class="action-card">
-        <h3>Resolutions</h3>
-        <p>Access joint, concurrent, and simple resolutions.</p>
-        <a href="https://miservices.github.io/legislature/resolutions">View Resolutions →</a>
+    <div class="mi-news-item">
+      <div class="mi-news-date">April 7, 2026</div>
+      <a class="mi-news-title" href="#">Legislature holds hearing on Great Lakes water quality</a>
     </div>
-
-    <div class="action-card">
-        <h3>Legislative Journals</h3>
-        <p>Official daily journals documenting legislative proceedings.</p>
-        <a href="https://miservices.github.io/legislature/journals">View Journals →</a>
+    <div class="mi-news-item">
+      <div class="mi-news-date">April 4, 2026</div>
+      <a class="mi-news-title" href="#">Governor signs automotive workforce development legislation</a>
     </div>
-</section>
+  </section>
 
-<section class="info">
-    <div>
-        <h2>About the Michigan Legislature</h2>
-        <p>
-            The Michigan Legislature consists of the Senate and the House of
-            Representatives. Together, they enact laws, adopt resolutions,
-            and maintain the official journals of legislative proceedings.
-        </p>
-        <p>
-            This website serves as the official public portal for legislative
-            information and public access to the lawmaking process.
-        </p>
+  <section class="mi-section">
+    <div class="mi-section-header"><div class="dot"></div><h3>Recent Legislation</h3></div>
+    <div class="mi-bill-item">
+      <span class="mi-bill-num">LB 0112</span>
+      <div class="mi-bill-desc">Expanding eligibility for the Earned Income Tax Credit for Michigan families</div>
+      <div class="mi-bill-status">Passed Legislature &mdash; Awaiting Signature</div>
     </div>
-
-    <aside class="sidebar">
-        <h3>Quick Facts</h3>
-        <ul>
-            <li>✔ 38 Senators</li>
-            <li>✔ 110 Representatives</li>
-            <li>✔ Regular &amp; Special Sessions</li>
-            <li>✔ Public Legislative Records</li>
-        </ul>
-    </aside>
-</section>
-
-<footer>
-    <div class="footer-inner">
-        <div>
-            IMPORTANT NOTICE
-        </div>
-        <div>
-            This site is not a real legislature, does not have legal authority, and is not affiliated with or endorsed by any real government.
-        </div>
+    <div class="mi-bill-item">
+      <span class="mi-bill-num">LB 0088</span>
+      <div class="mi-bill-desc">Road and bridge maintenance funding through fuel tax adjustment</div>
+      <div class="mi-bill-status">Committee: Transportation</div>
     </div>
+    <div class="mi-bill-item">
+      <span class="mi-bill-num">LB 0099</span>
+      <div class="mi-bill-desc">Broadband infrastructure expansion in rural Michigan communities</div>
+      <div class="mi-bill-status">Enrolled &mdash; Sent to Governor</div>
+    </div>
+    <div class="mi-bill-item">
+      <span class="mi-bill-num">LB 0134</span>
+      <div class="mi-bill-desc">Updating the Michigan Campaign Finance Act reporting requirements</div>
+      <div class="mi-bill-status">First Reading</div>
+    </div>
+    <a href="#" style="display:inline-block; margin-top: 8px; font-size: 13px; color: #003366; font-weight: 500;">View all bills &amp; resolutions &gt;</a>
+  </section>
+
+  <section class="mi-section">
+    <div class="mi-section-header"><div class="dot"></div><h3>Michigan Compiled Laws</h3></div>
+    <div style="font-size: 13px; color: #444; margin-bottom: 14px; line-height: 1.6;">Browse the official statutes of the State of Michigan, organized by chapter and subject matter.</div>
+    <div class="mi-mcl-links">
+      <a href="#" class="mi-mcl-link">Chapter 1 &mdash; General Provisions</a>
+      <a href="#" class="mi-mcl-link">Chapter 4 &mdash; Legislature</a>
+      <a href="#" class="mi-mcl-link">Chapter 15 &mdash; Public Officers &amp; Employees</a>
+      <a href="#" class="mi-mcl-link">Chapter 125 &mdash; Planning &amp; Zoning</a>
+      <a href="#" class="mi-mcl-link">Chapter 257 &mdash; Motor Vehicles</a>
+    </div>
+    <a href="#" style="display:inline-block; margin-top: 12px; font-size: 13px; color: #003366; font-weight: 500;">Browse all chapters &gt;</a>
+  </section>
+</main>
+
+<div class="mi-quicklinks">
+  <div class="mi-ql-card">
+    <div class="mi-ql-icon"><svg viewBox="0 0 12 12"><rect x="1" y="1" width="10" height="10" rx="1" fill="none" stroke="#adc6e8" stroke-width="1.2"/><line x1="3" y1="4" x2="9" y2="4" stroke="#adc6e8" stroke-width="1"/><line x1="3" y1="6" x2="9" y2="6" stroke="#adc6e8" stroke-width="1"/><line x1="3" y1="8" x2="7" y2="8" stroke="#adc6e8" stroke-width="1"/></svg></div>
+    <div class="mi-ql-label">Bill Status</div>
+  </div>
+  <div class="mi-ql-card">
+    <div class="mi-ql-icon"><svg viewBox="0 0 12 12"><rect x="1" y="3" width="10" height="8" rx="1" fill="none" stroke="#adc6e8" stroke-width="1.2"/><line x1="4" y1="3" x2="4" y2="1" stroke="#adc6e8" stroke-width="1.2"/><line x1="8" y1="3" x2="8" y2="1" stroke="#adc6e8" stroke-width="1.2"/></svg></div>
+    <div class="mi-ql-label">Committee Hearings</div>
+  </div>
+  <div class="mi-ql-card">
+    <div class="mi-ql-icon"><svg viewBox="0 0 12 12"><path d="M6 1L2 4v7h8V4z" fill="none" stroke="#adc6e8" stroke-width="1.2"/><line x1="4" y1="8" x2="8" y2="8" stroke="#adc6e8" stroke-width="1"/></svg></div>
+    <div class="mi-ql-label">Public Acts</div>
+  </div>
+  <div class="mi-ql-card">
+    <div class="mi-ql-icon"><svg viewBox="0 0 12 12"><rect x="1" y="1" width="10" height="10" rx="1" fill="none" stroke="#adc6e8" stroke-width="1.2"/><line x1="3" y1="6" x2="9" y2="6" stroke="#adc6e8" stroke-width="1"/><line x1="6" y1="3" x2="6" y2="9" stroke="#adc6e8" stroke-width="1"/></svg></div>
+    <div class="mi-ql-label">Floor Votes</div>
+  </div>
+  <div class="mi-ql-card">
+    <div class="mi-ql-icon"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="none" stroke="#adc6e8" stroke-width="1.2"/><line x1="6" y1="3" x2="6" y2="6" stroke="#adc6e8" stroke-width="1.2"/><line x1="6" y1="6" x2="9" y2="8" stroke="#adc6e8" stroke-width="1.2"/></svg></div>
+    <div class="mi-ql-label">Session Schedule</div>
+  </div>
+</div>
+
+<footer class="mi-footer">
+  <div>
+    <strong>Michigan Legislature</strong><br>
+    P.O. Box 30014, Lansing, MI 48909<br>
+    (517) 373-0135
+  </div>
+  <div class="mi-footer-links">
+    <a href="#">Privacy Policy</a>
+    <a href="#">Disclaimer</a>
+    <a href="#">Contact Us</a>
+  </div>
 </footer>
 
-</body>
-</html>
+<script>
+  document.querySelectorAll('.mi-nav a').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.querySelectorAll('.mi-nav a').forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+  function handleSearch() {
+    const query = document.getElementById('search-input').value.trim();
+    const category = document.getElementById('search-cat').value;
+    if (!query) { alert('Please enter a search term.'); return; }
+    alert('Searching for "' + query + '" in ' + category + '.\n\n(This would navigate to the search results page.)');
+  }
+  document.getElementById('search-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') handleSearch();
+  });
+</script>
