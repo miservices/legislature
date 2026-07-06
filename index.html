@@ -4,116 +4,123 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Home - Michigan Legislature</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.0.0/tabler-icons.min.css"/>
 <style>
+:root{
+  --navy:#0b1f3a;
+  --navy-mid:#152c50;
+  --navy-soft:#1d3763;
+  --gold:#a9812f;
+  --gold-bright:#d4af37;
+  --cream:#f7f4ec;
+  --paper:#fffdf8;
+  --ink:#1c2130;
+  --ink-soft:#5b5f6b;
+  --hair:#e3ddcc;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#111827;background:#f3f4f6;font-size:15px;line-height:1.6}
+body{font-family:'IBM Plex Sans',Helvetica,Arial,sans-serif;color:var(--ink);background:var(--cream);font-size:15px;line-height:1.6}
 a{color:inherit;text-decoration:none}
+.mono{font-family:'IBM Plex Mono',monospace}
+.serif{font-family:'Source Serif 4',Georgia,serif}
 
-.disclaimer{background:#0b1f3a;color:#fff;text-align:center;padding:.6rem 1.5rem;font-size:12.5px;line-height:1.5}
-.disclaimer strong{font-weight:700}
+/* ---------- disclaimer ---------- */
+.disclaimer{background:var(--navy);color:rgba(255,255,255,.65);text-align:center;padding:.55rem 1.5rem;font-size:12px;line-height:1.5;letter-spacing:.01em}
+.disclaimer strong{font-weight:600;color:rgba(255,255,255,.85)}
 
-.topbar{background:#0b1f3a;padding:.45rem 2rem;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,.12)}
-.topbar-left{font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.05em;text-transform:uppercase}
-.topbar-right{display:flex;gap:1.25rem}
-.topbar-right a{font-size:12px;color:rgba(255,255,255,.55);transition:color .12s}
-.topbar-right a:hover{color:#fff}
+/* ---------- masthead ---------- */
+.masthead{background:var(--navy);padding:1.3rem 2rem .3rem}
+.masthead-inner{display:flex;align-items:center;gap:16px}
+.seal{width:46px;height:46px;flex-shrink:0}
+.brand-wordmark .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold-bright);letter-spacing:.14em;text-transform:uppercase}
+.brand-wordmark .title{font-family:'Source Serif 4',Georgia,serif;font-size:26px;font-weight:600;color:#fff;letter-spacing:-.01em;line-height:1.15}
 
-.masthead{background:#fff;border-bottom:4px solid #0b1f3a;padding:1rem 2rem}
-.masthead-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:14px}
-.brand img.logo{height:46px;width:auto;display:block}
-.brand-wordmark .line1{font-size:11px;color:#6b7280;letter-spacing:.06em;text-transform:uppercase;font-weight:500}
-.brand-wordmark .line2{font-size:24px;font-weight:600;color:#0b1f3a;letter-spacing:-.02em;line-height:1.1}
-.masthead-search{display:flex;border:1.5px solid #d1d5db;border-radius:4px;overflow:hidden;transition:border-color .15s}
-.masthead-search:focus-within{border-color:#0b1f3a;box-shadow:0 0 0 3px rgba(11,31,58,.12)}
-.masthead-search input{padding:.55rem 1rem;font-size:14px;border:none;outline:none;width:260px;color:#111827;background:#fff}
-.masthead-search button{padding:.55rem 1.1rem;background:#0b1f3a;color:#fff;border:none;cursor:pointer;font-size:15px;transition:background .15s}
-.masthead-search button:hover{background:#15294f}
-
-nav.primary{background:#0b1f3a}
-nav.primary ul{max-width:1100px;margin:0 auto;display:flex;list-style:none;padding:0 2rem;flex-wrap:wrap}
+nav.primary{background:var(--navy);border-top:1px solid rgba(255,255,255,.08);margin-top:1rem}
+nav.primary ul{display:flex;list-style:none;padding:0 2rem;flex-wrap:wrap}
 nav.primary ul li{position:relative}
-nav.primary ul li a{display:flex;align-items:center;gap:4px;padding:.65rem 1rem;font-size:13.5px;color:rgba(255,255,255,.82);transition:all .12s;border-bottom:3px solid transparent;white-space:nowrap}
-nav.primary ul li a:hover{color:#fff;background:rgba(255,255,255,.1)}
-nav.primary ul li a.active{color:#fff;border-bottom-color:#fbbf24}
-nav.primary ul li a i{font-size:11px}
-nav.primary .dropdown-menu{position:absolute;top:100%;left:0;min-width:240px;background:#fff;border:1px solid #e5e7eb;border-top:3px solid #0b1f3a;border-radius:0 0 6px 6px;box-shadow:0 8px 20px rgba(0,0,0,.12);list-style:none;display:none;z-index:20;padding:.35rem 0}
+nav.primary ul li a{display:flex;align-items:center;gap:4px;padding:.7rem 1rem;font-size:13px;font-weight:500;color:rgba(255,255,255,.7);transition:all .12s;border-bottom:2px solid transparent;white-space:nowrap;letter-spacing:.01em}
+nav.primary ul li a:hover{color:#fff}
+nav.primary ul li a.active{color:#fff;border-bottom-color:var(--gold-bright)}
+nav.primary ul li a i{font-size:10px}
+nav.primary .dropdown-menu{position:absolute;top:100%;left:0;min-width:240px;background:var(--paper);border:1px solid var(--hair);border-top:2px solid var(--gold);box-shadow:0 12px 24px rgba(11,31,58,.16);list-style:none;display:none;z-index:20;padding:.35rem 0}
 nav.primary .has-dropdown:hover .dropdown-menu,
 nav.primary .has-dropdown:focus-within .dropdown-menu{display:block}
-nav.primary .dropdown-menu li a{color:#1f2937;padding:.55rem 1rem;font-size:13.5px;border-bottom:none;display:block}
-nav.primary .dropdown-menu li a:hover{background:rgba(11,31,58,.06);color:#0b1f3a}
+nav.primary .dropdown-menu li a{color:var(--ink);padding:.55rem 1rem;font-size:13px;border-bottom:none;display:block;font-weight:400}
+nav.primary .dropdown-menu li a:hover{background:rgba(11,31,58,.05);color:var(--navy)}
 
-.notice{background:#fffbeb;border-left:4px solid #f59e0b;padding:.65rem 2rem;font-size:13px;color:#78350f;display:flex;align-items:center;gap:.6rem}
-.notice i{font-size:16px;color:#d97706;flex-shrink:0}
-.notice strong{font-weight:600}
+/* ---------- hero / docket band ---------- */
+.hero{background:linear-gradient(180deg,var(--navy-mid),var(--navy));color:#fff;padding:2.2rem 2rem 2rem;display:grid;grid-template-columns:1.5fr 1fr;gap:2.5rem;border-bottom:3px solid var(--gold)}
+.hero-status{display:inline-flex;align-items:center;gap:.5rem;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-bright);margin-bottom:.9rem}
+.hero-status .dot{width:7px;height:7px;border-radius:50%;background:var(--gold-bright);box-shadow:0 0 0 3px rgba(212,175,55,.25)}
+.hero h1{font-family:'Source Serif 4',Georgia,serif;font-size:32px;font-weight:600;line-height:1.2;margin-bottom:.6rem}
+.hero p{color:rgba(255,255,255,.72);font-size:14px;max-width:46ch;line-height:1.6}
+.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;align-self:end;border-top:1px solid rgba(255,255,255,.14)}
+.hero-stat{padding:.9rem 1rem .2rem 0;border-right:1px solid rgba(255,255,255,.14)}
+.hero-stat:last-child{border-right:none}
+.hero-stat .n{font-family:'IBM Plex Mono',monospace;font-size:21px;font-weight:600;color:#fff;line-height:1}
+.hero-stat .l{font-size:11px;color:rgba(255,255,255,.55);margin-top:4px;line-height:1.4}
 
-.page-body{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 290px;gap:2rem;padding:2rem;align-items:start}
+@media(max-width:800px){.hero{grid-template-columns:1fr}}
 
-@media(max-width:720px){.page-body{grid-template-columns:1fr;padding:1rem}}
+/* ---------- page body ---------- */
+.page-body{display:grid;grid-template-columns:1fr 300px;gap:2.5rem;padding:2.2rem 2rem;align-items:start}
+@media(max-width:800px){.page-body{grid-template-columns:1fr;padding:1.25rem}}
 
-.search-hero{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:1.5rem;margin-bottom:2rem}
-.search-hero h2{font-size:18px;font-weight:600;color:#0b1f3a;margin-bottom:.25rem}
-.search-hero p{font-size:13px;color:#6b7280;margin-bottom:1.1rem}
-.search-row{display:flex;border:1.5px solid #d1d5db;border-radius:4px;overflow:hidden;transition:border-color .15s}
-.search-row:focus-within{border-color:#0b1f3a;box-shadow:0 0 0 3px rgba(11,31,58,.12)}
-.search-row select{padding:.65rem .85rem;font-size:13px;border:none;border-right:1px solid #e5e7eb;background:#f9fafb;color:#374151;outline:none;cursor:pointer;white-space:nowrap}
-.search-row input{flex:1;padding:.65rem 1rem;font-size:14px;border:none;outline:none;background:#fff;color:#111827;min-width:0}
-.search-row button{padding:.65rem 1.4rem;background:#0b1f3a;color:#fff;border:none;cursor:pointer;font-size:14px;font-weight:500;white-space:nowrap;transition:background .15s}
-.search-row button:hover{background:#15294f}
+.section-label{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.85rem;display:flex;align-items:center;gap:.6rem}
+.section-label::after{content:"";flex:1;height:1px;background:var(--hair)}
 
-.section-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#9ca3af;margin-bottom:.75rem}
+/* ---------- quick access ---------- */
+.quick-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--hair);border:1px solid var(--hair);margin-bottom:2.4rem}
+@media(max-width:800px){.quick-nav{grid-template-columns:repeat(2,1fr)}}
+.qn-item{background:var(--paper);padding:1.1rem 1rem;transition:background .12s;cursor:pointer;display:flex;flex-direction:column;gap:.5rem}
+.qn-item:hover{background:#fff}
+.qn-item i{font-size:20px;color:var(--gold)}
+.qn-item-text .title{font-size:13px;font-weight:600;color:var(--ink)}
+.qn-item-text .sub{font-size:11.5px;color:var(--ink-soft);margin-top:2px}
 
-.quick-nav{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#e5e7eb;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:2rem}
-.qn-item{background:#fff;padding:.9rem 1rem;display:flex;align-items:center;gap:.75rem;transition:background .12s;cursor:pointer}
-.qn-item:hover{background:rgba(11,31,58,.05)}
-.qn-item i{font-size:19px;color:#0b1f3a;flex-shrink:0}
-.qn-item-text .title{font-size:13.5px;font-weight:500;color:#111827}
-.qn-item-text .sub{font-size:11.5px;color:#6b7280;margin-top:1px}
-.qn-arrow{margin-left:auto;color:#9ca3af;font-size:14px;flex-shrink:0}
-
-.activity-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:.75rem}
-.activity-head h2{font-size:17px;font-weight:600;color:#0b1f3a}
-.activity-head a{font-size:13px;color:#0b1f3a}
+/* ---------- activity: journal / docket style ---------- */
+.activity-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:.9rem}
+.activity-head h2{font-family:'Source Serif 4',Georgia,serif;font-size:19px;font-weight:600;color:var(--navy)}
+.activity-head a{font-size:12.5px;color:var(--navy);font-family:'IBM Plex Mono',monospace}
 .activity-head a:hover{text-decoration:underline}
 
-.activity-list{border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:2rem}
-.activity-item{display:grid;grid-template-columns:72px 1fr;background:#fff;border-bottom:1px solid #f3f4f6;transition:background .1s}
-.activity-item:last-child{border-bottom:none}
-.activity-item:hover{background:#f9fafb}
-.ai-date{padding:.8rem .75rem;font-size:12px;color:#9ca3af;border-right:1px solid #f3f4f6;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1px;background:#fafafa}
-.ai-date .day{font-size:21px;font-weight:600;color:#0b1f3a;line-height:1}
-.ai-date .mon{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#9ca3af}
-.ai-body{padding:.75rem 1rem}
-.ai-bill{display:flex;align-items:center;gap:.45rem;margin-bottom:.2rem;flex-wrap:wrap}
-.ai-bill a{font-size:13.5px;font-weight:600;color:#0b1f3a}
-.ai-bill a:hover{text-decoration:underline}
-.chip{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;letter-spacing:.02em;text-transform:uppercase}
-.chip-bill{background:rgba(11,31,58,.08);color:#0b1f3a}
-.chip-r{background:#d1fae5;color:#065f46}
-.ai-action{font-size:13px;color:#374151;line-height:1.45}
-.ai-vote{font-size:11.5px;color:#9ca3af;margin-top:3px}
+.activity-list{border-top:1px solid var(--hair);margin-bottom:2.4rem}
+.activity-item{display:grid;grid-template-columns:64px 1fr;padding:1rem 0;border-bottom:1px solid var(--hair)}
+.ai-date{font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);padding-top:2px}
+.ai-date .day{font-size:19px;font-weight:600;color:var(--navy);display:block;line-height:1.1}
+.ai-date .mon{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em}
+.ai-body{}
+.ai-bill{display:flex;align-items:baseline;gap:.55rem;margin-bottom:.3rem;flex-wrap:wrap}
+.ai-bill .num{font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;color:var(--gold);letter-spacing:.02em}
+.ai-title{font-family:'Source Serif 4',Georgia,serif;font-size:15.5px;font-weight:600;color:var(--ink)}
+.chip{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;padding:2px 6px;letter-spacing:.03em;text-transform:uppercase;border:1px solid currentColor}
+.chip-bill{color:var(--navy)}
+.chip-r{color:#3f7a5c}
+.ai-action{font-size:13px;color:var(--ink-soft);line-height:1.5}
+.ai-desc{font-size:13px;color:var(--ink);line-height:1.55;margin-top:.4rem}
+.ai-vote{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);margin-top:.35rem}
 
-.sidebar{}
-.sidebar-card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:1.25rem}
-.sidebar-card-head{padding:.65rem 1rem;background:#0b1f3a}
-.sidebar-card-head h3{font-size:13px;font-weight:600;color:#fff;letter-spacing:.02em}
-.sidebar-card-body{}
-.sc-link{display:flex;align-items:center;justify-content:space-between;padding:.6rem 1rem;font-size:13px;color:#374151;transition:background .1s;border-bottom:1px solid #f3f4f6}
+/* ---------- sidebar ---------- */
+.sidebar-card{background:var(--paper);border:1px solid var(--hair);margin-bottom:1.5rem}
+.spotlight{background:var(--navy);color:#fff;padding:1.2rem 1.3rem;margin-bottom:1.5rem;border-top:3px solid var(--gold-bright)}
+.spotlight h3{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.1em;margin-bottom:.7rem;color:var(--gold-bright);text-transform:uppercase}
+.spotlight p{font-family:'Source Serif 4',Georgia,serif;font-size:14.5px;line-height:1.55;color:rgba(255,255,255,.9)}
+.spotlight a{display:inline-block;margin-top:.75rem;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--gold-bright);font-weight:600}
+.spotlight a:hover{text-decoration:underline}
+
+.sidebar-card-head{padding:.8rem 1.2rem;border-bottom:2px solid var(--navy)}
+.sidebar-card-head h3{font-family:'Source Serif 4',Georgia,serif;font-size:14.5px;font-weight:600;color:var(--navy);letter-spacing:.01em}
+.sc-link{display:flex;align-items:center;justify-content:space-between;padding:.65rem 1.2rem;font-size:13px;color:var(--ink);transition:background .1s;border-bottom:1px solid var(--hair)}
 .sc-link:last-child{border-bottom:none}
-.sc-link:hover{background:rgba(11,31,58,.05);color:#0b1f3a}
-.sc-link i{font-size:13px;color:#9ca3af;flex-shrink:0}
+.sc-link:hover{background:rgba(11,31,58,.04);color:var(--navy)}
+.sc-link i{font-size:12px;color:var(--gold);flex-shrink:0}
 
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
-.stat-box{padding:.85rem 1rem;text-align:center;border-right:1px solid #f3f4f6;border-bottom:1px solid #f3f4f6}
-.stat-box:nth-child(2n){border-right:none}
-.stat-box:nth-last-child(-n+2){border-bottom:none}
-.stat-box .n{font-size:22px;font-weight:700;color:#0b1f3a;line-height:1}
-.stat-box .l{font-size:11px;color:#9ca3af;margin-top:3px}
-
-footer{background:#0b1f3a;padding:1.5rem 2rem;margin-top:1rem}
-footer .inner{max-width:1100px;margin:0 auto}
-.footer-links{display:flex;flex-wrap:wrap;gap:.4rem 1.5rem;margin-bottom:.85rem}
+/* ---------- footer ---------- */
+footer{background:var(--navy);padding:1.6rem 2rem;margin-top:1rem}
+.footer-links{display:flex;flex-wrap:wrap;gap:.4rem 1.5rem;margin-bottom:.9rem}
 .footer-links a{font-size:12px;color:rgba(255,255,255,.45);transition:color .12s}
 .footer-links a:hover{color:rgba(255,255,255,.85)}
 .footer-copy{font-size:11.5px;color:rgba(255,255,255,.3);line-height:1.7;max-width:640px}
@@ -125,27 +132,16 @@ footer .inner{max-width:1100px;margin:0 auto}
   This is not an official government website. This site is a simulated legislative interface and does not represent any real government body or authority.
 </div>
 
-<div class="topbar">
-  <span class="topbar-left">Michigan.gov</span>
-  <div class="topbar-right">
-    <a href="https://legislature.mi.gov/Account/SignUp">Sign up</a>
-    <a href="https://legislature.mi.gov/Account/LogIn">Log in</a>
-    <a href="https://legislature.mi.gov/Home/Help">Help</a>
-  </div>
-</div>
-
 <div class="masthead">
   <div class="masthead-inner">
-    <div class="brand">
-      <img class="logo" src="/images/logo.png" alt="Michigan Legislature logo"/>
-      <div class="brand-wordmark">
-        <div class="line1">State of Michigan</div>
-        <div class="line2">Legislature</div>
-      </div>
-    </div>
-    <div class="masthead-search">
-      <input type="text" placeholder="Search bills, laws, legislators…" aria-label="Site search"/>
-      <button aria-label="Search"><i class="ti ti-search" aria-hidden="true"></i></button>
+    <svg class="seal" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="24" cy="24" r="22" fill="none" stroke="#d4af37" stroke-width="1.5"/>
+      <circle cx="24" cy="24" r="17" fill="none" stroke="#d4af37" stroke-width="1"/>
+      <text x="24" y="29" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-size="14" font-weight="700" fill="#fff">MI</text>
+    </svg>
+    <div class="brand-wordmark">
+      <div class="eyebrow">State of Michigan</div>
+      <div class="title">Legislature</div>
     </div>
   </div>
 </div>
@@ -166,156 +162,149 @@ footer .inner{max-width:1100px;margin:0 auto}
       <a href="https://legislature.mi.gov/Laws">Laws <i class="ti ti-chevron-down" aria-hidden="true"></i></a>
       <ul class="dropdown-menu">
         <li><a href="https://legislature.mi.gov/Laws/MCLSearch">Michigan Compiled Laws (statutes)</a></li>
-                <li><a href="https://legislature.mi.gov/Laws/PublicActs">Michigan Administrative Code</a></li>
+        <li><a href="https://legislature.mi.gov/Laws/PublicActs">Michigan Administrative Code</a></li>
         <li><a href="https://legislature.mi.gov/Laws/PublicActs">Public Acts (passed bills)</a></li>
         <li><a href="https://legislature.mi.gov/Laws/ExecutiveOrders">Executive Orders</a></li>
         <li><a href="https://legislature.mi.gov/Laws/ExecutiveReorganizationOrders">Executive Reorganization Orders</a></li>
       </ul>
     </li>
-        <li><a href="https://legislature.mi.gov/Bills">Bills</a></li>
-            <li><a href="https://legislature.mi.gov/Bills">Resolutions</a></li>
-                        <li><a href="https://legislature.mi.gov/Bills">Other Resources</a></li>
+    <li><a href="https://legislature.mi.gov/Bills">Bills</a></li>
+    <li><a href="https://legislature.mi.gov/Bills">Resolutions</a></li>
+    <li><a href="https://legislature.mi.gov/Bills">Other Resources</a></li>
   </ul>
 </nav>
 
-<div class="notice" role="status">
-  <i class="ti ti-info-circle" aria-hidden="true"></i>
-  <span>The Legislature is adjourned &nbsp;&mdash;&nbsp; Resumes <strong>Tue Jun 17 &middot; 10:00 AM</strong></span>
-</div>
+<section class="hero">
+  <div>
+    <div class="hero-status"><span class="dot"></span> Adjourned &nbsp;&middot;&nbsp; resumes Tue Jun 17, 10:00 AM</div>
+    <h1>103rd Michigan Legislature</h1>
+    <p>A single unicameral chamber of 148 legislators, in session for the 2025&ndash;2026 term. Michigan Compiled Laws current through Public Act 16 of 2026.</p>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="n">214</span><span class="l">Bills introduced<br/>this term</span></div>
+    <div class="hero-stat"><span class="n">37</span><span class="l">Signed into<br/>law</span></div>
+    <div class="hero-stat"><span class="n">PA&nbsp;16</span><span class="l">Latest public<br/>act, 2026</span></div>
+  </div>
+</section>
 
 <div class="page-body">
   <main>
-
-    <div class="search-hero">
-      <h2>Find legislation &amp; law</h2>
-      <p>2025–2026 legislative session &nbsp;&middot;&nbsp; Michigan Compiled Laws current through Public Act 16 of 2026</p>
-      <div class="search-row">
-        <select aria-label="Search scope">
-          <option>Bills (2025–2026)</option>
-          <option>Michigan Compiled Laws</option>
-          <option>All documents</option>
-          <option>Legislators</option>
-          <option>Public acts</option>
-        </select>
-        <input type="text" placeholder="e.g. LB 5571, education funding, MCL 380.1…" aria-label="Search query"/>
-        <button>Search</button>
-      </div>
-    </div>
 
     <p class="section-label">Quick access</p>
     <div class="quick-nav">
       <a class="qn-item" href="https://legislature.mi.gov/Search/ExecuteSearch?dateFromStr=today&docTypes=Bills&dailyReport=todaysbillactivity">
         <i class="ti ti-file-description" aria-hidden="true"></i>
-        <div class="qn-item-text"><div class="title">Today's bill activity</div><div class="sub">Bills introduced &amp; moved</div></div>
-        <i class="ti ti-arrow-right qn-arrow" aria-hidden="true"></i>
+        <div class="qn-item-text"><div class="title">Today's bill activity</div><div class="sub">Introduced &amp; moved</div></div>
       </a>
       <a class="qn-item" href="https://legislature.mi.gov/Search/ExecuteSearch?docTypes=Legislative%20Calendar&dateFromStr=today">
         <i class="ti ti-calendar-event" aria-hidden="true"></i>
         <div class="qn-item-text"><div class="title">Today's calendar</div><div class="sub">Floor schedule</div></div>
-        <i class="ti ti-arrow-right qn-arrow" aria-hidden="true"></i>
       </a>
       <a class="qn-item" href="https://legislature.mi.gov/Bills/DailyReport">
         <i class="ti ti-chart-bar" aria-hidden="true"></i>
-        <div class="qn-item-text"><div class="title">Daily bill status report</div><div class="sub">Full session status summary</div></div>
-        <i class="ti ti-arrow-right qn-arrow" aria-hidden="true"></i>
+        <div class="qn-item-text"><div class="title">Daily status report</div><div class="sub">Full session summary</div></div>
       </a>
       <a class="qn-item" href="https://legislature.mi.gov/Laws/ChapterIndex">
         <i class="ti ti-book-2" aria-hidden="true"></i>
-        <div class="qn-item-text"><div class="title">MCL chapter index</div><div class="sub">Browse compiled law by chapter</div></div>
-        <i class="ti ti-arrow-right qn-arrow" aria-hidden="true"></i>
+        <div class="qn-item-text"><div class="title">MCL chapter index</div><div class="sub">Browse by chapter</div></div>
       </a>
       <a class="qn-item" href="https://legislature.mi.gov/Laws/PublicActs">
         <i class="ti ti-writing" aria-hidden="true"></i>
-        <div class="qn-item-text"><div class="title">Public acts</div><div class="sub">Bills signed into law</div></div>
-        <i class="ti ti-arrow-right qn-arrow" aria-hidden="true"></i>
+        <div class="qn-item-text"><div class="title">Public acts</div><div class="sub">Signed into law</div></div>
       </a>
       <a class="qn-item" href="https://legislature.mi.gov/Laws/ExecutiveOrders">
         <i class="ti ti-lock-open" aria-hidden="true"></i>
         <div class="qn-item-text"><div class="title">Executive orders</div><div class="sub">Governor directives</div></div>
-        <i class="ti ti-arrow-right qn-arrow" aria-hidden="true"></i>
       </a>
       <a class="qn-item" href="https://legislature.mi.gov/Committees/Meetings">
         <i class="ti ti-users-group" aria-hidden="true"></i>
-        <div class="qn-item-text"><div class="title">Committee meetings</div><div class="sub">Upcoming &amp; recent hearings</div></div>
-        <i class="ti ti-arrow-right qn-arrow" aria-hidden="true"></i>
+        <div class="qn-item-text"><div class="title">Committee meetings</div><div class="sub">Upcoming &amp; recent</div></div>
       </a>
       <a class="qn-item" href="https://legislature.mi.gov/Laws/Constitution">
         <i class="ti ti-certificate" aria-hidden="true"></i>
-        <div class="qn-item-text"><div class="title">Michigan Constitution</div><div class="sub">Full text, 1963</div></div>
-        <i class="ti ti-arrow-right qn-arrow" aria-hidden="true"></i>
+        <div class="qn-item-text"><div class="title">State Constitution</div><div class="sub">Full text, 1963</div></div>
       </a>
     </div>
 
     <div class="activity-head">
       <h2>Recent legislative activity</h2>
-      <a href="https://legislature.mi.gov/Bills/DailyReport">View all activity <i class="ti ti-arrow-right" style="font-size:12px;vertical-align:-1px" aria-hidden="true"></i></a>
+      <a href="https://legislature.mi.gov/Bills/DailyReport">View all &rarr;</a>
     </div>
     <div class="activity-list">
       <div class="activity-item">
         <div class="ai-date"><span class="day">11</span><span class="mon">Jun</span></div>
         <div class="ai-body">
-          <div class="ai-bill"><a href="https://legislature.mi.gov/Home/GetObject?ObjectName=2025-LB-4359">LB 4359</a><span class="chip chip-bill">Bill</span></div>
-          <div class="ai-action">Presented to the Governor · 3:00 PM</div>
+          <div class="ai-bill"><span class="num">LB 4359</span><span class="ai-title">Great Lakes Shoreline Erosion Response Act</span><span class="chip chip-bill">Bill</span></div>
+          <div class="ai-action">Presented to the Governor &middot; 3:00 PM</div>
+          <div class="ai-desc">Creates a rapid-response fund so coastal townships can shore up bluffs before the next big storm washes out the road.</div>
         </div>
       </div>
       <div class="activity-item">
         <div class="ai-date"><span class="day">11</span><span class="mon">Jun</span></div>
         <div class="ai-body">
-          <div class="ai-bill"><a href="https://legislature.mi.gov/Home/GetObject?ObjectName=2026-LB-5571">LB 5571</a><span class="chip chip-bill">Bill</span></div>
-          <div class="ai-action">Passed with immediate effect · transmitted to the Governor</div>
+          <div class="ai-bill"><span class="num">LB 5571</span><span class="ai-title">Statewide Broadband Modernization Act</span><span class="chip chip-bill">Bill</span></div>
+          <div class="ai-action">Passed with immediate effect &middot; transmitted to the Governor</div>
           <div class="ai-vote">Roll Call #211 &nbsp;&middot;&nbsp; Yeas 81 &nbsp;&middot;&nbsp; Nays 25</div>
+          <div class="ai-desc">Requires ISPs receiving state grants to bring fiber to every rural address by 2029, or forfeit the funding.</div>
         </div>
       </div>
       <div class="activity-item">
         <div class="ai-date"><span class="day">11</span><span class="mon">Jun</span></div>
         <div class="ai-body">
-          <div class="ai-bill"><a href="https://legislature.mi.gov/Home/GetObject?ObjectName=2026-LB-5995">LB 5995</a><span class="chip chip-bill">Bill</span></div>
-          <div class="ai-action">Passed with immediate effect · transmitted to the Governor</div>
+          <div class="ai-bill"><span class="num">LB 5995</span><span class="ai-title">School Meal Debt Forgiveness Act</span><span class="chip chip-bill">Bill</span></div>
+          <div class="ai-action">Passed with immediate effect &middot; transmitted to the Governor</div>
           <div class="ai-vote">Roll Call #210 &nbsp;&middot;&nbsp; Yeas 106 &nbsp;&middot;&nbsp; Nays 0</div>
+          <div class="ai-desc">Wipes out unpaid school lunch balances statewide and bans "lunch shaming" practices going forward.</div>
         </div>
       </div>
       <div class="activity-item">
         <div class="ai-date"><span class="day">11</span><span class="mon">Jun</span></div>
         <div class="ai-body">
-          <div class="ai-bill"><a href="https://legislature.mi.gov/Home/GetObject?ObjectName=2025-LB-5124">LB 5124</a><span class="chip chip-bill">Bill</span></div>
-          <div class="ai-action">Passed with immediate effect · transmitted to the Governor</div>
+          <div class="ai-bill"><span class="num">LB 5124</span><span class="ai-title">Emergency Wolf Population Management Act</span><span class="chip chip-bill">Bill</span></div>
+          <div class="ai-action">Passed with immediate effect &middot; transmitted to the Governor</div>
           <div class="ai-vote">Roll Call #209 &nbsp;&middot;&nbsp; Yeas 83 &nbsp;&middot;&nbsp; Nays 23</div>
+          <div class="ai-desc">Hands the DNR authority to issue limited culling permits in the Upper Peninsula after three straight years of livestock losses.</div>
         </div>
       </div>
       <div class="activity-item">
         <div class="ai-date"><span class="day">11</span><span class="mon">Jun</span></div>
         <div class="ai-body">
-          <div class="ai-bill"><a href="https://legislature.mi.gov/Home/GetObject?ObjectName=2025-LB-0301">LB 301</a><span class="chip chip-bill">Bill</span></div>
-          <div class="ai-action">Passed third reading with immediate effect · transmitted to the Governor</div>
+          <div class="ai-bill"><span class="num">LB 301</span><span class="ai-title">Independent Auto Repair Fairness Act</span><span class="chip chip-bill">Bill</span></div>
+          <div class="ai-action">Passed third reading with immediate effect &middot; transmitted to the Governor</div>
           <div class="ai-vote">Roll Call #207 &nbsp;&middot;&nbsp; Yeas 98 &nbsp;&middot;&nbsp; Nays 8</div>
+          <div class="ai-desc">Forces automakers to sell diagnostic tool access to independent mechanics on the same terms as dealerships.</div>
         </div>
       </div>
       <div class="activity-item">
         <div class="ai-date"><span class="day">11</span><span class="mon">Jun</span></div>
         <div class="ai-body">
-          <div class="ai-bill"><a href="https://legislature.mi.gov/Home/GetObject?ObjectName=2025-LB-0240">LB 240</a><span class="chip chip-bill">Bill</span></div>
-          <div class="ai-action">Passed with amendments · immediate effect · laid over one day under the rules</div>
+          <div class="ai-bill"><span class="num">LB 240</span><span class="ai-title">Concert Ticket Resale Transparency Act</span><span class="chip chip-bill">Bill</span></div>
+          <div class="ai-action">Passed with amendments &middot; immediate effect &middot; laid over one day under the rules</div>
+          <div class="ai-desc">Caps resale markups at 20% over face value and requires bots-vs-humans reporting from resale platforms.</div>
         </div>
       </div>
       <div class="activity-item">
         <div class="ai-date"><span class="day">11</span><span class="mon">Jun</span></div>
         <div class="ai-body">
-          <div class="ai-bill"><a href="https://legislature.mi.gov/Home/GetObject?ObjectName=2026-LB-6079">LB 6079</a><span class="chip chip-bill">Bill</span></div>
-          <div class="ai-action">Introduced by Legislator Jason Morgan · referred to Committee on Transportation &amp; Infrastructure</div>
+          <div class="ai-bill"><span class="num">LB 6079</span><span class="ai-title">Rural Bridge Weight Limit Modernization Act</span><span class="chip chip-bill">Bill</span></div>
+          <div class="ai-action">Introduced by Legislator Jason Morgan &middot; referred to Committee on Transportation &amp; Infrastructure</div>
+          <div class="ai-desc">Orders a statewide re-survey of 1950s-era bridge ratings after a grain truck went through a deck outside Alma.</div>
         </div>
       </div>
       <div class="activity-item">
         <div class="ai-date"><span class="day">11</span><span class="mon">Jun</span></div>
         <div class="ai-body">
-          <div class="ai-bill"><a href="https://legislature.mi.gov/Home/GetObject?ObjectName=2026-LB-6078">LB 6078</a><span class="chip chip-bill">Bill</span></div>
-          <div class="ai-action">Introduced by Legislator Curtis VanderWall · referred to Committee on Regulatory Reform</div>
+          <div class="ai-bill"><span class="num">LB 6078</span><span class="ai-title">Short-Term Rental Neighbor Notice Act</span><span class="chip chip-bill">Bill</span></div>
+          <div class="ai-action">Introduced by Legislator Curtis VanderWall &middot; referred to Committee on Regulatory Reform</div>
+          <div class="ai-desc">Would require hosts to notify adjacent property owners before listing a home for short-term rental.</div>
         </div>
       </div>
       <div class="activity-item">
         <div class="ai-date"><span class="day">11</span><span class="mon">Jun</span></div>
         <div class="ai-body">
-          <div class="ai-bill"><a href="https://legislature.mi.gov/Home/GetObject?ObjectName=2026-LR-0331">LR 331</a><span class="chip chip-r">Resolution</span></div>
-          <div class="ai-action">Introduced by Legislator Steve Frisbie · adopted</div>
+          <div class="ai-bill"><span class="num">LR 331</span><span class="ai-title">Honoring the 2026 State Cherry Pie Champion</span><span class="chip chip-r">Resolution</span></div>
+          <div class="ai-action">Introduced by Legislator Steve Frisbie &middot; adopted</div>
+          <div class="ai-desc">A unanimous, entirely ceremonial tribute &mdash; the closest thing this chamber has to a unanimous consent day.</div>
         </div>
       </div>
     </div>
@@ -324,56 +313,46 @@ footer .inner{max-width:1100px;margin:0 auto}
 
   <aside aria-label="Sidebar">
 
-    <div class="sidebar-card">
-      <div class="sidebar-card-head"><h3>Session at a glance</h3></div>
-      <div class="stats-grid">
-        <div class="stat-box"><div class="n">103rd</div><div class="l">Legislature</div></div>
-        <div class="stat-box"><div class="n">PA 16</div><div class="l">Latest act, 2026</div></div>
-        <div class="stat-box"><div class="n">148</div><div class="l">Legislators</div></div>
-        <div class="stat-box"><div class="n">1</div><div class="l">Chamber</div></div>
-      </div>
+    <div class="spotlight">
+      <h3>On the floor Tuesday</h3>
+      <p>LB 6041, the Data Center Water Use Disclosure Act, gets its first floor vote &mdash; the fight over Great Lakes water rights for AI data centers finally reaches the chamber.</p>
+      <a href="https://legislature.mi.gov/Legislature/Calendars">View the full calendar &rarr;</a>
     </div>
 
     <div class="sidebar-card">
       <div class="sidebar-card-head"><h3>Legislature</h3></div>
-      <div class="sidebar-card-body">
-        <a class="sc-link" href="https://legislature.mi.gov/">Michigan Legislature website <i class="ti ti-external-link" aria-hidden="true"></i></a>
-        <a class="sc-link" href="https://legislature.mi.gov/Legislature/Legislators">Find your legislator <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
-        <a class="sc-link" href="https://legislature.mi.gov/Legislature/Legislators">Contact a legislator <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
-        <a class="sc-link" href="https://cloud.castus.tv/vod/milegislature?page=HOME">Legislature video <i class="ti ti-player-play" aria-hidden="true"></i></a>
-        <a class="sc-link" href="https://lfa.michigan.gov/">Legislative Fiscal Agency <i class="ti ti-external-link" aria-hidden="true"></i></a>
-      </div>
+      <a class="sc-link" href="https://legislature.mi.gov/">Michigan Legislature website <i class="ti ti-external-link" aria-hidden="true"></i></a>
+      <a class="sc-link" href="https://legislature.mi.gov/Legislature/Legislators">Find your legislator <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+      <a class="sc-link" href="https://legislature.mi.gov/Legislature/Legislators">Contact a legislator <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+      <a class="sc-link" href="https://cloud.castus.tv/vod/milegislature?page=HOME">Legislature video <i class="ti ti-player-play" aria-hidden="true"></i></a>
+      <a class="sc-link" href="https://lfa.michigan.gov/">Legislative Fiscal Agency <i class="ti ti-external-link" aria-hidden="true"></i></a>
     </div>
 
     <div class="sidebar-card">
       <div class="sidebar-card-head"><h3>More resources</h3></div>
-      <div class="sidebar-card-body">
-        <a class="sc-link" href="https://legislature.mi.gov/Committees/Meetings">Committee meetings <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
-        <a class="sc-link" href="https://legislature.mi.gov/Committees/CBRs">Committee bill records <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
-        <a class="sc-link" href="https://legislature.mi.gov/Home/ListServerSignUp">Meeting notifications <i class="ti ti-bell" aria-hidden="true"></i></a>
-        <a class="sc-link" href="https://legislature.mi.gov/Legislature/Directory">Legislative directory <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
-        <a class="sc-link" href="https://legislature.mi.gov/Legislature/MichiganManuals">Michigan manuals <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
-        <a class="sc-link" href="https://legislature.mi.gov/Legislature/HistoricalDocuments">Historical documents <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
-        <a class="sc-link" href="https://legislature.mi.gov/Bills/Initiatives">Initiatives &amp; alt. measures <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
-      </div>
+      <a class="sc-link" href="https://legislature.mi.gov/Committees/Meetings">Committee meetings <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+      <a class="sc-link" href="https://legislature.mi.gov/Committees/CBRs">Committee bill records <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+      <a class="sc-link" href="https://legislature.mi.gov/Home/ListServerSignUp">Meeting notifications <i class="ti ti-bell" aria-hidden="true"></i></a>
+      <a class="sc-link" href="https://legislature.mi.gov/Legislature/Directory">Legislative directory <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+      <a class="sc-link" href="https://legislature.mi.gov/Legislature/MichiganManuals">Michigan manuals <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+      <a class="sc-link" href="https://legislature.mi.gov/Legislature/HistoricalDocuments">Historical documents <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+      <a class="sc-link" href="https://legislature.mi.gov/Bills/Initiatives">Initiatives &amp; alt. measures <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
     </div>
 
   </aside>
 </div>
 
 <footer>
-  <div class="inner">
-    <div class="footer-links">
-      <a href="https://legislature.mi.gov/Home/AcceptableUse">Acceptable use</a>
-      <a href="https://legislature.mi.gov/Home/Privacy">Privacy policy</a>
-      <a href="https://legislature.mi.gov/Home/DMCA">DMCA</a>
-      <a href="https://legislature.mi.gov/Home/CommentForm">Comment form</a>
-      <a href="https://legislature.mi.gov/Home/Accessibility">Accessibility</a>
-      <a href="https://legislature.mi.gov/Home/SiteMap">Site map</a>
-      <a href="https://legislature.mi.gov/Home/RelatedSites">Related sites</a>
-    </div>
-    <p class="footer-copy">A free service of the Legislative Service Bureau in cooperation with the Michigan Legislative Council and the Michigan Legislature. Information is provided without warranties and is subject to revision.</p>
+  <div class="footer-links">
+    <a href="https://legislature.mi.gov/Home/AcceptableUse">Acceptable use</a>
+    <a href="https://legislature.mi.gov/Home/Privacy">Privacy policy</a>
+    <a href="https://legislature.mi.gov/Home/DMCA">DMCA</a>
+    <a href="https://legislature.mi.gov/Home/CommentForm">Comment form</a>
+    <a href="https://legislature.mi.gov/Home/Accessibility">Accessibility</a>
+    <a href="https://legislature.mi.gov/Home/SiteMap">Site map</a>
+    <a href="https://legislature.mi.gov/Home/RelatedSites">Related sites</a>
   </div>
+  <p class="footer-copy">A free service of the Legislative Service Bureau in cooperation with the Michigan Legislative Council and the Michigan Legislature. Information is provided without warranties and is subject to revision.</p>
 </footer>
 
 </body>
