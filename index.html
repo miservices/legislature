@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Shared header styles (disclaimer, masthead, nav, notice bar) -->
+<link rel="stylesheet" href="/shared/header.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#111827;background:#f3f4f6;font-size:15px;line-height:1.6}
@@ -17,36 +19,6 @@ a{color:inherit;text-decoration:none}
 /* Shared max-width container so nothing hugs the browser edge on wide viewports */
 .wrap{max-width:1240px;margin:0 auto;padding:0 2.5rem}
 @media(max-width:720px){.wrap{padding:0 1.25rem}}
-
-.disclaimer{background:#0b1f3a;color:#fff;text-align:center;padding:.6rem 1.5rem;font-size:12.5px;line-height:1.5}
-.disclaimer strong{font-weight:700}
-
-.masthead{background:#fff;border-bottom:4px solid #0b1f3a;padding:1.25rem 0}
-.masthead-inner{display:flex;align-items:center;justify-content:flex-start;gap:1rem;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:14px}
-.brand-wordmark .line1{font-size:11px;color:#6b7280;letter-spacing:.06em;text-transform:uppercase;font-weight:500}
-.brand-wordmark .line2{font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:600;color:#0b1f3a;letter-spacing:-.01em;line-height:1.1}
-
-nav.primary{background:#0b1f3a}
-nav.primary ul{display:flex;list-style:none;flex-wrap:wrap}
-nav.primary ul li{position:relative}
-nav.primary ul li a{display:flex;align-items:center;gap:4px;padding:.65rem 1rem;font-size:13.5px;color:rgba(255,255,255,.82);transition:all .12s;border-bottom:3px solid transparent;white-space:nowrap}
-nav.primary ul li:first-child a{padding-left:0}
-nav.primary ul li a:hover{color:#fff;background:rgba(255,255,255,.1)}
-nav.primary ul li a.active{color:#fff;border-bottom-color:#fbbf24}
-nav.primary ul li a .icon{font-size:11px}
-nav.primary .dropdown-menu{position:absolute;top:100%;left:0;min-width:260px;background:#fff;border:1px solid #e5e7eb;border-top:3px solid #0b1f3a;border-radius:0 0 6px 6px;box-shadow:0 8px 20px rgba(0,0,0,.12);list-style:none;display:none;z-index:20;padding:.35rem 0;margin-top:0}
-nav.primary .has-dropdown:hover .dropdown-menu,
-nav.primary .has-dropdown:focus-within .dropdown-menu{display:block}
-nav.primary .dropdown-menu li{position:static}
-nav.primary .dropdown-menu li a{color:#1f2937;padding:.55rem 1rem;font-size:13.5px;border-bottom:none;display:block;white-space:nowrap}
-nav.primary .dropdown-menu li a:hover{background:rgba(11,31,58,.06);color:#0b1f3a}
-nav.primary .dropdown-menu li:first-child a{padding-left:1rem}
-
-.notice{background:#fffbeb;border-left:4px solid #f59e0b;padding:.65rem 0}
-.notice-inner{display:flex;align-items:center;gap:.6rem;font-size:13px;color:#78350f}
-.notice .icon{font-size:16px;color:#d97706;flex-shrink:0}
-.notice strong{font-weight:600}
 
 /* ---------- HERO ---------- */
 .hero{position:relative;background:linear-gradient(155deg,#0b1f3a 0%,#0e2c52 55%,#123a63 100%);overflow:hidden;padding:3.4rem 0 3rem}
@@ -149,12 +121,15 @@ footer{background:#0b1f3a;padding:1.75rem 0}
 </head>
 <body>
 
-<!-- Icon sprite: self-contained, no external font/CDN dependency -->
+<!-- Injected shared header: disclaimer, masthead, nav, notice bar -->
+<script>window.ACTIVE_NAV = "home";</script>
+<div id="site-header"></div>
+<script src="/shared/header.js"></script>
+
+<!-- Icon sprite for the rest of this page's icons -->
 <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
   <defs>
-    <symbol id="i-chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
     <symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
-    <symbol id="i-info-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="11"/><line x1="12" y1="8" x2="12" y2="8"/></symbol>
     <symbol id="i-file-description" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></symbol>
     <symbol id="i-calendar-event" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="12" cy="15" r="1.6"/></symbol>
     <symbol id="i-chart-bar" viewBox="0 0 24 24"><line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="4"/></symbol>
@@ -168,58 +143,6 @@ footer{background:#0b1f3a;padding:1.75rem 0}
     <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
   </defs>
 </svg>
-
-<div class="disclaimer" role="note">
-  This is not an official government website. This site is a simulated legislative interface and does not represent any real government body or authority.
-</div>
-
-<div class="masthead">
-  <div class="masthead-inner wrap">
-    <div class="brand">
-      <div class="brand-wordmark">
-        <div class="line1">State of Michigan</div>
-        <div class="line2">Legislature</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<nav class="primary" aria-label="Primary navigation">
-  <div class="wrap">
-  <ul>
-    <li><a href="https://miservices.github.io/legislature/" class="active">Home</a></li>
-    <li class="has-dropdown">
-      <a href="https://miservices.github.io/legislature/legislators/">Legislature <svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></a>
-      <ul class="dropdown-menu">
-        <li><a href="https://miservices.github.io/legislature/legislators/">Legislators</a></li>
-        <li><a href="https://miservices.github.io/legislature/committees/">Committees</a></li>
-        <li><a href="https://miservices.github.io/legislature/calendar/">Calendar</a></li>
-        <li><a href="https://miservices.github.io/legislature/journals/">Journals</a></li>
-      </ul>
-    </li>
-    <li class="has-dropdown">
-      <a href="https://miservices.github.io/legislature/mcl/">Laws <svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></a>
-      <ul class="dropdown-menu">
-        <li><a href="https://miservices.github.io/legislature/mcl/">Michigan Compiled Laws</a></li>
-        <li><a href="https://miservices.github.io/legislature/mac/">Michigan Administrative Code</a></li>
-        <li><a href="https://miservices.github.io/legislature/public-acts/">Public Acts (passed bills)</a></li>
-        <li><a href="https://miservices.github.io/legislature/sos/executive-reorganization-orders/">Executive Orders</a></li>
-        <li><a href="https://miservices.github.io/legislature/sos/executive-reorganization-orders/">Executive Reorganization Orders</a></li>
-      </ul>
-    </li>
-    <li><a href="https://miservices.github.io/legislature/bills/">Bills</a></li>
-    <li><a href="https://miservices.github.io/legislature/resolutions/">Resolutions</a></li>
-    <li><a href="https://miservices.github.io/legislature/resources/">Other Resources</a></li>
-  </ul>
-  </div>
-</nav>
-
-<div class="notice" role="status">
-  <div class="notice-inner wrap">
-    <svg class="icon" aria-hidden="true"><use href="#i-info-circle"/></svg>
-    <span>The Legislature is adjourned &nbsp;&mdash;&nbsp; Resumes <strong>Tue Jun 17 &middot; 10:00 AM</strong></span>
-  </div>
-</div>
 
 <section class="hero">
   <div class="wrap hero-inner">

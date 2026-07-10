@@ -1,0 +1,41 @@
+/*
+ * Shared header styles for the Michigan Legislature site.
+ * Covers the elements injected by shared/header.js:
+ * disclaimer bar, masthead, primary nav, and notice bar.
+ * Link this in <head> on every page that uses header.js.
+ */
+
+.icon{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-0.125em;flex-shrink:0;display:inline-block}
+
+.wrap{max-width:1240px;margin:0 auto;padding:0 2.5rem}
+@media(max-width:720px){.wrap{padding:0 1.25rem}}
+
+.disclaimer{background:#0b1f3a;color:#fff;text-align:center;padding:.6rem 1.5rem;font-size:12.5px;line-height:1.5}
+.disclaimer strong{font-weight:700}
+
+.masthead{background:#fff;border-bottom:4px solid #0b1f3a;padding:1.25rem 0}
+.masthead-inner{display:flex;align-items:center;justify-content:flex-start;gap:1rem;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-wordmark .line1{font-size:11px;color:#6b7280;letter-spacing:.06em;text-transform:uppercase;font-weight:500}
+.brand-wordmark .line2{font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:600;color:#0b1f3a;letter-spacing:-.01em;line-height:1.1}
+
+nav.primary{background:#0b1f3a}
+nav.primary ul{display:flex;list-style:none;flex-wrap:wrap}
+nav.primary ul li{position:relative}
+nav.primary ul li a{display:flex;align-items:center;gap:4px;padding:.65rem 1rem;font-size:13.5px;color:rgba(255,255,255,.82);transition:all .12s;border-bottom:3px solid transparent;white-space:nowrap}
+nav.primary ul li:first-child a{padding-left:0}
+nav.primary ul li a:hover{color:#fff;background:rgba(255,255,255,.1)}
+nav.primary ul li a.active{color:#fff;border-bottom-color:#fbbf24}
+nav.primary ul li a .icon{font-size:11px}
+nav.primary .dropdown-menu{position:absolute;top:100%;left:0;min-width:260px;background:#fff;border:1px solid #e5e7eb;border-top:3px solid #0b1f3a;border-radius:0 0 6px 6px;box-shadow:0 8px 20px rgba(0,0,0,.12);list-style:none;display:none;z-index:20;padding:.35rem 0;margin-top:0}
+nav.primary .has-dropdown:hover .dropdown-menu,
+nav.primary .has-dropdown:focus-within .dropdown-menu{display:block}
+nav.primary .dropdown-menu li{position:static}
+nav.primary .dropdown-menu li a{color:#1f2937;padding:.55rem 1rem;font-size:13.5px;border-bottom:none;display:block;white-space:nowrap}
+nav.primary .dropdown-menu li a:hover{background:rgba(11,31,58,.06);color:#0b1f3a}
+nav.primary .dropdown-menu li:first-child a{padding-left:1rem}
+
+.notice{background:#fffbeb;border-left:4px solid #f59e0b;padding:.65rem 0}
+.notice-inner{display:flex;align-items:center;gap:.6rem;font-size:13px;color:#78350f}
+.notice .icon{font-size:16px;color:#d97706;flex-shrink:0}
+.notice strong{font-weight:600}
