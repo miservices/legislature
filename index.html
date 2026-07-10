@@ -35,11 +35,13 @@ nav.primary ul li:first-child a{padding-left:0}
 nav.primary ul li a:hover{color:#fff;background:rgba(255,255,255,.1)}
 nav.primary ul li a.active{color:#fff;border-bottom-color:#fbbf24}
 nav.primary ul li a .icon{font-size:11px}
-nav.primary .dropdown-menu{position:absolute;top:100%;left:0;min-width:240px;background:#fff;border:1px solid #e5e7eb;border-top:3px solid #0b1f3a;border-radius:0 0 6px 6px;box-shadow:0 8px 20px rgba(0,0,0,.12);list-style:none;display:none;z-index:20;padding:.35rem 0}
+nav.primary .dropdown-menu{position:absolute;top:100%;left:0;min-width:260px;background:#fff;border:1px solid #e5e7eb;border-top:3px solid #0b1f3a;border-radius:0 0 6px 6px;box-shadow:0 8px 20px rgba(0,0,0,.12);list-style:none;display:none;z-index:20;padding:.35rem 0;margin-top:0}
 nav.primary .has-dropdown:hover .dropdown-menu,
 nav.primary .has-dropdown:focus-within .dropdown-menu{display:block}
-nav.primary .dropdown-menu li a{color:#1f2937;padding:.55rem 1rem;font-size:13.5px;border-bottom:none;display:block}
+nav.primary .dropdown-menu li{position:static}
+nav.primary .dropdown-menu li a{color:#1f2937;padding:.55rem 1rem;font-size:13.5px;border-bottom:none;display:block;white-space:nowrap}
 nav.primary .dropdown-menu li a:hover{background:rgba(11,31,58,.06);color:#0b1f3a}
+nav.primary .dropdown-menu li:first-child a{padding-left:1rem}
 
 .notice{background:#fffbeb;border-left:4px solid #f59e0b;padding:.65rem 0}
 .notice-inner{display:flex;align-items:center;gap:.6rem;font-size:13px;color:#78350f}
@@ -185,29 +187,29 @@ footer{background:#0b1f3a;padding:1.75rem 0}
 <nav class="primary" aria-label="Primary navigation">
   <div class="wrap">
   <ul>
-    <li><a href="https://legislature.mi.gov/" class="active">Home</a></li>
+    <li><a href="https://miservices.github.io/legislature/" class="active">Home</a></li>
     <li class="has-dropdown">
-      <a href="https://legislature.mi.gov/Legislature">Legislature <svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></a>
+      <a href="https://miservices.github.io/legislature/legislators/">Legislature <svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></a>
       <ul class="dropdown-menu">
-        <li><a href="https://legislature.mi.gov/Legislature/Legislators">Legislators</a></li>
-        <li><a href="https://legislature.mi.gov/Committees">Committees</a></li>
-        <li><a href="https://legislature.mi.gov/Legislature/Calendars">Calendar</a></li>
-        <li><a href="https://legislature.mi.gov/Legislature/Journals">Journals</a></li>
+        <li><a href="https://miservices.github.io/legislature/legislators/">Legislators</a></li>
+        <li><a href="https://miservices.github.io/legislature/committees/">Committees</a></li>
+        <li><a href="https://miservices.github.io/legislature/calendar/">Calendar</a></li>
+        <li><a href="https://miservices.github.io/legislature/journals/">Journals</a></li>
       </ul>
     </li>
     <li class="has-dropdown">
-      <a href="https://legislature.mi.gov/Laws">Laws <svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></a>
+      <a href="https://miservices.github.io/legislature/mcl/">Laws <svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></a>
       <ul class="dropdown-menu">
-        <li><a href="https://legislature.mi.gov/Laws/MCLSearch">Michigan Compiled Laws (statutes)</a></li>
-        <li><a href="https://legislature.mi.gov/Laws/PublicActs">Michigan Administrative Code</a></li>
-        <li><a href="https://legislature.mi.gov/Laws/PublicActs">Public Acts (passed bills)</a></li>
-        <li><a href="https://legislature.mi.gov/Laws/ExecutiveOrders">Executive Orders</a></li>
-        <li><a href="https://legislature.mi.gov/Laws/ExecutiveReorganizationOrders">Executive Reorganization Orders</a></li>
+        <li><a href="https://miservices.github.io/legislature/mcl/">Michigan Compiled Laws</a></li>
+        <li><a href="https://miservices.github.io/legislature/mac/">Michigan Administrative Code</a></li>
+        <li><a href="https://miservices.github.io/legislature/public-acts/">Public Acts (passed bills)</a></li>
+        <li><a href="https://miservices.github.io/legislature/sos/executive-reorganization-orders/">Executive Orders</a></li>
+        <li><a href="https://miservices.github.io/legislature/sos/executive-reorganization-orders/">Executive Reorganization Orders</a></li>
       </ul>
     </li>
-    <li><a href="https://legislature.mi.gov/Bills">Bills</a></li>
-    <li><a href="https://legislature.mi.gov/Bills">Resolutions</a></li>
-    <li><a href="https://legislature.mi.gov/Bills">Other Resources</a></li>
+    <li><a href="https://miservices.github.io/legislature/bills/">Bills</a></li>
+    <li><a href="https://miservices.github.io/legislature/resolutions/">Resolutions</a></li>
+    <li><a href="https://miservices.github.io/legislature/resources/">Other Resources</a></li>
   </ul>
   </div>
 </nav>
@@ -222,9 +224,9 @@ footer{background:#0b1f3a;padding:1.75rem 0}
 <section class="hero">
   <div class="wrap hero-inner">
     <div class="hero-copy">
-      <div class="hero-eyebrow">103rd Legislature &middot; Adjourned until Jun 17</div>
+      <div class="hero-eyebrow">1st Legislature &middot; 2026 Session</div>
       <h1>Every bill, vote, and statute in the State of Michigan.</h1>
-      <p class="hero-sub">Search live legislation, browse the compiled laws, and see exactly how each of the 148 members voted &mdash; updated the moment the gavel falls.</p>
+      <p class="hero-sub">Search live legislation, browse the compiled laws, and see exactly how your state law makers voted &mdash; updated the moment the gavel falls.</p>
       <div class="hero-search">
         <select aria-label="Search category">
           <option>Bills &amp; Resolutions</option>
@@ -236,9 +238,9 @@ footer{background:#0b1f3a;padding:1.75rem 0}
         <button type="button">Search</button>
       </div>
       <div class="hero-links">
-        <a href="https://legislature.mi.gov/Search/ExecuteSearch?dateFromStr=today&docTypes=Bills&dailyReport=todaysbillactivity">Today's bill activity</a>
-        <a href="https://legislature.mi.gov/Legislature/Calendars">Floor calendar</a>
-        <a href="https://legislature.mi.gov/Legislature/Legislators">Find your legislator</a>
+        <a href="https://miservices.github.io/legislature/bills/">Recent bill activity</a>
+        <a href="https://miservices.github.io/legislature/calendar/">Floor calendar</a>
+        <a href="https://miservices.github.io/legislature/legislators/">Find your legislator</a>
       </div>
     </div>
   </div>
@@ -250,42 +252,32 @@ footer{background:#0b1f3a;padding:1.75rem 0}
 
     <p class="section-label">Quick access</p>
     <div class="quick-nav">
-      <a class="qn-item" href="https://legislature.mi.gov/Search/ExecuteSearch?dateFromStr=today&docTypes=Bills&dailyReport=todaysbillactivity">
+      <a class="qn-item" href="https://miservices.github.io/legislature/bills/">
         <svg class="icon" aria-hidden="true"><use href="#i-file-description"/></svg>
-        <div class="qn-item-text"><div class="title">Today's bill activity</div><div class="sub">Bills introduced &amp; moved</div></div>
+        <div class="qn-item-text"><div class="title">Recent bill activity</div><div class="sub">Bills introduced &amp; moved</div></div>
         <svg class="icon qn-arrow" aria-hidden="true"><use href="#i-arrow-right"/></svg>
       </a>
-      <a class="qn-item" href="https://legislature.mi.gov/Search/ExecuteSearch?docTypes=Legislative%20Calendar&dateFromStr=today">
+      <a class="qn-item" href="https://miservices.github.io/legislature/calendar/">
         <svg class="icon" aria-hidden="true"><use href="#i-calendar-event"/></svg>
-        <div class="qn-item-text"><div class="title">Today's calendar</div><div class="sub">Floor schedule</div></div>
+        <div class="qn-item-text"><div class="title">Calendar</div><div class="sub">Floor schedule</div></div>
         <svg class="icon qn-arrow" aria-hidden="true"><use href="#i-arrow-right"/></svg>
       </a>
-      <a class="qn-item" href="https://legislature.mi.gov/Bills/DailyReport">
-        <svg class="icon" aria-hidden="true"><use href="#i-chart-bar"/></svg>
-        <div class="qn-item-text"><div class="title">Daily bill status report</div><div class="sub">Full session status summary</div></div>
-        <svg class="icon qn-arrow" aria-hidden="true"><use href="#i-arrow-right"/></svg>
-      </a>
-      <a class="qn-item" href="https://legislature.mi.gov/Laws/ChapterIndex">
+      <a class="qn-item" href="https://miservices.github.io/legislature/mcl/">
         <svg class="icon" aria-hidden="true"><use href="#i-book-2"/></svg>
-        <div class="qn-item-text"><div class="title">MCL chapter index</div><div class="sub">Browse compiled law by chapter</div></div>
+        <div class="qn-item-text"><div class="title">Michigan compiled laws (statutes)</div><div class="sub">Browse compiled law by chapter</div></div>
         <svg class="icon qn-arrow" aria-hidden="true"><use href="#i-arrow-right"/></svg>
       </a>
-      <a class="qn-item" href="https://legislature.mi.gov/Laws/PublicActs">
+      <a class="qn-item" href="https://miservices.github.io/legislature/public-acts/">
         <svg class="icon" aria-hidden="true"><use href="#i-writing"/></svg>
         <div class="qn-item-text"><div class="title">Public acts</div><div class="sub">Bills signed into law</div></div>
         <svg class="icon qn-arrow" aria-hidden="true"><use href="#i-arrow-right"/></svg>
       </a>
-      <a class="qn-item" href="https://legislature.mi.gov/Laws/ExecutiveOrders">
+      <a class="qn-item" href="https://miservices.github.io/legislature/sos/executive-reorganization-orders/">
         <svg class="icon" aria-hidden="true"><use href="#i-lock-open"/></svg>
         <div class="qn-item-text"><div class="title">Executive orders</div><div class="sub">Governor directives</div></div>
         <svg class="icon qn-arrow" aria-hidden="true"><use href="#i-arrow-right"/></svg>
       </a>
-      <a class="qn-item" href="https://legislature.mi.gov/Committees/Meetings">
-        <svg class="icon" aria-hidden="true"><use href="#i-users-group"/></svg>
-        <div class="qn-item-text"><div class="title">Committee meetings</div><div class="sub">Upcoming &amp; recent hearings</div></div>
-        <svg class="icon qn-arrow" aria-hidden="true"><use href="#i-arrow-right"/></svg>
-      </a>
-      <a class="qn-item" href="https://legislature.mi.gov/Laws/Constitution">
+      <a class="qn-item" href="https://miservices.github.io/legislature/constitution/">
         <svg class="icon" aria-hidden="true"><use href="#i-certificate"/></svg>
         <div class="qn-item-text"><div class="title">Michigan Constitution</div><div class="sub">Full text, 1963</div></div>
         <svg class="icon qn-arrow" aria-hidden="true"><use href="#i-arrow-right"/></svg>
@@ -294,7 +286,7 @@ footer{background:#0b1f3a;padding:1.75rem 0}
 
     <div class="activity-head">
       <h2>Recent legislative activity</h2>
-      <a href="https://legislature.mi.gov/Bills/DailyReport">View all activity <svg class="icon" style="font-size:12px;vertical-align:-1px" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+      <a href="https://miservices.github.io/legislature/bills/">View all activity <svg class="icon" style="font-size:12px;vertical-align:-1px" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
     </div>
     <div class="activity-list">
       <div class="activity-item">
@@ -382,15 +374,15 @@ footer{background:#0b1f3a;padding:1.75rem 0}
     <div class="spotlight">
       <h3>On the floor Tuesday</h3>
       <p>LB 6041, the Data Center Water Use Disclosure Act, gets its first floor vote &mdash; the fight over Great Lakes water rights for AI data centers finally reaches the chamber.</p>
-      <a href="https://legislature.mi.gov/Legislature/Calendars">View the full calendar &rarr;</a>
+      <a href="https://miservices.github.io/legislature/calendar/">View the full calendar &rarr;</a>
     </div>
 
     <div class="sidebar-card">
       <div class="sidebar-card-head"><h3>Session at a glance</h3></div>
       <div class="stats-grid">
-        <div class="stat-box"><div class="n">103rd</div><div class="l">Legislature</div></div>
-        <div class="stat-box"><div class="n">PA 16</div><div class="l">Latest act, 2026</div></div>
-        <div class="stat-box"><div class="n">148</div><div class="l">Legislators</div></div>
+        <div class="stat-box"><div class="n">First</div><div class="l">Legislature</div></div>
+        <div class="stat-box"><div class="n">PA 16</div><div class="l">Latest act</div></div>
+        <div class="stat-box"><div class="n">16</div><div class="l">Legislators</div></div>
         <div class="stat-box"><div class="n">1</div><div class="l">Unicameral chamber</div></div>
       </div>
     </div>
@@ -398,24 +390,9 @@ footer{background:#0b1f3a;padding:1.75rem 0}
     <div class="sidebar-card">
       <div class="sidebar-card-head"><h3>Legislature</h3></div>
       <div class="sidebar-card-body">
-        <a class="sc-link" href="https://legislature.mi.gov/">Michigan Legislature website <svg class="icon" aria-hidden="true"><use href="#i-external-link"/></svg></a>
-        <a class="sc-link" href="https://legislature.mi.gov/Legislature/Legislators">Find your legislator <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
-        <a class="sc-link" href="https://legislature.mi.gov/Legislature/Legislators">Contact a legislator <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
-        <a class="sc-link" href="https://cloud.castus.tv/vod/milegislature?page=HOME">Legislature video <svg class="icon" aria-hidden="true"><use href="#i-player-play"/></svg></a>
-        <a class="sc-link" href="https://lfa.michigan.gov/">Legislative Fiscal Agency <svg class="icon" aria-hidden="true"><use href="#i-external-link"/></svg></a>
-      </div>
-    </div>
-
-    <div class="sidebar-card">
-      <div class="sidebar-card-head"><h3>More resources</h3></div>
-      <div class="sidebar-card-body">
-        <a class="sc-link" href="https://legislature.mi.gov/Committees/Meetings">Committee meetings <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
-        <a class="sc-link" href="https://legislature.mi.gov/Committees/CBRs">Committee bill records <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
-        <a class="sc-link" href="https://legislature.mi.gov/Home/ListServerSignUp">Meeting notifications <svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg></a>
-        <a class="sc-link" href="https://legislature.mi.gov/Legislature/Directory">Legislative directory <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
-        <a class="sc-link" href="https://legislature.mi.gov/Legislature/MichiganManuals">Michigan manuals <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
-        <a class="sc-link" href="https://legislature.mi.gov/Legislature/HistoricalDocuments">Historical documents <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
-        <a class="sc-link" href="https://legislature.mi.gov/Bills/Initiatives">Initiatives &amp; alt. measures <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+        <a class="sc-link" href="https://miservices.github.io/legislature/legislators/">Contact a legislator <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+        <a class="sc-link" href="https://miservices.github.io/legislature/committees/">Committee meetings <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+        <a class="sc-link" href="https://miservices.github.io/legislature/journals/">Journals <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
       </div>
     </div>
 
@@ -425,16 +402,7 @@ footer{background:#0b1f3a;padding:1.75rem 0}
 
 <footer>
   <div class="wrap">
-  <div class="footer-links">
-    <a href="https://legislature.mi.gov/Home/AcceptableUse">Acceptable use</a>
-    <a href="https://legislature.mi.gov/Home/Privacy">Privacy policy</a>
-    <a href="https://legislature.mi.gov/Home/DMCA">DMCA</a>
-    <a href="https://legislature.mi.gov/Home/CommentForm">Comment form</a>
-    <a href="https://legislature.mi.gov/Home/Accessibility">Accessibility</a>
-    <a href="https://legislature.mi.gov/Home/SiteMap">Site map</a>
-    <a href="https://legislature.mi.gov/Home/RelatedSites">Related sites</a>
-  </div>
-  <p class="footer-copy">A free service of the Legislative Service Bureau in cooperation with the Michigan Legislative Council and the Michigan Legislature. Information is provided without warranties and is subject to revision.</p>
+  <p class="footer-copy">A free service of the Legislative Service Bureau in cooperation with the Michigan Legislature. Information is provided without warranties and is subject to revision. This is not an official government website. This site is a simulated legislative interface and does not represent any real government body or authority.</p>
   </div>
 </footer>
 
