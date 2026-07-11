@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Bills &amp; Resolutions - Michigan Legislature</title>
+<title>Bills | Michigan Legislature</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -139,8 +139,8 @@ footer.site-footer{background:#0b1f3a;padding:1.75rem 0}
 <section class="page-hero">
   <div class="wrap page-hero-inner">
     <div class="page-hero-eyebrow">Legislation</div>
-    <h2>Bills &amp; Resolutions</h2>
-    <p>Search and track legislation introduced in the Michigan Legislature during the current session.</p>
+    <h2>Bill Tracker</h2>
+    <p>Search and track legislation introduced in the Michigan Legislature whenever and wherever you want.</p>
   </div>
 </section>
 
@@ -416,7 +416,7 @@ function renderBillList(updateUrl){
     return;
   }
 
-  let html=`<div class="list-count">${data.length} bill${data.length!==1?"s":""} &amp; resolutions</div>`;
+  let html=`<div class="list-count">${data.length} bill${data.length!==1?"s":""}</div>`;
   html+=`<div class="bill-list">`;
   data.forEach(b=>{
     const id=normalizeId(b["Bill No"]);
@@ -450,7 +450,7 @@ function showDetail(b,updateUrl){
   }
 
   document.getElementById("content").innerHTML=`
-    <div class="back-link" onclick="applyFilters()">&#8592; Back to Bills &amp; Resolutions</div>
+    <div class="back-link" onclick="applyFilters()">&#8592; Back to Bill Tracker</div>
 
     <div class="detail-num">${escHtml(formatNumber(b))}</div>
     <div class="detail-title">${escHtml(b["Name"]||"")}</div>
