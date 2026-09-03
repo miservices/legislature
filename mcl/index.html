@@ -89,7 +89,7 @@ main{padding:2rem 0 4rem}
 .chapter-banner p{font-size:12.5px;color:rgba(255,255,255,.65)}
 
 .section-table{border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff}
-.section-row{display:grid;grid-template-columns:120px 1fr;border-bottom:1px solid #f3f4f6;transition:background .1s;cursor:pointer}
+.section-row{display:grid;grid-template-columns:150px 1fr;border-bottom:1px solid #f3f4f6;transition:background .1s;cursor:pointer}
 .section-row:last-child{border-bottom:none}
 .section-row:hover{background:#f9fafb}
 .section-row .sr-cite{padding:.9rem 1rem;color:#0b1f3a;font-weight:600;font-size:13px;border-right:1px solid #f3f4f6;background:#fafafa;display:flex;align-items:center}
@@ -213,7 +213,6 @@ footer{background:#0b1f3a;padding:1.5rem 0}
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaZtiF885qU65kN8IttJzYV8NcCiBFYI0Pn8z27HG8owEIiAeI2W4eg0r2Rpd-rdjVmMJXiKINu-gt/pub?output=csv";
 
 let sections = {}, chapters = {}, orderedSections = [], orderedChapters = [];
-const CONSTITUTION_CITE = "C";
 
 function toRoman(num){
   const map = [[1000,"M"],[900,"CM"],[500,"D"],[400,"CD"],[100,"C"],[90,"XC"],[50,"L"],[40,"XL"],[10,"X"],[9,"IX"],[5,"V"],[4,"IV"],[1,"I"]];
@@ -222,21 +221,28 @@ function toRoman(num){
   return out || String(num);
 }
 
-function parseConstitutionCite(cite){
-  // "C.5.22" -> { article: "5", section: "22" }
-  const parts = cite.split(".");
-  return { article: parts[1] || "", section: parts.slice(2).join(".") };
+/* A chapter is a Constitution article if its title says so, e.g. "CONSTITUTION ARTICLE I DECLARATION OF RIGHTS" */
+function isConstitutionChapter(chCite){
+  const ch = chapters[chCite];
+  return !!ch && /^constitution\s+article/i.test(ch.title || "");
 }
 
-function citeSortKey(cite){
-  if(cite === CONSTITUTION_CITE || cite.startsWith(CONSTITUTION_CITE+".")){
-    const parts = cite.split(".").slice(1).map(Number);
-    return [-1, ...parts];
-  }
-  return [0, ...cite.split(".").map(Number)];
+function articleRoman(chCite){
+  const ch = chapters[chCite];
+  const m = (ch && ch.title || "").match(/article\s+([ivxlcdm]+)/i);
+  return m ? m[1].toUpperCase() : toRoman(chCite);
 }
+
+/* "CONSTITUTION ARTICLE I DECLARATION OF RIGHTS" -> "Declaration of Rights" */
+function articleName(chCite){
+  const ch = chapters[chCite];
+  const raw = (ch && ch.title || "").replace(/^constitution\s+article\s+[ivxlcdm]+\s*/i, "").trim();
+  const small = new Set(["of","the","and","in","for","to","a","an","or"]);
+  return raw.toLowerCase().split(/\s+/).map((w,i)=> (i>0 && small.has(w)) ? w : (w.charAt(0).toUpperCase()+w.slice(1))).join(" ") || (ch && ch.title) || "";
+}
+
 function compareCites(a,b){
-  const ka = citeSortKey(a), kb = citeSortKey(b);
+  const ka = a.split(".").map(Number), kb = b.split(".").map(Number);
   const len = Math.max(ka.length,kb.length);
   for(let i=0;i<len;i++){
     const va = ka[i] ?? 0, vb = kb[i] ?? 0;
@@ -325,6 +331,10 @@ function route(){
     buildChapterIndex();
     const el = document.getElementById("all-chapters");
     if(el){ el.scrollIntoView({behavior:"instant", block:"start"}); return; }
+  } else if(h === "constitution"){
+    setChrome(true);
+    buildPathbar([{label:"Constitution"}]);
+    buildConstitutionOverview();
   } else if(h.includes(".")){
     setChrome(true);
     openSection(h);
@@ -358,16 +368,17 @@ function buildPathbar(crumbs){
 /* ---------- view: chapter index ---------- */
 function buildChapterIndex(){
   const root = document.getElementById("laws");
-  const numberedChapters = orderedChapters.filter(c=>c!==CONSTITUTION_CITE);
-  const hasConstitution = !!chapters[CONSTITUTION_CITE];
+  const constitutionChapters = orderedChapters.filter(isConstitutionChapter);
+  const numberedChapters = orderedChapters.filter(c=>!isConstitutionChapter(c));
+  const constitutionSections = orderedSections.filter(s=>isConstitutionChapter(s.split(".")[0]));
+  const numberedSections = orderedSections.filter(s=>!isConstitutionChapter(s.split(".")[0]));
 
   let html = `<div class="quick-nav">`;
-  if(hasConstitution){
-    const artCount = new Set(orderedSections.filter(s=>s.startsWith("C.")).map(s=>parseConstitutionCite(s).article)).size;
+  if(constitutionChapters.length){
     html += `
-      <a class="qn-item" href="#${CONSTITUTION_CITE}">
+      <a class="qn-item" href="#constitution">
         <svg class="icon" aria-hidden="true"><use href="#i-certificate"/></svg>
-        <div class="qn-item-text"><div class="title">Michigan Constitution</div><div class="sub">${artCount} article${artCount===1?"":"s"} &middot; 1963</div></div>
+        <div class="qn-item-text"><div class="title">Michigan Constitution</div><div class="sub">${constitutionChapters.length} article${constitutionChapters.length===1?"":"s"} &middot; 1963</div></div>
         <svg class="icon qn-arrow" aria-hidden="true"><use href="#i-arrow-right"/></svg>
       </a>`;
   }
@@ -388,7 +399,7 @@ function buildChapterIndex(){
   html += `
     <div class="index-head" id="all-chapters">
       <h2>All chapters</h2>
-      <span class="count-pill">${numberedChapters.length} chapters &middot; ${orderedSections.filter(s=>!s.startsWith("C.")).length} sections</span>
+      <span class="count-pill">${numberedChapters.length} chapters &middot; ${numberedSections.length} sections</span>
     </div>
     <div class="chapter-grid">`;
   numberedChapters.forEach(cite=>{
@@ -407,11 +418,47 @@ function buildChapterIndex(){
   root.innerHTML = html;
 }
 
+/* ---------- view: constitution overview (all articles) ---------- */
+function buildConstitutionOverview(){
+  const root = document.getElementById("laws");
+  const constitutionChapters = orderedChapters.filter(isConstitutionChapter);
+  const totalSections = orderedSections.filter(s=>isConstitutionChapter(s.split(".")[0])).length;
+
+  let html = `
+    <a class="back-link" href="#"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> Back to all chapters</a>
+    <div class="chapter-banner">
+      <div class="num"><svg class="icon" style="font-size:30px"><use href="#i-certificate"/></svg></div>
+      <div>
+        <h1>Michigan Constitution of 1963</h1>
+        <p>${constitutionChapters.length} article${constitutionChapters.length===1?"":"s"} &middot; ${totalSections} section${totalSections===1?"":"s"}</p>
+      </div>
+    </div>`;
+
+  if(constitutionChapters.length === 0){
+    html += `<div class="empty-state"><p>No articles have been codified yet.</p></div>`;
+  } else {
+    html += `<div class="chapter-grid">`;
+    constitutionChapters.forEach(cite=>{
+      const count = orderedSections.filter(s=>s.startsWith(cite+".")).length;
+      html += `
+        <a class="chapter-card" href="#${cite}">
+          <div class="chapter-num">${articleRoman(cite)}</div>
+          <div class="chapter-card-body">
+            <div class="chapter-card-title">${articleName(cite)}</div>
+            <div class="chapter-card-meta">${count} section${count===1?"":"s"}</div>
+          </div>
+        </a>`;
+    });
+    html += `</div>`;
+  }
+  root.innerHTML = html;
+}
+
 /* ---------- view: chapter (section list) ---------- */
 function openChapter(cite){
   const ch = chapters[cite];
   const root = document.getElementById("laws");
-  const isConstitution = cite === CONSTITUTION_CITE;
+  const isConstitution = isConstitutionChapter(cite);
 
   if(!ch){
     buildPathbar([{label:"Chapter not found"}]);
@@ -424,14 +471,43 @@ function openChapter(cite){
     return;
   }
 
-  buildPathbar([{label: isConstitution ? "Constitution" : "Chapter "+cite, href:cite}]);
+  const list = orderedSections.filter(s=>s.startsWith(cite+"."));
 
   if(isConstitution){
-    openConstitution(ch, root);
+    const roman = articleRoman(cite);
+    buildPathbar([
+      {label:"Constitution", href:"constitution"},
+      {label:"Article "+roman}
+    ]);
+
+    let html = `
+      <a class="back-link" href="#constitution"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> Back to the Constitution</a>
+      <div class="chapter-banner">
+        <div class="num">${roman}</div>
+        <div>
+          <h1>Article ${roman} &mdash; ${articleName(cite)}</h1>
+          <p>${list.length} section${list.length===1?"":"s"} codified under this article</p>
+        </div>
+      </div>`;
+
+    if(list.length === 0){
+      html += `<div class="empty-state"><p>No sections have been codified under this article yet.</p></div>`;
+    } else {
+      html += `<div class="section-table">`;
+      list.forEach(s=>{
+        html += `
+          <a class="section-row" href="#${s}">
+            <span class="sr-cite mono">C.${s}</span>
+            <span class="sr-title">${sections[s].title || ""} <svg class="icon sr-arrow"><use href="#i-arrow-right"/></svg></span>
+          </a>`;
+      });
+      html += `</div>`;
+    }
+    root.innerHTML = html;
     return;
   }
 
-  const list = orderedSections.filter(s=>s.startsWith(cite+"."));
+  buildPathbar([{label:"Chapter "+cite, href:cite}]);
 
   let html = `
     <a class="back-link" href="#"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> Back to all chapters</a>
@@ -459,47 +535,6 @@ function openChapter(cite){
   root.innerHTML = html;
 }
 
-function openConstitution(ch, root){
-  const list = orderedSections.filter(s=>s.startsWith("C."));
-  const byArticle = {};
-  list.forEach(s=>{
-    const { article } = parseConstitutionCite(s);
-    (byArticle[article] = byArticle[article] || []).push(s);
-  });
-  const articleNums = Object.keys(byArticle).sort((a,b)=>Number(a)-Number(b));
-
-  let html = `
-    <a class="back-link" href="#"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> Back to all chapters</a>
-    <div class="chapter-banner">
-      <div class="num"><svg class="icon" style="font-size:30px"><use href="#i-certificate"/></svg></div>
-      <div>
-        <h1>${ch.title || "Michigan Constitution"}</h1>
-        <p>${articleNums.length} article${articleNums.length===1?"":"s"} &middot; ${list.length} section${list.length===1?"":"s"}</p>
-      </div>
-    </div>`;
-
-  if(articleNums.length === 0){
-    html += `<div class="empty-state"><p>No articles have been codified yet.</p></div>`;
-  } else {
-    articleNums.forEach(article=>{
-      const roman = toRoman(article);
-      html += `<div class="article-group">
-        <div class="article-head"><span class="num">Article ${roman}</span></div>
-        <div class="section-table">`;
-      byArticle[article].forEach(s=>{
-        const { section } = parseConstitutionCite(s);
-        html += `
-          <a class="section-row" href="#${s}">
-            <span class="sr-cite mono">C.${article}.${section}</span>
-            <span class="sr-title">${sections[s].title || ""} <svg class="icon sr-arrow"><use href="#i-arrow-right"/></svg></span>
-          </a>`;
-      });
-      html += `</div></div>`;
-    });
-  }
-  root.innerHTML = html;
-}
-
 /* ---------- view: section (law text) ---------- */
 function getIndentLevel(line){
   const t = line.trim();
@@ -513,16 +548,16 @@ function getIndentLevel(line){
 function openSection(cite){
   const s = sections[cite];
   const root = document.getElementById("laws");
-  const isConstitution = cite.startsWith(CONSTITUTION_CITE+".");
-  const ch = isConstitution ? CONSTITUTION_CITE : cite.split(".")[0];
+  const ch = cite.split(".")[0];
+  const isConstitution = isConstitutionChapter(ch);
 
   if(!s){
     buildPathbar([{label:"Section not found"}]);
     root.innerHTML = `
-      <a class="back-link" href="#${ch}"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> Back to ${isConstitution ? "the Constitution" : "Chapter "+ch}</a>
+      <a class="back-link" href="#${ch}"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> Back to ${isConstitution ? "Article "+articleRoman(ch) : "Chapter "+ch}</a>
       <div class="empty-state">
         <div class="icon"><svg class="icon" style="font-size:26px"><use href="#i-file-empty"/></svg></div>
-        <p>${cite} could not be found.</p>
+        <p>${isConstitution ? "C."+cite : "MCL "+cite} could not be found.</p>
       </div>`;
     return;
   }
@@ -530,15 +565,14 @@ function openSection(cite){
   const chTitle = chapters[ch] ? chapters[ch].title : "";
 
   if(isConstitution){
-    const { article, section } = parseConstitutionCite(cite);
-    const roman = toRoman(article);
+    const roman = articleRoman(ch);
     buildPathbar([
-      {label:"Constitution", href:CONSTITUTION_CITE},
-      {label:"Article "+roman, href:CONSTITUTION_CITE},
-      {label:"C."+article+"."+section}
+      {label:"Constitution", href:"constitution"},
+      {label:"Article "+roman, href:ch},
+      {label:"C."+cite}
     ]);
 
-    const siblings = orderedSections.filter(x=>x.startsWith(CONSTITUTION_CITE+"."+article+"."));
+    const siblings = orderedSections.filter(x=>x.startsWith(ch+"."));
     const idx = siblings.indexOf(cite);
     const prev = idx > 0 ? siblings[idx-1] : null;
     const next = idx >= 0 && idx < siblings.length-1 ? siblings[idx+1] : null;
@@ -551,12 +585,12 @@ function openSection(cite){
       }).join("");
 
     root.innerHTML = `
-      <a class="back-link" href="#${ch}"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> Back to the Constitution</a>
+      <a class="back-link" href="#${ch}"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> Back to Article ${roman}</a>
       <div class="law-layout">
         <div>
           <div class="law-card">
             <div class="law-card-head">
-              <span class="law-cite">C.${article}.${section}</span>
+              <span class="law-cite">C.${cite}</span>
               <h1>${s.title || ""}</h1>
             </div>
             <div class="law-body">
@@ -573,9 +607,15 @@ function openSection(cite){
           <div class="law-side-card">
             <div class="law-side-head"><h3>Article ${roman}</h3></div>
             <div class="law-side-list">
-              ${prev ? `<a class="law-side-link" href="#${prev}"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> ${parseConstitutionCite(prev).section ? "C."+article+"."+parseConstitutionCite(prev).section : prev}</a>` : ""}
-              <a class="law-side-link" href="#${CONSTITUTION_CITE}"><svg class="icon"><use href="#i-list"/></svg> All articles</a>
-              ${next ? `<a class="law-side-link" href="#${next}"><svg class="icon"><use href="#i-arrow-right"/></svg> C.${article}.${parseConstitutionCite(next).section}</a>` : ""}
+              ${prev ? `<a class="law-side-link" href="#${prev}"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> C.${prev}</a>` : ""}
+              <a class="law-side-link" href="#${ch}"><svg class="icon"><use href="#i-list"/></svg> All sections in Article ${roman}</a>
+              ${next ? `<a class="law-side-link" href="#${next}"><svg class="icon"><use href="#i-arrow-right"/></svg> C.${next}</a>` : ""}
+            </div>
+          </div>
+          <div class="law-side-card">
+            <div class="law-side-head"><h3>About this article</h3></div>
+            <div class="law-side-list">
+              <a class="law-side-link" href="#${ch}"><svg class="icon"><use href="#i-certificate"/></svg> ${articleName(ch)}</a>
             </div>
           </div>
         </aside>
