@@ -352,6 +352,11 @@ function route(){
     setChrome(true);
     buildPathbar([{label:"Constitution"}]);
     buildConstitutionOverview();
+  } else if(h.startsWith("search:")){
+    const query = h.slice(7);
+    setChrome(true);
+    buildPathbar([{label:`Search results for "${escapeHtml(query)}"`}]);
+    buildSearchResults(query);
   } else if(h.includes(".")){
     setChrome(true);
     openSection(h);
@@ -758,23 +763,112 @@ function printSection(cite){
   doc.save(`MCL_${cite}.pdf`);
 }
 
-/* ---------- search bar: jump to citation or filter chapters ---------- */
+/* ---------- search bar: exact citation jumps straight there, everything else gets a results page ---------- */
 function runSearch(inputId){
   const q = document.getElementById(inputId).value.trim();
   if(!q) return;
-  if(/^\d+(\.\d+)?$/.test(q)){
+  if(sections[q] || chapters[q]){
     location.hash = q;
     return;
   }
-  const lower = q.toLowerCase();
-  const matchChapter = orderedChapters.find(c => (chapters[c].title||"").toLowerCase().includes(lower));
-  const matchSection = orderedSections.find(s => (sections[s].title||"").toLowerCase().includes(lower));
-  if(matchSection) location.hash = matchSection;
-  else if(matchChapter) location.hash = matchChapter;
+  location.hash = "search:" + encodeURIComponent(q);
 }
 document.getElementById("lawSearchBtn").addEventListener("click", ()=>runSearch("lawSearch"));
 document.getElementById("lawSearch").addEventListener("keydown", e=>{ if(e.key==="Enter") runSearch("lawSearch"); });
 document.getElementById("lawSearchSub").addEventListener("keydown", e=>{ if(e.key==="Enter") runSearch("lawSearchSub"); });
+
+/* ---------- view: search results ---------- */
+function sectionCiteLabel(cite){
+  const chCite = cite.split(".")[0];
+  if(isConstitutionChapter(chCite)) return "Art. " + articleRoman(chCite) + ", \u00a7 " + constSectionNumber(cite);
+  return "MCL " + cite;
+}
+
+function buildSearchResults(query){
+  const root = document.getElementById("laws");
+  const subInput = document.getElementById("lawSearchSub");
+  if(subInput) subInput.value = query;
+
+  const lower = query.toLowerCase().trim();
+  const RESULT_CAP = 60;
+
+  const chapterMatches = lower ? orderedChapters.filter(c=>{
+    const ch = chapters[c];
+    const title = isConstitutionChapter(c) ? articleName(c) : (ch.title || "");
+    return title.toLowerCase().includes(lower) || c === query;
+  }) : [];
+
+  const sectionMatches = lower ? orderedSections.filter(s=>{
+    const sec = sections[s];
+    return (sec.title||"").toLowerCase().includes(lower)
+      || (sec.desc||"").toLowerCase().includes(lower)
+      || s === query
+      || sectionCiteLabel(s).toLowerCase().includes(lower);
+  }).slice(0, RESULT_CAP) : [];
+
+  const total = chapterMatches.length + sectionMatches.length;
+
+  let html = `
+    <a class="back-link" href="#"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> Back to all chapters</a>
+    <div class="index-head">
+      <h2>Search results</h2>
+      <span class="count-pill">${total} result${total===1?"":"s"} for &ldquo;${escapeHtml(query)}&rdquo;</span>
+    </div>`;
+
+  if(total === 0){
+    html += `
+      <div class="empty-state">
+        <div class="icon"><svg class="icon" style="font-size:26px"><use href="#i-search"/></svg></div>
+        <p>No chapters, articles, or sections match &ldquo;${escapeHtml(query)}&rdquo;. Try a different keyword, or a citation like <span class="mono">750.32</span>.</p>
+      </div>`;
+    root.innerHTML = html;
+    return;
+  }
+
+  if(chapterMatches.length){
+    html += `<p class="section-label" style="margin:1.4rem 0 .75rem">Chapters &amp; articles</p><div class="chapter-grid">`;
+    chapterMatches.forEach(cite=>{
+      const isConst = isConstitutionChapter(cite);
+      const count = orderedSections.filter(s=>s.startsWith(cite+".")).length;
+      const num = isConst ? articleRoman(cite) : cite;
+      const title = isConst ? "Article "+articleRoman(cite)+" \u2014 "+articleName(cite) : (chapters[cite].title || "Untitled chapter");
+      html += `
+        <a class="chapter-card" href="#${cite}">
+          <div class="chapter-num">${num}</div>
+          <div class="chapter-card-body">
+            <div class="chapter-card-title">${title}</div>
+            <div class="chapter-card-meta">${count} section${count===1?"":"s"}</div>
+          </div>
+        </a>`;
+    });
+    html += `</div>`;
+  }
+
+  if(sectionMatches.length){
+    html += `<p class="section-label" style="margin:1.6rem 0 .75rem">Sections</p><div class="section-table">`;
+    sectionMatches.forEach(s=>{
+      const chCite = s.split(".")[0];
+      const chLabel = isConstitutionChapter(chCite) ? "Article "+articleRoman(chCite) : "Chapter "+chCite;
+      html += `
+        <a class="section-row" href="#${s}">
+          <span class="sr-cite mono">${sectionCiteLabel(s)}</span>
+          <span class="sr-title">
+            <span>
+              <div>${sections[s].title || ""}</div>
+              <div style="font-size:11px;color:#9ca3af;margin-top:2px">${chLabel}</div>
+            </span>
+            <svg class="icon sr-arrow"><use href="#i-arrow-right"/></svg>
+          </span>
+        </a>`;
+    });
+    html += `</div>`;
+    if(orderedSections.filter(s=>(sections[s].title||"").toLowerCase().includes(lower) || (sections[s].desc||"").toLowerCase().includes(lower)).length > RESULT_CAP){
+      html += `<p style="font-size:12px;color:#9ca3af;margin-top:.75rem">Showing the first ${RESULT_CAP} matching sections. Try a more specific search to narrow this down.</p>`;
+    }
+  }
+
+  root.innerHTML = html;
+}
 
 window.addEventListener("hashchange", route);
 window.addEventListener("load", init);
