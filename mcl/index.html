@@ -23,15 +23,17 @@ a{color:inherit;text-decoration:none}
 .mcl-main{flex:1 0 auto}
 
 /* ---------- HERO ---------- */
-.hero{position:relative;background:#fff;border-bottom:1px solid #e5e7eb;overflow:hidden;padding:2.75rem 0 2.5rem}
-.hero::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#0b1f3a 0%,#123a63 55%,#fbbf24 100%)}
+.hero{position:relative;background:linear-gradient(180deg,#eef1f6 0%,#f4f6fa 100%);border-bottom:1px solid #e5e7eb;overflow:hidden;padding:3.25rem 0}
 .hero-inner{position:relative}
-.hero-eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#0b1f3a;background:rgba(11,31,58,.06);border:1px solid rgba(11,31,58,.14);padding:.4rem .8rem .4rem .65rem;border-radius:999px;margin-bottom:1.15rem}
-.hero-eyebrow .icon{color:#c99a00;font-size:13px}
-.hero h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.15;color:#0b1f3a;letter-spacing:-.01em;max-width:24ch;margin-bottom:.7rem}
-.hero-sub{font-size:14.5px;color:#6b7280;max-width:58ch;margin-bottom:1.75rem}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:3rem;align-items:center}
+@media(max-width:920px){.hero-grid{grid-template-columns:1fr}}
 
-.hero-search{display:flex;align-items:center;gap:.6rem;background:#0b1f3a;border-radius:8px;padding:.3rem .3rem .3rem 1rem;max-width:620px;box-shadow:0 10px 26px rgba(11,31,58,.18)}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#0b1f3a;background:#fff;border:1px solid #e5e7eb;padding:.4rem .8rem .4rem .65rem;border-radius:999px;margin-bottom:1.15rem;box-shadow:0 2px 6px rgba(11,31,58,.05)}
+.hero-eyebrow .icon{color:#c99a00;font-size:13px}
+.hero h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:clamp(26px,3.2vw,38px);line-height:1.15;color:#0b1f3a;letter-spacing:-.01em;max-width:20ch;margin-bottom:.7rem}
+.hero-sub{font-size:14.5px;color:#6b7280;max-width:52ch;margin-bottom:1.75rem}
+
+.hero-search{display:flex;align-items:center;gap:.6rem;background:#0b1f3a;border-radius:8px;padding:.3rem .3rem .3rem 1rem;max-width:560px;box-shadow:0 10px 26px rgba(11,31,58,.18)}
 .hero-search .icon{color:#fbbf24;flex-shrink:0;font-size:17px}
 .hero-search input{flex:1;padding:.75rem 0;font-size:14px;border:none;outline:none;background:transparent;color:#fff;min-width:0}
 .hero-search input::placeholder{color:rgba(255,255,255,.5)}
@@ -39,14 +41,27 @@ a{color:inherit;text-decoration:none}
 .hero-search button:hover{background:#f7ce5c}
 .hero.is-hidden{display:none}
 
-.hero-examples{display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;margin-top:.9rem;max-width:620px}
+.hero-examples{display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;margin-top:.9rem;max-width:560px}
 .hero-examples span{font-size:11.5px;color:#9ca3af;margin-right:.15rem}
 .hero-chip{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11.5px;color:#0b1f3a;background:#fff;border:1px solid #d6dde5;border-radius:5px;padding:.3rem .6rem;cursor:pointer;transition:border-color .12s,background .12s}
 .hero-chip:hover{border-color:#0b1f3a;background:#f1f4f8}
 
-.hero-stats{display:flex;flex-wrap:wrap;gap:2.25rem;margin-top:2rem;padding-top:1.5rem;border-top:1px solid #eef0f3;max-width:720px}
-.hero-stat .n{font-family:'Fraunces',Georgia,serif;font-size:22px;font-weight:600;color:#0b1f3a;line-height:1}
-.hero-stat .l{font-size:10.5px;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin-top:.3rem}
+.hero-stats{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.75rem}
+.hero-stat{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:.65rem 1.1rem;display:flex;align-items:baseline;gap:.5rem}
+.hero-stat .n{font-family:'Fraunces',Georgia,serif;font-size:19px;font-weight:600;color:#0b1f3a;line-height:1}
+.hero-stat .l{font-size:10.5px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em}
+
+/* ---------- HERO PREVIEW CARD (mirrors the real law-card styling below) ---------- */
+.hero-preview{background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 24px 50px rgba(11,31,58,.1);overflow:hidden}
+.hero-preview-head{padding:1.35rem 1.5rem 1.15rem;border-bottom:1px solid #e5e7eb;background:linear-gradient(180deg,#fafbfc,#fff)}
+.hero-preview-tag{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#9ca3af;margin-bottom:.6rem}
+.hero-preview-cite{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#0b1f3a;background:rgba(11,31,58,.07);display:inline-block;padding:3px 8px;border-radius:4px;margin-bottom:.65rem}
+.hero-preview-head h3{font-family:'Fraunces',Georgia,serif;font-size:17px;font-weight:600;color:#111827;line-height:1.3}
+.hero-preview-body{padding:1.25rem 1.5rem}
+.hero-preview-line{height:9px;border-radius:4px;background:#eef0f3;margin-bottom:.65rem}
+.hero-preview-body .hero-preview-line:last-child{margin-bottom:0}
+.hero-preview-foot{padding:.85rem 1.5rem;border-top:1px solid #f3f4f6;font-size:11.5px;color:#9ca3af;display:flex;align-items:center;gap:.4rem}
+.hero-preview-foot .icon{color:#c7cdd6}
 
 /* ---------- SUBPAGE UTILITY BAR (replaces hero on chapter/section views) ---------- */
 .utilitybar{background:#fff;border-bottom:1px solid #e5e7eb;display:none}
@@ -191,25 +206,43 @@ footer{background:#0b1f3a;padding:1.5rem 0}
 
 <section class="hero" id="hero">
   <div class="hero-inner mcl-container" style="max-width:1240px;margin-left:auto;margin-right:auto;width:100%;box-sizing:border-box;padding-left:2.5rem;padding-right:2.5rem">
-    <div class="hero-eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-book-2"/></svg> Michigan Compiled Laws</div>
-    <h1>Every chapter, section, and statute — as enacted.</h1>
-    <p class="hero-sub">Browse the full body of Michigan statutory law by chapter, or look up a section by its exact citation.</p>
-    <div class="hero-search">
-      <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
-      <input type="text" id="lawSearch" placeholder="Try “750.32”, “Article V”, or “firearms”…"/>
-      <button type="button" id="lawSearchBtn">Look up</button>
-    </div>
-    <div class="hero-examples">
-      <span>Examples:</span>
-      <span class="hero-chip" data-example="750.32">750.32</span>
-      <span class="hero-chip" data-example="Article V">Article V</span>
-      <span class="hero-chip" data-example="firearms">firearms</span>
-      <span class="hero-chip" data-example="public acts">public acts</span>
-    </div>
-    <div class="hero-stats" id="heroStats">
-      <div class="hero-stat"><div class="n">&mdash;</div><div class="l">Chapters</div></div>
-      <div class="hero-stat"><div class="n">&mdash;</div><div class="l">Sections</div></div>
-      <div class="hero-stat"><div class="n">&mdash;</div><div class="l">Articles</div></div>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <div class="hero-eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-book-2"/></svg> Michigan Compiled Laws</div>
+        <h1>Every chapter, section, and statute — as enacted.</h1>
+        <p class="hero-sub">Browse the full body of Michigan statutory law by chapter, or look up a section by its exact citation.</p>
+        <div class="hero-search">
+          <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+          <input type="text" id="lawSearch" placeholder="Try “750.32”, “Article V”, or “firearms”…"/>
+          <button type="button" id="lawSearchBtn">Look up</button>
+        </div>
+        <div class="hero-examples">
+          <span>Examples:</span>
+          <span class="hero-chip" data-example="750.32">750.32</span>
+          <span class="hero-chip" data-example="Article V">Article V</span>
+          <span class="hero-chip" data-example="firearms">firearms</span>
+          <span class="hero-chip" data-example="public acts">public acts</span>
+        </div>
+        <div class="hero-stats" id="heroStats">
+          <div class="hero-stat"><span class="n">&mdash;</span><span class="l">Chapters</span></div>
+          <div class="hero-stat"><span class="n">&mdash;</span><span class="l">Sections</span></div>
+          <div class="hero-stat"><span class="n">&mdash;</span><span class="l">Articles</span></div>
+        </div>
+      </div>
+      <div class="hero-preview" aria-hidden="true">
+        <div class="hero-preview-head">
+          <div class="hero-preview-tag">As it reads today</div>
+          <span class="hero-preview-cite">MCL 8.3a</span>
+          <h3>Rules of statutory construction</h3>
+        </div>
+        <div class="hero-preview-body">
+          <div class="hero-preview-line" style="width:96%"></div>
+          <div class="hero-preview-line" style="width:88%"></div>
+          <div class="hero-preview-line" style="width:92%"></div>
+          <div class="hero-preview-line" style="width:60%"></div>
+        </div>
+        <div class="hero-preview-foot"><svg class="icon" aria-hidden="true"><use href="#i-history"/></svg> Amended and current as of the latest public act</div>
+      </div>
     </div>
   </div>
 </section>
