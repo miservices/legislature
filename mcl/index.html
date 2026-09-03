@@ -18,7 +18,7 @@ a{color:inherit;text-decoration:none}
 @media(max-width:720px){.wrap{padding:0 1.25rem}}
 .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
 #site-header, .hero, .utilitybar, .pathbar, footer{flex-shrink:0}
-.content-wrap{flex:1 0 auto}
+.mcl-main{flex:1 0 auto}
 
 /* ---------- HERO ---------- */
 .hero{position:relative;background:linear-gradient(155deg,#0b1f3a 0%,#0e2c52 55%,#123a63 100%);overflow:hidden;padding:3rem 0 2.6rem}
@@ -60,15 +60,22 @@ main{padding:2rem 0 4rem}
 .section-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#9ca3af}
 .count-pill{font-size:12px;color:#6b7280}
 
-/* ---------- QUICK NAV (constitution / chapters — matches home page) ---------- */
-.quick-nav{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#e5e7eb;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:2.25rem}
-.qn-item{background:#fff;padding:.9rem 1.1rem;display:flex;align-items:center;gap:.75rem;transition:background .12s;cursor:pointer}
-.qn-item:hover{background:rgba(11,31,58,.05)}
-.qn-item .icon{font-size:19px;color:#0b1f3a;flex-shrink:0}
-.qn-item-text .title{font-size:13.5px;font-weight:500;color:#111827}
-.qn-item-text .sub{font-size:11.5px;color:#6b7280;margin-top:1px}
-.qn-arrow{margin-left:auto;color:#9ca3af;font-size:14px;flex-shrink:0}
-@media(max-width:600px){.quick-nav{grid-template-columns:1fr}}
+/* ---------- CONSTITUTION ACCORDION ---------- */
+.const-accordion{background:#fff;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:1.75rem;overflow:hidden}
+.const-accordion-head{display:flex;align-items:center;gap:.85rem;padding:1rem 1.25rem;cursor:pointer;user-select:none;transition:background .12s}
+.const-accordion-head:hover{background:#f9fafb}
+.const-accordion-head .badge{flex-shrink:0;width:40px;height:40px;border-radius:6px;background:#0b1f3a;color:#fbbf24;display:flex;align-items:center;justify-content:center}
+.const-accordion-head .badge .icon{font-size:18px}
+.const-accordion-head .title{font-size:14px;font-weight:600;color:#111827}
+.const-accordion-head .sub{font-size:11.5px;color:#6b7280;margin-top:1px}
+.const-accordion-head .chevron{margin-left:auto;color:#9ca3af;transition:transform .15s;flex-shrink:0}
+.const-accordion.is-open .chevron{transform:rotate(180deg)}
+.const-accordion-panel{max-height:0;overflow:hidden;transition:max-height .2s ease}
+.const-accordion.is-open .const-accordion-panel{max-height:900px}
+.const-article-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:.55rem;padding:0 1.25rem 1.15rem;border-top:1px solid #f3f4f6;padding-top:1rem}
+.const-article-link{display:flex;align-items:center;gap:.6rem;padding:.55rem .7rem;border:1px solid #e5e7eb;border-radius:6px;font-size:12.5px;color:#374151;transition:border-color .12s,background .12s}
+.const-article-link:hover{border-color:#0b1f3a;background:#f9fafb;color:#0b1f3a}
+.const-article-link .num{font-family:'Fraunces',Georgia,serif;font-weight:600;color:#0b1f3a;flex-shrink:0;width:1.6em}
 
 /* ---------- CHAPTER INDEX (grid) ---------- */
 .index-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.1rem;gap:1rem;flex-wrap:wrap}
@@ -89,7 +96,7 @@ main{padding:2rem 0 4rem}
 .chapter-banner p{font-size:12.5px;color:rgba(255,255,255,.65)}
 
 .section-table{border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff}
-.section-row{display:grid;grid-template-columns:150px 1fr;border-bottom:1px solid #f3f4f6;transition:background .1s;cursor:pointer}
+.section-row{display:grid;grid-template-columns:120px 1fr;border-bottom:1px solid #f3f4f6;transition:background .1s;cursor:pointer}
 .section-row:last-child{border-bottom:none}
 .section-row:hover{background:#f9fafb}
 .section-row .sr-cite{padding:.9rem 1rem;color:#0b1f3a;font-weight:600;font-size:13px;border-right:1px solid #f3f4f6;background:#fafafa;display:flex;align-items:center}
@@ -166,6 +173,7 @@ footer{background:#0b1f3a;padding:1.5rem 0}
     <symbol id="i-list" viewBox="0 0 24 24"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></symbol>
     <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><polyline points="12 7 12 12 15 14"/></symbol>
     <symbol id="i-certificate" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M9 13.5 7 22l5-3 5 3-2-8.5"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
   </defs>
 </svg>
 
@@ -196,7 +204,7 @@ footer{background:#0b1f3a;padding:1.5rem 0}
   </div>
 </div>
 
-<div class="wrap content-wrap">
+<div class="wrap mcl-main">
 <main id="laws"></main>
 </div>
 
@@ -239,6 +247,19 @@ function articleName(chCite){
   const raw = (ch && ch.title || "").replace(/^constitution\s+article\s+[ivxlcdm]+\s*/i, "").trim();
   const small = new Set(["of","the","and","in","for","to","a","an","or"]);
   return raw.toLowerCase().split(/\s+/).map((w,i)=> (i>0 && small.has(w)) ? w : (w.charAt(0).toUpperCase()+w.slice(1))).join(" ") || (ch && ch.title) || "";
+}
+
+/* A constitution section cite like "1.001" or "1.0.01" -> just the plain section number, e.g. "1" */
+function constSectionNumber(cite){
+  const parts = cite.split(".");
+  const last = parts[parts.length-1];
+  const n = parseInt(last, 10);
+  return isNaN(n) ? last : String(n);
+}
+
+function toggleConstAccordion(){
+  const el = document.getElementById("constAccordion");
+  if(el) el.classList.toggle("is-open");
 }
 
 function compareCites(a,b){
@@ -325,12 +346,6 @@ function route(){
     setChrome(false);
     buildPathbar([]);
     buildChapterIndex();
-  } else if(h === "all-chapters"){
-    setChrome(false);
-    buildPathbar([]);
-    buildChapterIndex();
-    const el = document.getElementById("all-chapters");
-    if(el){ el.scrollIntoView({behavior:"instant", block:"start"}); return; }
   } else if(h === "constitution"){
     setChrome(true);
     buildPathbar([{label:"Constitution"}]);
@@ -370,25 +385,30 @@ function buildChapterIndex(){
   const root = document.getElementById("laws");
   const constitutionChapters = orderedChapters.filter(isConstitutionChapter);
   const numberedChapters = orderedChapters.filter(c=>!isConstitutionChapter(c));
-  const constitutionSections = orderedSections.filter(s=>isConstitutionChapter(s.split(".")[0]));
   const numberedSections = orderedSections.filter(s=>!isConstitutionChapter(s.split(".")[0]));
 
-  let html = `<div class="quick-nav">`;
+  let html = "";
   if(constitutionChapters.length){
     html += `
-      <a class="qn-item" href="#constitution">
-        <svg class="icon" aria-hidden="true"><use href="#i-certificate"/></svg>
-        <div class="qn-item-text"><div class="title">Michigan Constitution</div><div class="sub">${constitutionChapters.length} article${constitutionChapters.length===1?"":"s"} &middot; 1963</div></div>
-        <svg class="icon qn-arrow" aria-hidden="true"><use href="#i-arrow-right"/></svg>
-      </a>`;
-  }
-  html += `
-      <a class="qn-item" href="#all-chapters">
-        <svg class="icon" aria-hidden="true"><use href="#i-book-2"/></svg>
-        <div class="qn-item-text"><div class="title">Compiled Laws</div><div class="sub">${numberedChapters.length} chapters &middot; all sections</div></div>
-        <svg class="icon qn-arrow" aria-hidden="true"><use href="#i-arrow-right"/></svg>
-      </a>
+    <div class="const-accordion" id="constAccordion">
+      <div class="const-accordion-head" onclick="toggleConstAccordion()">
+        <div class="badge"><svg class="icon"><use href="#i-certificate"/></svg></div>
+        <div>
+          <div class="title">Michigan Constitution</div>
+          <div class="sub">${constitutionChapters.length} article${constitutionChapters.length===1?"":"s"} &middot; 1963</div>
+        </div>
+        <svg class="icon chevron" aria-hidden="true"><use href="#i-chevron-down"/></svg>
+      </div>
+      <div class="const-accordion-panel">
+        <div class="const-article-list">
+          ${constitutionChapters.map(cite=>`
+            <a class="const-article-link" href="#${cite}">
+              <span class="num">${articleRoman(cite)}</span> ${articleName(cite)}
+            </a>`).join("")}
+        </div>
+      </div>
     </div>`;
+  }
 
   if(numberedChapters.length === 0){
     html += `<div class="empty-state"><p>No chapters are available yet.</p></div>`;
@@ -397,7 +417,7 @@ function buildChapterIndex(){
   }
 
   html += `
-    <div class="index-head" id="all-chapters">
+    <div class="index-head">
       <h2>All chapters</h2>
       <span class="count-pill">${numberedChapters.length} chapters &middot; ${numberedSections.length} sections</span>
     </div>
@@ -497,7 +517,7 @@ function openChapter(cite){
       list.forEach(s=>{
         html += `
           <a class="section-row" href="#${s}">
-            <span class="sr-cite mono">C.${s}</span>
+            <span class="sr-cite mono">&sect; ${constSectionNumber(s)}</span>
             <span class="sr-title">${sections[s].title || ""} <svg class="icon sr-arrow"><use href="#i-arrow-right"/></svg></span>
           </a>`;
       });
@@ -557,7 +577,7 @@ function openSection(cite){
       <a class="back-link" href="#${ch}"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> Back to ${isConstitution ? "Article "+articleRoman(ch) : "Chapter "+ch}</a>
       <div class="empty-state">
         <div class="icon"><svg class="icon" style="font-size:26px"><use href="#i-file-empty"/></svg></div>
-        <p>${isConstitution ? "C."+cite : "MCL "+cite} could not be found.</p>
+        <p>${isConstitution ? "Article "+articleRoman(ch)+", &sect; "+constSectionNumber(cite) : "MCL "+cite} could not be found.</p>
       </div>`;
     return;
   }
@@ -566,10 +586,11 @@ function openSection(cite){
 
   if(isConstitution){
     const roman = articleRoman(ch);
+    const secNum = constSectionNumber(cite);
     buildPathbar([
       {label:"Constitution", href:"constitution"},
       {label:"Article "+roman, href:ch},
-      {label:"C."+cite}
+      {label:"&sect; "+secNum}
     ]);
 
     const siblings = orderedSections.filter(x=>x.startsWith(ch+"."));
@@ -590,7 +611,7 @@ function openSection(cite){
         <div>
           <div class="law-card">
             <div class="law-card-head">
-              <span class="law-cite">C.${cite}</span>
+              <span class="law-cite">Article ${roman}, &sect; ${secNum}</span>
               <h1>${s.title || ""}</h1>
             </div>
             <div class="law-body">
@@ -607,9 +628,9 @@ function openSection(cite){
           <div class="law-side-card">
             <div class="law-side-head"><h3>Article ${roman}</h3></div>
             <div class="law-side-list">
-              ${prev ? `<a class="law-side-link" href="#${prev}"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> C.${prev}</a>` : ""}
+              ${prev ? `<a class="law-side-link" href="#${prev}"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> &sect; ${constSectionNumber(prev)}</a>` : ""}
               <a class="law-side-link" href="#${ch}"><svg class="icon"><use href="#i-list"/></svg> All sections in Article ${roman}</a>
-              ${next ? `<a class="law-side-link" href="#${next}"><svg class="icon"><use href="#i-arrow-right"/></svg> C.${next}</a>` : ""}
+              ${next ? `<a class="law-side-link" href="#${next}"><svg class="icon"><use href="#i-arrow-right"/></svg> &sect; ${constSectionNumber(next)}</a>` : ""}
             </div>
           </div>
           <div class="law-side-card">
