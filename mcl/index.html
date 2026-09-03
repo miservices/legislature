@@ -32,17 +32,28 @@ a{color:inherit;text-decoration:none}
 .hero-search input::placeholder{color:#9ca3af}
 .hero-search button{padding:.8rem 1.5rem;background:#fbbf24;color:#3f2d00;border:none;cursor:pointer;font-size:14px;font-weight:700;white-space:nowrap;transition:background .15s}
 .hero-search button:hover{background:#f7ce5c}
+.hero.is-hidden{display:none}
+
+/* ---------- SUBPAGE UTILITY BAR (replaces hero on chapter/section views) ---------- */
+.utilitybar{background:#fff;border-bottom:1px solid #e5e7eb;display:none}
+.utilitybar.is-visible{display:block}
+.utilitybar-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.9rem 0;flex-wrap:wrap}
+.utility-search{display:flex;align-items:center;gap:.5rem;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:.4rem .7rem;width:280px;max-width:100%}
+.utility-search .icon{color:#9ca3af;flex-shrink:0}
+.utility-search input{border:none;background:transparent;outline:none;font-size:13px;color:#111827;width:100%}
+.utility-search input::placeholder{color:#9ca3af}
 
 /* ---------- BREADCRUMB / PATH BAR ---------- */
-.pathbar{background:#fff;border-bottom:1px solid #e5e7eb}
-.pathbar-inner{display:flex;align-items:center;gap:.4rem;padding:.85rem 0;font-size:13px;color:#6b7280;flex-wrap:wrap}
+.pathbar{background:#fbfbfc;border-bottom:1px solid #e5e7eb;display:none}
+.pathbar.is-visible{display:block}
+.pathbar-inner{display:flex;align-items:center;gap:.4rem;padding:.7rem 0;font-size:13px;color:#6b7280;flex-wrap:wrap}
 .pathbar a{color:#0b1f3a;font-weight:500}
 .pathbar a:hover{text-decoration:underline}
 .pathbar .sep{color:#d1d5db}
 .pathbar .current{color:#111827;font-weight:600}
 .pathbar .cite-tag{font-size:11px;background:#f3f4f6;border:1px solid #e5e7eb;color:#6b7280;padding:1px 6px;border-radius:3px;margin-left:.2rem}
 
-main{padding:2.5rem 0 4rem}
+main{padding:2rem 0 4rem}
 
 .section-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#9ca3af}
 .count-pill{font-size:12px;color:#6b7280}
@@ -139,11 +150,11 @@ footer{background:#0b1f3a;padding:1.5rem 0}
   </defs>
 </svg>
 
-<section class="hero">
+<section class="hero" id="hero">
   <div class="wrap hero-inner">
     <div class="hero-eyebrow">Michigan Compiled Laws</div>
-    <h1 id="heroTitle">Every chapter, section, and statute — as enacted.</h1>
-    <p class="hero-sub" id="heroSub">Browse the full body of Michigan statutory law by chapter, or jump straight to a section by citation.</p>
+    <h1>Every chapter, section, and statute — as enacted.</h1>
+    <p class="hero-sub">Browse the full body of Michigan statutory law by chapter, or jump straight to a section by citation.</p>
     <div class="hero-search">
       <input type="text" id="lawSearch" placeholder="Search by citation, chapter number, or keyword…"/>
       <button type="button" id="lawSearchBtn">Search</button>
@@ -151,7 +162,16 @@ footer{background:#0b1f3a;padding:1.5rem 0}
   </div>
 </section>
 
-<div class="pathbar">
+<div class="utilitybar" id="utilitybar">
+  <div class="wrap utilitybar-inner">
+    <div class="utility-search">
+      <svg class="icon"><use href="#i-search"/></svg>
+      <input type="text" id="lawSearchSub" placeholder="Search citation, chapter, or keyword…"/>
+    </div>
+  </div>
+</div>
+
+<div class="pathbar" id="pathbarWrap">
   <div class="wrap pathbar-inner" id="pathbar">
     <a href="#">Compiled Laws</a>
   </div>
@@ -246,32 +266,23 @@ function parseCSV(text){
 function route(){
   const h = decodeURIComponent(location.hash.replace("#",""));
   if(!h){
-    setHero(null);
+    setChrome(false);
     buildPathbar([]);
     buildChapterIndex();
   } else if(h.includes(".")){
-    setHero("section");
+    setChrome(true);
     openSection(h);
   } else {
-    setHero("chapter");
+    setChrome(true);
     openChapter(h);
   }
   window.scrollTo({top:0, behavior:"instant"});
 }
 
-function setHero(mode){
-  const title = document.getElementById("heroTitle");
-  const sub = document.getElementById("heroSub");
-  if(mode===null){
-    title.textContent = "Every chapter, section, and statute — as enacted.";
-    sub.textContent = "Browse the full body of Michigan statutory law by chapter, or jump straight to a section by citation.";
-  } else if(mode==="chapter"){
-    title.textContent = "Chapter contents";
-    sub.textContent = "All sections codified under this chapter, in citation order.";
-  } else {
-    title.textContent = "Statutory text";
-    sub.textContent = "The section as currently codified, with its amendment history.";
-  }
+function setChrome(onSubpage){
+  document.getElementById("hero").classList.toggle("is-hidden", onSubpage);
+  document.getElementById("utilitybar").classList.toggle("is-visible", onSubpage);
+  document.getElementById("pathbarWrap").classList.toggle("is-visible", onSubpage);
 }
 
 function buildPathbar(crumbs){
@@ -502,8 +513,8 @@ function printSection(cite){
 }
 
 /* ---------- search bar: jump to citation or filter chapters ---------- */
-function runSearch(){
-  const q = document.getElementById("lawSearch").value.trim();
+function runSearch(inputId){
+  const q = document.getElementById(inputId).value.trim();
   if(!q) return;
   if(/^\d+(\.\d+)?$/.test(q)){
     location.hash = q;
@@ -515,8 +526,9 @@ function runSearch(){
   if(matchSection) location.hash = matchSection;
   else if(matchChapter) location.hash = matchChapter;
 }
-document.getElementById("lawSearchBtn").addEventListener("click", runSearch);
-document.getElementById("lawSearch").addEventListener("keydown", e=>{ if(e.key==="Enter") runSearch(); });
+document.getElementById("lawSearchBtn").addEventListener("click", ()=>runSearch("lawSearch"));
+document.getElementById("lawSearch").addEventListener("keydown", e=>{ if(e.key==="Enter") runSearch("lawSearch"); });
+document.getElementById("lawSearchSub").addEventListener("keydown", e=>{ if(e.key==="Enter") runSearch("lawSearchSub"); });
 
 window.addEventListener("hashchange", route);
 window.addEventListener("load", init);
