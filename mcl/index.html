@@ -3,380 +3,523 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Michigan Compiled Laws - Michigan Legislature</title>
+<title>Michigan Compiled Laws | Michigan Legislature</title>
+<link rel="icon" type="image/png" href="/legislature.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- Shared header styles (disclaimer, masthead, nav, notice bar) -->
-<link rel="stylesheet" href="../shared/header.css">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/header.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#111827;background:#f3f4f6;font-size:15px;line-height:1.6}
 a{color:inherit;text-decoration:none}
-
 .icon{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-0.125em;flex-shrink:0;display:inline-block}
-
 .wrap{max-width:1240px;margin:0 auto;padding:0 2.5rem}
 @media(max-width:720px){.wrap{padding:0 1.25rem}}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
 
-/* ---------- PAGE HERO ---------- */
-.page-hero{position:relative;background:linear-gradient(155deg,#0b1f3a 0%,#0e2c52 55%,#123a63 100%);overflow:hidden;padding:2.4rem 0}
-.page-hero::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px, rgba(255,255,255,.06) 1px, transparent 0);background-size:22px 22px;opacity:.6;pointer-events:none}
-.page-hero-inner{position:relative}
-.page-hero-eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#fbbf24;margin-bottom:.6rem}
-.page-hero-eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:#fbbf24;box-shadow:0 0 0 4px rgba(251,191,36,.18)}
-.page-hero h2{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:clamp(24px,3vw,32px);line-height:1.15;color:#fff;letter-spacing:-.01em;margin-bottom:.4rem}
-.page-hero p{font-size:14px;color:rgba(255,255,255,.72);max-width:56ch}
+/* ---------- HERO ---------- */
+.hero{position:relative;background:linear-gradient(155deg,#0b1f3a 0%,#0e2c52 55%,#123a63 100%);overflow:hidden;padding:3rem 0 2.6rem}
+.hero::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px, rgba(255,255,255,.06) 1px, transparent 0);background-size:22px 22px;opacity:.6;pointer-events:none}
+.hero-inner{position:relative}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#fbbf24;margin-bottom:1rem}
+.hero-eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:#fbbf24;box-shadow:0 0 0 4px rgba(251,191,36,.18)}
+.hero h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.15;color:#fff;letter-spacing:-.01em;max-width:24ch;margin-bottom:.7rem}
+.hero-sub{font-size:14.5px;color:rgba(255,255,255,.72);max-width:58ch;margin-bottom:1.5rem}
 
-/* ---------- SEARCH BAR ---------- */
-.search-bar{background:#fff;border-bottom:1px solid #e5e7eb;padding:1.1rem 0}
-.search-bar-inner{display:flex;border-radius:6px;overflow:hidden;box-shadow:0 6px 18px rgba(11,31,58,.08);border:1px solid #e5e7eb}
-.search-bar input{flex:1;padding:.75rem 1rem;font-size:14px;border:none;outline:none;background:#fff;color:#111827;min-width:0;font-family:inherit}
-.search-bar button{padding:.75rem 1.5rem;background:#0b1f3a;color:#fff;border:none;cursor:pointer;font-size:13.5px;font-weight:600;white-space:nowrap;transition:background .15s;font-family:inherit}
-.search-bar button:hover{background:#123a63}
+.hero-search{display:flex;border-radius:6px;overflow:hidden;box-shadow:0 12px 28px rgba(0,0,0,.28);max-width:560px}
+.hero-search input{flex:1;padding:.8rem 1rem;font-size:14px;border:none;outline:none;background:#fff;color:#111827;min-width:0}
+.hero-search input::placeholder{color:#9ca3af}
+.hero-search button{padding:.8rem 1.5rem;background:#fbbf24;color:#3f2d00;border:none;cursor:pointer;font-size:14px;font-weight:700;white-space:nowrap;transition:background .15s}
+.hero-search button:hover{background:#f7ce5c}
 
-/* ---------- LAYOUT (single column, drill-down) ---------- */
-.mcl-layout{padding:2.25rem 0}
+/* ---------- BREADCRUMB / PATH BAR ---------- */
+.pathbar{background:#fff;border-bottom:1px solid #e5e7eb}
+.pathbar-inner{display:flex;align-items:center;gap:.4rem;padding:.85rem 0;font-size:13px;color:#6b7280;flex-wrap:wrap}
+.pathbar a{color:#0b1f3a;font-weight:500}
+.pathbar a:hover{text-decoration:underline}
+.pathbar .sep{color:#d1d5db}
+.pathbar .current{color:#111827;font-weight:600}
+.pathbar .cite-tag{font-size:11px;background:#f3f4f6;border:1px solid #e5e7eb;color:#6b7280;padding:1px 6px;border-radius:3px;margin-left:.2rem}
 
-.chapter-list{display:flex;flex-direction:column}
-.chapter-row{display:flex;align-items:flex-start;gap:.9rem;padding:1rem 0;border-bottom:1px solid #e5e7eb;cursor:pointer;transition:background .1s}
-.chapter-row:first-child{padding-top:0}
-.chapter-row:last-child{border-bottom:none}
-.chapter-row:hover .chapter-row-title{color:#0b1f3a}
-.chapter-num-badge{font-family:'Fraunces',Georgia,serif;font-size:16px;font-weight:600;color:#0b1f3a;min-width:52px;flex-shrink:0;padding-top:1px}
-.chapter-row-title{font-size:14.5px;font-weight:500;color:#374151;line-height:1.5;transition:color .1s;text-transform:uppercase;letter-spacing:.01em}
+main{padding:2.5rem 0 4rem}
 
-.skel-wrap{padding:.25rem 0}
-.skel{background:#e5e7eb;border-radius:4px;animation:shimmer 1.4s infinite;height:16px;margin-bottom:16px}
-.skel:last-child{margin-bottom:0}
-@keyframes shimmer{0%{opacity:.55}50%{opacity:1}100%{opacity:.55}}
+.section-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#9ca3af}
+.count-pill{font-size:12px;color:#6b7280}
 
-.content-card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:1.75rem 2rem;min-height:300px}
+/* ---------- CHAPTER INDEX (grid) ---------- */
+.index-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.1rem;gap:1rem;flex-wrap:wrap}
+.index-head h2{font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:600;color:#0b1f3a}
 
-.breadcrumb{font-size:12.5px;color:#6b7280;margin-bottom:1.25rem}
-.breadcrumb a{color:#0b1f3a;cursor:pointer;font-weight:500}
-.breadcrumb a:hover{text-decoration:underline}
-.breadcrumb span{margin:0 6px;color:#c7ccd4}
+.chapter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
+.chapter-card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:1.15rem 1.25rem;display:flex;gap:1rem;align-items:flex-start;transition:border-color .12s,box-shadow .12s,transform .12s;cursor:pointer}
+.chapter-card:hover{border-color:#0b1f3a;box-shadow:0 6px 18px rgba(11,31,58,.08);transform:translateY(-1px)}
+.chapter-num{flex-shrink:0;width:52px;height:52px;border-radius:6px;background:#0b1f3a;color:#fbbf24;font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.1}
+.chapter-card-body{min-width:0}
+.chapter-card-title{font-size:14px;font-weight:600;color:#111827;margin-bottom:.2rem}
+.chapter-card-meta{font-size:12px;color:#9ca3af}
 
-.chapter-title-bar{border-bottom:2px solid #0b1f3a;padding-bottom:.9rem;margin-bottom:1.25rem}
-.chapter-title-bar h3{font-family:'Fraunces',Georgia,serif;font-size:19px;color:#0b1f3a;font-weight:600;text-transform:uppercase;letter-spacing:.01em}
-.chapter-title-bar p{font-size:12.5px;color:#6b7280;margin-top:.3rem}
+/* ---------- CHAPTER VIEW (section list) ---------- */
+.chapter-banner{background:linear-gradient(135deg,#0b1f3a,#15294f);border-radius:10px;padding:1.6rem 1.75rem;margin-bottom:1.75rem;color:#fff;display:flex;align-items:center;gap:1.25rem}
+.chapter-banner .num{font-family:'Fraunces',Georgia,serif;font-size:34px;font-weight:600;color:#fbbf24;flex-shrink:0}
+.chapter-banner h1{font-family:'Fraunces',Georgia,serif;font-size:21px;font-weight:600;margin-bottom:.15rem}
+.chapter-banner p{font-size:12.5px;color:rgba(255,255,255,.65)}
 
-.section-list{display:flex;flex-direction:column}
-.section-row{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 0;border-bottom:1px solid #f3f4f6;cursor:pointer;transition:background .1s}
+.section-table{border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff}
+.section-row{display:grid;grid-template-columns:120px 1fr;border-bottom:1px solid #f3f4f6;transition:background .1s;cursor:pointer}
 .section-row:last-child{border-bottom:none}
 .section-row:hover{background:#f9fafb}
-.section-row:hover .section-row-title{color:#0b1f3a;font-weight:600}
-.section-cite{font-size:12px;font-weight:700;color:#0b1f3a;min-width:82px;flex-shrink:0;padding-top:1px}
-.section-row-title{font-size:13.5px;color:#374151;line-height:1.45;text-transform:uppercase;letter-spacing:.01em}
+.section-row .sr-cite{padding:.9rem 1rem;color:#0b1f3a;font-weight:600;font-size:13px;border-right:1px solid #f3f4f6;background:#fafafa;display:flex;align-items:center}
+.section-row .sr-title{padding:.9rem 1.15rem;font-size:13.5px;color:#374151;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.section-row .sr-arrow{color:#c7cdd6;flex-shrink:0}
 
-.section-cite-large{font-size:13px;font-weight:700;color:#0b1f3a;margin-bottom:.3rem;letter-spacing:.02em}
-.section-title-large{font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:600;color:#111827;margin-bottom:1.25rem;line-height:1.35}
-.section-body{font-size:14px;line-height:1.8;color:#1f2937}
-.section-body div{margin:.4rem 0}
-.section-history{margin-top:1.5rem;padding-top:1rem;border-top:1px solid #e5e7eb;font-size:13px;color:#6b7280}
-.section-history strong{color:#374151}
+/* ---------- SECTION (LAW TEXT) VIEW ---------- */
+.law-layout{display:grid;grid-template-columns:1fr 240px;gap:2.5rem;align-items:start}
+@media(max-width:860px){.law-layout{grid-template-columns:1fr}}
 
-.back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#0b1f3a;font-weight:600;margin-bottom:1.5rem;cursor:pointer}
+.law-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden}
+.law-card-head{padding:1.6rem 2rem 1.4rem;border-bottom:1px solid #e5e7eb;background:linear-gradient(180deg,#fafbfc,#fff)}
+.law-cite{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600;color:#0b1f3a;background:rgba(11,31,58,.07);display:inline-block;padding:3px 8px;border-radius:4px;margin-bottom:.7rem;letter-spacing:.01em}
+.law-card-head h1{font-family:'Fraunces',Georgia,serif;font-size:24px;font-weight:600;color:#111827;line-height:1.3}
+
+.law-body{padding:1.8rem 2rem 2.2rem;font-size:15px;color:#1f2937}
+.law-body .line{margin:.55rem 0}
+
+.law-history{margin:0 2rem 1.8rem;padding:1rem 1.15rem;background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;font-size:12.5px;color:#6b7280}
+.law-history strong{color:#374151}
+
+.law-actions{display:flex;gap:.6rem;padding:1rem 2rem;border-top:1px solid #f3f4f6}
+.law-actions button, .law-actions a{font-size:12.5px;font-weight:600;color:#0b1f3a;background:#fff;border:1px solid #d6dde5;border-radius:6px;padding:.5rem .9rem;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;transition:background .12s,border-color .12s}
+.law-actions button:hover, .law-actions a:hover{background:#f1f4f8;border-color:#0b1f3a}
+
+.law-side-card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:1.1rem;overflow:hidden}
+.law-side-head{padding:.6rem 1.05rem;background:#0b1f3a}
+.law-side-head h3{font-size:12px;font-weight:600;color:#fff;letter-spacing:.02em}
+.law-side-list{}
+.law-side-link{display:flex;align-items:center;gap:.5rem;padding:.65rem 1.05rem;font-size:13px;color:#374151;border-bottom:1px solid #f3f4f6;transition:background .1s}
+.law-side-link:last-child{border-bottom:none}
+.law-side-link:hover{background:rgba(11,31,58,.05);color:#0b1f3a}
+.law-side-link .icon{color:#9ca3af;flex-shrink:0}
+
+.back-link{display:inline-flex;align-items:center;gap:.4rem;font-size:13px;font-weight:600;color:#0b1f3a;margin-bottom:1.1rem}
 .back-link:hover{text-decoration:underline}
 
-.empty-state{padding:3.5rem 0;text-align:center;color:#9ca3af;font-size:13.5px}
+/* ---------- SKELETON ---------- */
+.skeleton{background:linear-gradient(90deg,#e3e8ef 25%,#f1f4f8 50%,#e3e8ef 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:6px}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.skeleton-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
+.skeleton-card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:1.15rem 1.25rem;display:flex;gap:1rem}
+.skeleton-sq{width:52px;height:52px;border-radius:6px;flex-shrink:0}
+.skeleton-line{height:12px;margin-bottom:8px}
 
-.search-results-header{font-size:12.5px;color:#6b7280;margin-bottom:1rem}
-.search-result-item{padding:.9rem 0;border-bottom:1px solid #f3f4f6;cursor:pointer}
-.search-result-item:last-child{border-bottom:none}
-.search-result-item:hover .search-result-title{color:#0b1f3a}
-.search-result-cite{font-size:12px;color:#0b1f3a;font-weight:700;margin-bottom:.2rem}
-.search-result-title{font-size:13.5px;color:#111827;margin-bottom:.2rem;transition:color .1s;text-transform:uppercase;letter-spacing:.01em}
-.search-result-snippet{font-size:12.5px;color:#6b7280;line-height:1.5}
-mark{background:#fff3cd;color:#4a3800;border-radius:2px;padding:0 2px}
+.empty-state{padding:3rem 1.5rem;text-align:center;color:#6b7280;background:#fff;border:1px solid #e5e7eb;border-radius:8px}
+.empty-state .icon{font-size:26px;color:#c7cdd6;margin-bottom:.6rem}
+.empty-state p{font-size:13.5px}
 
-footer.site-footer{background:#0b1f3a;padding:1.75rem 0}
-.footer-copy{font-size:11.5px;color:rgba(255,255,255,.3);line-height:1.7;max-width:640px}
+footer{background:#0b1f3a;padding:1.5rem 0}
+.footer-copy{font-size:11.5px;color:rgba(255,255,255,.42);line-height:1.55;max-width:none;width:100%;margin:0;text-align:justify}
 </style>
 </head>
 <body>
 
-<!-- Injected shared header: disclaimer, masthead, nav, notice bar -->
-<script>window.ACTIVE_NAV = "laws";</script>
+<script>window.ACTIVE_NAV = "mcl";</script>
 <div id="site-header"></div>
-<script src="../shared/header.js"></script>
+<script src="shared/header.js"></script>
 
-<section class="page-hero">
-  <div class="wrap page-hero-inner">
-    <div class="page-hero-eyebrow">Laws</div>
-    <h2>Michigan Compiled Laws</h2>
-    <p>Complete statutory laws of the State of Michigan, organized by chapter.</p>
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <defs>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+    <symbol id="i-book-2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+    <symbol id="i-printer" viewBox="0 0 24 24"><path d="M17 17h2a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2"/><rect x="7" y="13" width="10" height="8" rx="1"/><path d="M7 9V4h10v5"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a3.5 3.5 0 0 0 5 0l3-3a3.5 3.5 0 0 0-5-5l-1 1"/><path d="M14 10a3.5 3.5 0 0 0-5 0l-3 3a3.5 3.5 0 0 0 5 5l1-1"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+    <symbol id="i-file-empty" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><polyline points="12 7 12 12 15 14"/></symbol>
+  </defs>
+</svg>
+
+<section class="hero">
+  <div class="wrap hero-inner">
+    <div class="hero-eyebrow">Michigan Compiled Laws</div>
+    <h1 id="heroTitle">Every chapter, section, and statute — as enacted.</h1>
+    <p class="hero-sub" id="heroSub">Browse the full body of Michigan statutory law by chapter, or jump straight to a section by citation.</p>
+    <div class="hero-search">
+      <input type="text" id="lawSearch" placeholder="Search by citation, chapter number, or keyword…"/>
+      <button type="button" id="lawSearchBtn">Search</button>
+    </div>
   </div>
 </section>
 
-<div class="search-bar">
-  <div class="wrap">
-    <div class="search-bar-inner">
-      <input type="text" id="law-search" placeholder="Search compiled laws by citation, title, or keyword…"/>
-      <button type="button" onclick="runSearch()">Search</button>
-    </div>
+<div class="pathbar">
+  <div class="wrap pathbar-inner" id="pathbar">
+    <a href="#">Compiled Laws</a>
   </div>
 </div>
 
 <div class="wrap">
-  <div class="mcl-layout">
-    <div class="content-card" id="content">
-      <div class="skel-wrap">
-        <div class="skel" style="width:70%"></div>
-        <div class="skel" style="width:55%"></div>
-        <div class="skel" style="width:62%"></div>
-        <div class="skel" style="width:48%"></div>
-        <div class="skel" style="width:58%"></div>
-      </div>
-    </div>
-  </div>
+<main id="laws"></main>
 </div>
 
-<footer class="site-footer">
+<footer>
   <div class="wrap">
-  <p class="footer-copy">A free service of the Legislative Service Bureau in cooperation with the Michigan Legislature. Information is provided without warranties and is subject to revision. This is not an official government website. This site is a simulated legislative interface and does not represent any real government body or authority.</p>
+    <p class="footer-copy">
+      This website is a free service of the Legislative Service Bureau in cooperation with the Michigan Legislature and Library of Michigan. This site is intended to provide accurate and timely legislative information to the citizens of the State of Michigan and other interested parties. Pursuant to Public Act 6, the Revised Statutes of 1846, the information codified under the Michigan Compiled Laws (MCL), Michigan Administrative Code (MAC), public acts (PA), executive orders, and executive reorganization orders constitutes the substance of Michigan law and is legally binding and considered the official record of state law, except in rare and narrowly defined circumstances recognized under applicable law. This information is subject to revision. If you believe this information is inaccurate, out-of-date, or incomplete, please contact us. This site is a simulated legislative interface and does not represent any real government body or authority.
+    </p>
   </div>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQaZtiF885qU65kN8IttJzYV8NcCiBFYI0Pn8z27HG8owEIiAeI2W4eg0r2Rpd-rdjVmMJXiKINu-gt/pub?output=csv";
-let sections={},chapters={},orderedSections=[],orderedChapters=[];
-let activeChapter=null,activeSection=null,searchMode=false;
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaZtiF885qU65kN8IttJzYV8NcCiBFYI0Pn8z27HG8owEIiAeI2W4eg0r2Rpd-rdjVmMJXiKINu-gt/pub?output=csv";
 
-function parseCSV(text){
-  const rows=[];let row=[],cell="",q=false;
-  for(let i=0;i<text.length;i++){
-    const c=text[i],n=text[i+1];
-    if(c=='"'&&n=='"'){cell+='"';i++}
-    else if(c=='"')q=!q;
-    else if(c==','&&!q){row.push(cell);cell=""}
-    else if((c=='\n'||c=='\r')&&!q){
-      if(cell||row.length){row.push(cell);rows.push(row);row=[];cell=""}
-    }else cell+=c;
+let sections = {}, chapters = {}, orderedSections = [], orderedChapters = [];
+
+/* ---------- boot / skeleton ---------- */
+function showSkeletons(){
+  const root = document.getElementById("laws");
+  let html = '<p class="section-label" style="margin-bottom:1rem">Chapters</p><div class="skeleton-grid">';
+  for(let i=0;i<9;i++){
+    html += `<div class="skeleton-card">
+      <div class="skeleton skeleton-sq"></div>
+      <div style="flex:1;padding-top:.15rem">
+        <div class="skeleton skeleton-line" style="width:70%"></div>
+        <div class="skeleton skeleton-line" style="width:45%"></div>
+      </div>
+    </div>`;
   }
-  if(cell||row.length){row.push(cell);rows.push(row)}
-  rows.slice(1).forEach(r=>{
-    const cite=r[0]?.trim(),type=r[1]?.trim()?.toLowerCase(),title=r[2]?.trim(),desc=r[4]?.trim(),history=r[5]?.trim();
-    if(!cite||!type)return;
-    if(type==="chapter"){chapters[cite]={cite,title};orderedChapters.push(cite);}
-    if(type==="section"){sections[cite]={cite,title,desc,history};orderedSections.push(cite);}
-  });
-  orderedSections.sort((a,b)=>parseFloat(a)-parseFloat(b));
+  html += "</div>";
+  root.innerHTML = html;
 }
-
-function getIndentLevel(line){
-  const t=line.trim();
-  if(/^\([a-z]\)/.test(t))return 1;
-  if(/^\([ivxlcdm]+\)/i.test(t))return 2;
-  if(/^\d+\)/.test(t))return 3;
-  if(/^[a-z]\)/.test(t))return 4;
-  return 0;
-}
-
-function renderChapterList(updateUrl){
-  if(updateUrl!==false)history.pushState(null,'',window.location.pathname+window.location.search);
-  activeChapter=null;activeSection=null;searchMode=false;
-  const searchEl=document.getElementById("law-search");
-  if(searchEl)searchEl.value="";
-  const c=document.getElementById("content");
-  let html=`<div class="chapter-title-bar"><h3>Michigan Compiled Laws</h3><p>${orderedChapters.length} chapter${orderedChapters.length!==1?'s':''}</p></div>`;
-  html+=`<div class="chapter-list">`;
-  orderedChapters.forEach(cite=>{
-    const ch=chapters[cite];
-    html+=`<div class="chapter-row" onclick="showChapter('${cite}')"><div class="chapter-num-badge">${cite}</div><div class="chapter-row-title">${ch.title}</div></div>`;
-  });
-  html+=`</div>`;
-  c.innerHTML=html;
-}
-
-function showChapter(cite,updateUrl){
-  if(updateUrl!==false)history.pushState(null,'','#'+cite);
-  activeChapter=cite;activeSection=null;searchMode=false;
-  const searchEl=document.getElementById("law-search");
-  if(searchEl)searchEl.value="";
-  const ch=chapters[cite];
-  const secs=orderedSections.filter(s=>s.startsWith(cite+"."));
-  const c=document.getElementById("content");
-  let html=`<div class="breadcrumb"><a onclick="renderChapterList()">Michigan Compiled Laws</a><span>&rsaquo;</span>Chapter ${cite}</div>`;
-  html+=`<div class="chapter-title-bar"><h3>Chapter ${cite} &mdash; ${ch.title}</h3><p>${secs.length} section${secs.length!==1?'s':''}</p></div>`;
-  html+=`<div class="section-list">`;
-  secs.forEach(s=>{
-    if(!sections[s])return;
-    html+=`<div class="section-row" onclick="showSection('${s}')"><div class="section-cite">MCL ${s}</div><div class="section-row-title">${sections[s].title||'(untitled)'}</div></div>`;
-  });
-  if(!secs.length)html+=`<div class="empty-state">No sections found for this chapter.</div>`;
-  html+=`</div>`;
-  c.innerHTML=html;
-}
-
-function showSection(cite,updateUrl){
-  if(updateUrl!==false)history.pushState(null,'','#'+cite);
-  activeSection=cite;
-  const s=sections[cite];if(!s)return;
-  const ch=cite.split(".")[0];
-  const c=document.getElementById("content");
-  let html=`<div class="breadcrumb"><a onclick="renderChapterList()">Michigan Compiled Laws</a><span>&rsaquo;</span><a onclick="showChapter('${ch}')">Chapter ${ch}</a><span>&rsaquo;</span>MCL ${cite}</div>`;
-  html+=`<div class="back-link" onclick="showChapter('${ch}')">&#8592; Back to Chapter ${ch}</div>`;
-  html+=`<div class="section-view">`;
-  html+=`<div class="section-cite-large">MCL ${cite}</div>`;
-  html+=`<div class="section-title-large">${s.title||''}</div>`;
-  html+=`<div class="section-body">`;
-  (s.desc||"").split(/\r?\n/).map(l=>l.trim()).filter(l=>l).forEach(line=>{
-    const level=getIndentLevel(line);
-    html+=`<div style="margin-left:${level*24}px">${escHtml(line)}</div>`;
-  });
-  html+=`</div>`;
-  if(s.history)html+=`<div class="section-history"><strong>History:</strong> ${escHtml(s.history)}</div>`;
-  html+=`</div>`;
-  c.innerHTML=html;
-}
-
-function runSearch(){
-  const q = document.getElementById("law-search").value.trim().toLowerCase();
-  if(!q) return;
-
-  searchMode = true;
-  activeChapter = null;
-  activeSection = null;
-
-  const chapterResults = [];
-  const sectionStrong = [];
-  const sectionWeak = [];
-
-  orderedChapters.forEach(cite => {
-    const ch = chapters[cite];
-    if(!ch) return;
-
-    const title = (ch.title || "").toLowerCase();
-
-    if(cite.toLowerCase().includes(q) || title.includes(q)){
-      chapterResults.push({
-        cite,
-        title: ch.title,
-        type: "chapter"
-      });
-    }
-  });
-
-  orderedSections.forEach(cite => {
-    const s = sections[cite];
-    if(!s) return;
-
-    const title = (s.title || "").toLowerCase();
-    const desc = (s.desc || "").toLowerCase();
-
-    const inCite = cite.toLowerCase().includes(q);
-    const inTitle = title.includes(q);
-    const inDesc = desc.includes(q);
-
-    if(inCite || inTitle){
-      sectionStrong.push({
-        cite,
-        s
-      });
-    } else if(inDesc){
-      sectionWeak.push({
-        cite,
-        s
-      });
-    }
-  });
-
-  const c = document.getElementById("content");
-
-  let html = `<div class="breadcrumb">Search results for "<strong>${escHtml(q)}</strong>"</div>`;
-
-  const total = chapterResults.length + sectionStrong.length + sectionWeak.length;
-  html += `<div class="search-results-header">${total} result${total !== 1 ? 's' : ''} found</div>`;
-
-  if(!total){
-    html += `<div class="empty-state">No matches found.</div>`;
-    c.innerHTML = html;
-    return;
-  }
-
-  chapterResults.forEach(ch => {
-    html += `
-      <div class="search-result-item" onclick="showChapter('${ch.cite}')">
-        <div class="search-result-cite">CH ${ch.cite}</div>
-        <div class="search-result-title">${highlight(ch.title || '', q)}</div>
-        <div class="search-result-snippet">Chapter match</div>
-      </div>
-    `;
-  });
-
-  sectionStrong.forEach(item => {
-    const s = item.s;
-    const cite = item.cite;
-
-    const snippet = highlight((s.desc || "").slice(0,160), q);
-
-    html += `
-      <div class="search-result-item" onclick="showSection('${cite}')">
-        <div class="search-result-cite">MCL ${cite}</div>
-        <div class="search-result-title">${highlight(s.title || '', q)}</div>
-        ${snippet ? `<div class="search-result-snippet">${snippet}${(s.desc||"").length>160?'&hellip;':''}</div>` : ''}
-      </div>
-    `;
-  });
-
-  sectionWeak.forEach(item => {
-    const s = item.s;
-    const cite = item.cite;
-
-    const snippet = highlight((s.desc || "").slice(0,160), q);
-
-    html += `
-      <div class="search-result-item" style="opacity:0.85" onclick="showSection('${cite}')">
-        <div class="search-result-cite">MCL ${cite}</div>
-        <div class="search-result-title">${highlight(s.title || '', q)}</div>
-        ${snippet ? `<div class="search-result-snippet">${snippet}${(s.desc||"").length>160?'&hellip;':''}</div>` : ''}
-      </div>
-    `;
-  });
-
-  c.innerHTML = html;
-}
-
-function highlight(text,q){
-  if(!q||!text)return escHtml(text);
-  const escaped=escHtml(text);
-  const re=new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
-  return escaped.replace(re,m=>`<mark>${m}</mark>`);
-}
-
-function escHtml(t){
-  return (t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-}
-
-function routeFromHash(updateUrl){
-  const hash=decodeURIComponent(window.location.hash.replace(/^#/,'').replace(/\/$/,''));
-  if(!hash){renderChapterList(false);return;}
-  if(sections[hash]){showSection(hash,false);return;}
-  if(chapters[hash]){showChapter(hash,false);return;}
-  // Fallback: maybe it's a section citation whose chapter prefix matches
-  const chapterGuess=hash.split(".")[0];
-  if(chapters[chapterGuess]){showChapter(chapterGuess,false);return;}
-  renderChapterList(false);
-}
-
-window.addEventListener("popstate",()=>{routeFromHash(false);});
-
-document.getElementById("law-search").addEventListener("keydown",e=>{if(e.key==="Enter")runSearch();});
 
 async function init(){
+  showSkeletons();
   try{
-    const r=await fetch(CSV_URL);
-    const text=await r.text();
+    const r = await fetch(CSV_URL);
+    const text = await r.text();
     parseCSV(text);
-    routeFromHash(false);
   }catch(e){
-    document.getElementById("content").innerHTML=`<div class="empty-state" style="color:#c04040;">Failed to load statute data. Please try refreshing.</div>`;
+    document.getElementById("laws").innerHTML = `
+      <div class="empty-state">
+        <div class="icon"><svg class="icon" style="font-size:26px"><use href="#i-file-empty"/></svg></div>
+        <p>The compiled laws couldn't be loaded right now. Please try again shortly.</p>
+      </div>`;
     console.error(e);
   }
 }
-init();
+
+/* ---------- CSV parsing (unchanged logic) ---------- */
+function parseCSV(text){
+  const rows = []; let row = [], cell = "", q = false;
+  for(let i=0;i<text.length;i++){
+    const c = text[i], n = text[i+1];
+    if(c=='"' && n=='"'){ cell+='"'; i++; }
+    else if(c=='"') q=!q;
+    else if(c==','&&!q){ row.push(cell); cell=""; }
+    else if((c=='\n'||c=='\r')&&!q){
+      if(cell||row.length){ row.push(cell); rows.push(row); row=[]; cell=""; }
+    } else cell+=c;
+  }
+  if(cell||row.length){ row.push(cell); rows.push(row); }
+
+  rows.slice(1).forEach(r=>{
+    const cite = r[0]?.trim();
+    const type = r[1]?.trim()?.toLowerCase();
+    const title = r[2]?.trim();
+    const desc = r[4]?.trim();
+    const history = r[5]?.trim();
+    if(!cite || !type) return;
+
+    if(type === "chapter") chapters[cite] = { cite, title };
+    if(type === "section"){
+      sections[cite] = { cite, title, desc, history };
+      orderedSections.push(cite);
+    }
+  });
+
+  orderedSections.sort((a,b)=>parseFloat(a)-parseFloat(b));
+  orderedChapters = Object.keys(chapters).sort((a,b)=>parseFloat(a)-parseFloat(b));
+  route();
+}
+
+/* ---------- routing: #750  or  #750.58 ---------- */
+function route(){
+  const h = decodeURIComponent(location.hash.replace("#",""));
+  if(!h){
+    setHero(null);
+    buildPathbar([]);
+    buildChapterIndex();
+  } else if(h.includes(".")){
+    setHero("section");
+    openSection(h);
+  } else {
+    setHero("chapter");
+    openChapter(h);
+  }
+  window.scrollTo({top:0, behavior:"instant"});
+}
+
+function setHero(mode){
+  const title = document.getElementById("heroTitle");
+  const sub = document.getElementById("heroSub");
+  if(mode===null){
+    title.textContent = "Every chapter, section, and statute — as enacted.";
+    sub.textContent = "Browse the full body of Michigan statutory law by chapter, or jump straight to a section by citation.";
+  } else if(mode==="chapter"){
+    title.textContent = "Chapter contents";
+    sub.textContent = "All sections codified under this chapter, in citation order.";
+  } else {
+    title.textContent = "Statutory text";
+    sub.textContent = "The section as currently codified, with its amendment history.";
+  }
+}
+
+function buildPathbar(crumbs){
+  const bar = document.getElementById("pathbar");
+  let html = `<a href="#">Compiled Laws</a>`;
+  crumbs.forEach((c,i)=>{
+    html += `<span class="sep">/</span>`;
+    if(i === crumbs.length-1){
+      html += `<span class="current">${c.label}</span>${c.tag ? `<span class="cite-tag mono">${c.tag}</span>`:""}`;
+    } else {
+      html += `<a href="#${c.href}">${c.label}</a>`;
+    }
+  });
+  bar.innerHTML = html;
+}
+
+/* ---------- view: chapter index ---------- */
+function buildChapterIndex(){
+  const root = document.getElementById("laws");
+  if(orderedChapters.length === 0){
+    root.innerHTML = `<div class="empty-state"><p>No chapters are available yet.</p></div>`;
+    return;
+  }
+  let html = `
+    <div class="index-head">
+      <h2>All chapters</h2>
+      <span class="count-pill">${orderedChapters.length} chapters &middot; ${orderedSections.length} sections</span>
+    </div>
+    <div class="chapter-grid">`;
+  orderedChapters.forEach(cite=>{
+    const ch = chapters[cite];
+    const count = orderedSections.filter(s=>s.startsWith(cite+".")).length;
+    html += `
+      <a class="chapter-card" href="#${cite}">
+        <div class="chapter-num">${cite}</div>
+        <div class="chapter-card-body">
+          <div class="chapter-card-title">${ch.title || "Untitled chapter"}</div>
+          <div class="chapter-card-meta">${count} section${count===1?"":"s"}</div>
+        </div>
+      </a>`;
+  });
+  html += "</div>";
+  root.innerHTML = html;
+}
+
+/* ---------- view: chapter (section list) ---------- */
+function openChapter(cite){
+  const ch = chapters[cite];
+  const root = document.getElementById("laws");
+  if(!ch){
+    buildPathbar([{label:"Chapter not found"}]);
+    root.innerHTML = `
+      <a class="back-link" href="#"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> Back to all chapters</a>
+      <div class="empty-state">
+        <div class="icon"><svg class="icon" style="font-size:26px"><use href="#i-file-empty"/></svg></div>
+        <p>Chapter ${cite} could not be found.</p>
+      </div>`;
+    return;
+  }
+
+  buildPathbar([{label:"Chapter "+cite, tag:ch.title, href:cite}]);
+
+  const list = orderedSections.filter(s=>s.startsWith(cite+"."));
+
+  let html = `
+    <a class="back-link" href="#"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> Back to all chapters</a>
+    <div class="chapter-banner">
+      <div class="num">${cite}</div>
+      <div>
+        <h1>${ch.title}</h1>
+        <p>${list.length} section${list.length===1?"":"s"} codified under this chapter</p>
+      </div>
+    </div>`;
+
+  if(list.length === 0){
+    html += `<div class="empty-state"><p>No sections have been codified under this chapter yet.</p></div>`;
+  } else {
+    html += `<div class="section-table">`;
+    list.forEach(s=>{
+      html += `
+        <a class="section-row" href="#${s}">
+          <span class="sr-cite mono">MCL ${s}</span>
+          <span class="sr-title">${sections[s].title || ""} <svg class="icon sr-arrow"><use href="#i-arrow-right"/></svg></span>
+        </a>`;
+    });
+    html += `</div>`;
+  }
+  root.innerHTML = html;
+}
+
+/* ---------- view: section (law text) ---------- */
+function getIndentLevel(line){
+  const t = line.trim();
+  if(/^\([a-z]\)/.test(t)) return 1;
+  if(/^\([ivxlcdm]+\)/i.test(t)) return 2;
+  if(/^\d+\)/.test(t)) return 3;
+  if(/^[a-z]\)/.test(t)) return 4;
+  return 0;
+}
+
+function openSection(cite){
+  const s = sections[cite];
+  const root = document.getElementById("laws");
+  const ch = cite.split(".")[0];
+
+  if(!s){
+    buildPathbar([{label:"Section not found"}]);
+    root.innerHTML = `
+      <a class="back-link" href="#${ch}"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> Back to Chapter ${ch}</a>
+      <div class="empty-state">
+        <div class="icon"><svg class="icon" style="font-size:26px"><use href="#i-file-empty"/></svg></div>
+        <p>MCL ${cite} could not be found.</p>
+      </div>`;
+    return;
+  }
+
+  const chTitle = chapters[ch] ? chapters[ch].title : "";
+  buildPathbar([
+    {label:"Chapter "+ch, tag:chTitle, href:ch},
+    {label:"MCL "+cite}
+  ]);
+
+  const siblings = orderedSections.filter(x=>x.startsWith(ch+"."));
+  const idx = siblings.indexOf(cite);
+  const prev = idx > 0 ? siblings[idx-1] : null;
+  const next = idx >= 0 && idx < siblings.length-1 ? siblings[idx+1] : null;
+
+  const bodyLines = (s.desc || "")
+    .split(/\r?\n/)
+    .map(l=>l.trim())
+    .filter(l=>l)
+    .map(line=>{
+      const level = getIndentLevel(line);
+      return `<div class="line" style="margin-left:${level*25}px">${escapeHtml(line)}</div>`;
+    }).join("");
+
+  let html = `
+    <a class="back-link" href="#${ch}"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> Back to Chapter ${ch}</a>
+    <div class="law-layout">
+      <div>
+        <div class="law-card">
+          <div class="law-card-head">
+            <span class="law-cite">MCL ${cite}</span>
+            <h1>${s.title || ""}</h1>
+          </div>
+          <div class="law-body">
+            ${bodyLines || "<p style='color:#9ca3af'>No text is on file for this section.</p>"}
+          </div>
+          ${s.history ? `<div class="law-history"><strong>History:</strong> ${escapeHtml(s.history)}</div>` : ""}
+          <div class="law-actions">
+            <button onclick="printSection('${cite}')"><svg class="icon"><use href="#i-printer"/></svg> Print as PDF</button>
+            <button onclick="copyLink('${cite}')" id="copyBtn-${cite}"><svg class="icon"><use href="#i-link"/></svg> Copy link</button>
+          </div>
+        </div>
+      </div>
+      <aside>
+        <div class="law-side-card">
+          <div class="law-side-head"><h3>In this chapter</h3></div>
+          <div class="law-side-list">
+            ${prev ? `<a class="law-side-link" href="#${prev}"><svg class="icon"><use href="#i-arrow-right" transform="rotate(180 12 12)"/></svg> MCL ${prev}</a>` : ""}
+            <a class="law-side-link" href="#${ch}"><svg class="icon"><use href="#i-list"/></svg> All sections in Ch. ${ch}</a>
+            ${next ? `<a class="law-side-link" href="#${next}"><svg class="icon"><use href="#i-arrow-right"/></svg> MCL ${next}</a>` : ""}
+          </div>
+        </div>
+        <div class="law-side-card">
+          <div class="law-side-head"><h3>About this chapter</h3></div>
+          <div class="law-side-list">
+            <a class="law-side-link" href="#${ch}"><svg class="icon"><use href="#i-book-2"/></svg> ${chTitle}</a>
+          </div>
+        </div>
+      </aside>
+    </div>`;
+
+  root.innerHTML = html;
+}
+
+function escapeHtml(str){
+  const d = document.createElement("div");
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function copyLink(cite){
+  const url = location.origin + location.pathname + "#" + cite;
+  navigator.clipboard?.writeText(url);
+  const btn = document.getElementById("copyBtn-"+cite);
+  if(btn){
+    const original = btn.innerHTML;
+    btn.innerHTML = "Copied";
+    setTimeout(()=>btn.innerHTML = original, 1400);
+  }
+}
+
+function printSection(cite){
+  if(!window.jspdf) return alert("PDF library not loaded");
+  const { jsPDF } = window.jspdf;
+  const s = sections[cite]; if(!s) return;
+  const doc = new jsPDF();
+  const margin = 14;
+  let y = 16;
+  doc.setFont("helvetica","bold"); doc.setFontSize(13);
+  doc.text(`MCL ${cite}`, margin, y); y += 8;
+  doc.setFontSize(11);
+  const titleLines = doc.splitTextToSize(s.title || "", 180);
+  doc.text(titleLines, margin, y); y += titleLines.length*6 + 4;
+
+  doc.setFont("helvetica","normal"); doc.setFontSize(10.5);
+  const bodyLines = doc.splitTextToSize(s.desc || "", 180);
+  bodyLines.forEach(line=>{
+    if(y > 280){ doc.addPage(); y = 16; }
+    doc.text(line, margin, y);
+    y += 5.5;
+  });
+
+  if(s.history){
+    y += 4;
+    if(y > 280){ doc.addPage(); y = 16; }
+    doc.setFont("helvetica","italic"); doc.setFontSize(9.5);
+    const hLines = doc.splitTextToSize("History: " + s.history, 180);
+    hLines.forEach(line=>{
+      if(y > 280){ doc.addPage(); y = 16; }
+      doc.text(line, margin, y);
+      y += 5;
+    });
+  }
+
+  doc.save(`MCL_${cite}.pdf`);
+}
+
+/* ---------- search bar: jump to citation or filter chapters ---------- */
+function runSearch(){
+  const q = document.getElementById("lawSearch").value.trim();
+  if(!q) return;
+  if(/^\d+(\.\d+)?$/.test(q)){
+    location.hash = q;
+    return;
+  }
+  const lower = q.toLowerCase();
+  const matchChapter = orderedChapters.find(c => (chapters[c].title||"").toLowerCase().includes(lower));
+  const matchSection = orderedSections.find(s => (sections[s].title||"").toLowerCase().includes(lower));
+  if(matchSection) location.hash = matchSection;
+  else if(matchChapter) location.hash = matchChapter;
+}
+document.getElementById("lawSearchBtn").addEventListener("click", runSearch);
+document.getElementById("lawSearch").addEventListener("keydown", e=>{ if(e.key==="Enter") runSearch(); });
+
+window.addEventListener("hashchange", route);
+window.addEventListener("load", init);
 </script>
 
 </body>
