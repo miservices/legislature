@@ -14,7 +14,8 @@
 body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#111827;background:#f3f4f6;font-size:15px;line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
 a{color:inherit;text-decoration:none}
 .icon{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-0.125em;flex-shrink:0;display:inline-block}
-.wrap{max-width:1240px;margin:0 auto;padding:0 2.5rem}
+.wrap{max-width:1240px !important;margin:0 auto !important;padding:0 2.5rem;width:100%}
+html body .wrap{max-width:1240px;margin-left:auto;margin-right:auto}
 @media(max-width:720px){.wrap{padding:0 1.25rem}}
 .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
 #site-header, .hero, .utilitybar, .pathbar, footer{flex-shrink:0}
@@ -178,7 +179,7 @@ footer{background:#0b1f3a;padding:1.5rem 0}
 </svg>
 
 <section class="hero" id="hero">
-  <div class="wrap hero-inner">
+  <div class="wrap hero-inner" style="max-width:1240px;margin-left:auto;margin-right:auto;width:100%;box-sizing:border-box">
     <div class="hero-eyebrow">Michigan Compiled Laws</div>
     <h1>Every chapter, section, and statute — as enacted.</h1>
     <p class="hero-sub">Browse the full body of Michigan statutory law by chapter, or jump straight to a section by citation.</p>
@@ -190,7 +191,7 @@ footer{background:#0b1f3a;padding:1.5rem 0}
 </section>
 
 <div class="utilitybar" id="utilitybar">
-  <div class="wrap utilitybar-inner">
+  <div class="wrap utilitybar-inner" style="max-width:1240px;margin-left:auto;margin-right:auto;width:100%;box-sizing:border-box">
     <div class="utility-search">
       <svg class="icon"><use href="#i-search"/></svg>
       <input type="text" id="lawSearchSub" placeholder="Search citation, chapter, or keyword…"/>
@@ -199,17 +200,17 @@ footer{background:#0b1f3a;padding:1.5rem 0}
 </div>
 
 <div class="pathbar" id="pathbarWrap">
-  <div class="wrap pathbar-inner" id="pathbar">
+  <div class="wrap pathbar-inner" id="pathbar" style="max-width:1240px;margin-left:auto;margin-right:auto;width:100%;box-sizing:border-box">
     <a href="#">Compiled Laws</a>
   </div>
 </div>
 
-<div class="wrap mcl-main">
+<div class="wrap mcl-main" style="max-width:1240px;margin-left:auto;margin-right:auto;width:100%;box-sizing:border-box">
 <main id="laws"></main>
 </div>
 
 <footer>
-  <div class="wrap">
+  <div class="wrap" style="max-width:1240px;margin-left:auto;margin-right:auto;width:100%;box-sizing:border-box">
     <p class="footer-copy">
       This website is a free service of the Legislative Service Bureau in cooperation with the Michigan Legislature and Library of Michigan. This site is intended to provide accurate and timely legislative information to the citizens of the State of Michigan and other interested parties. Pursuant to Public Act 6, the Revised Statutes of 1846, the information codified under the Michigan Compiled Laws (MCL), Michigan Administrative Code (MAC), public acts (PA), executive orders, and executive reorganization orders constitutes the substance of Michigan law and is legally binding and considered the official record of state law, except in rare and narrowly defined circumstances recognized under applicable law. This information is subject to revision. If you believe this information is inaccurate, out-of-date, or incomplete, please contact us. This site is a simulated legislative interface and does not represent any real government body or authority.
     </p>
