@@ -17,7 +17,6 @@ a{color:inherit;text-decoration:none}
 .wrap{max-width:1240px;margin:0 auto;padding:0 2.5rem}
 @media(max-width:720px){.wrap{padding:0 1.25rem}}
 
-/* HERO */
 .hero{position:relative;background:linear-gradient(155deg,#0b1f3a 0%,#0e2c52 55%,#123a63 100%);overflow:hidden;padding:2.6rem 0 2.4rem}
 .hero::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.06) 1px,transparent 0);background-size:22px 22px;opacity:.6;pointer-events:none}
 .hero .wrap{position:relative}
@@ -29,7 +28,6 @@ a{color:inherit;text-decoration:none}
 .hero h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:clamp(28px,3.4vw,38px);line-height:1.12;color:#fff;letter-spacing:-.01em;margin-bottom:.7rem}
 .hero-sub{font-size:14.5px;color:rgba(255,255,255,.72);max-width:60ch}
 
-/* BODY */
 .page-body{display:grid;grid-template-columns:1fr 300px;gap:2.5rem;align-items:start;padding:2.5rem 0}
 @media(max-width:900px){.page-body{grid-template-columns:1fr}}
 
@@ -47,19 +45,18 @@ a{color:inherit;text-decoration:none}
 .card h3{font-size:15px;font-weight:600;color:#0b1f3a;line-height:1.25}
 .card .role{font-size:12px;color:#6b7280}
 .card-body{padding:0 1.1rem 1rem;flex:1}
-.meta{display:flex;justify-content:space-between;font-size:12.5px;padding:.45rem 0;border-top:1px solid #f3f4f6}
-.meta span:first-child{color:#9ca3af}
-.meta span:last-child{color:#374151;font-weight:500;text-align:right}
-.tags{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.55rem}
+.group{border-top:1px solid #f3f4f6;padding-top:.55rem;margin-top:.55rem}
+.group-label{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#9ca3af;margin-bottom:.3rem}
+.tags{display:flex;flex-wrap:wrap;gap:.35rem}
 .chip{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;letter-spacing:.02em;text-transform:uppercase;background:rgba(11,31,58,.08);color:#0b1f3a}
-.chip.chair{background:#fef3c7;color:#92400e}
+.chip.special{background:#fef3c7;color:#92400e}
+.none{font-size:12.5px;color:#9ca3af}
 .card-foot{display:flex;border-top:1px solid #f3f4f6}
 .card-foot a{flex:1;text-align:center;padding:.6rem;font-size:12.5px;font-weight:500;color:#0b1f3a;display:flex;align-items:center;justify-content:center;gap:.35rem;transition:background .1s}
 .card-foot a+a{border-left:1px solid #f3f4f6}
 .card-foot a:hover{background:rgba(11,31,58,.05)}
 .empty{display:none;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:2rem;text-align:center;color:#6b7280}
 
-/* SIDEBAR */
 .sidebar-card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:1.25rem}
 .sidebar-card-head{padding:.65rem 1.1rem;background:#0b1f3a}
 .sidebar-card-head h3{font-size:13px;font-weight:600;color:#fff;letter-spacing:.02em}
@@ -67,15 +64,14 @@ a{color:inherit;text-decoration:none}
 .sc-link:last-child{border-bottom:none}
 .sc-link:hover{background:rgba(11,31,58,.05);color:#0b1f3a}
 .sc-link .icon{font-size:13px;color:#9ca3af}
+.sc-link .n{font-size:12px;color:#9ca3af;font-weight:500;margin-left:.5rem;white-space:nowrap}
+.sc-sub{padding:.5rem 1.1rem;font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#9ca3af;background:#fafafa;border-bottom:1px solid #f3f4f6}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr}
 .stat-box{padding:.9rem 1.1rem;text-align:center;border-right:1px solid #f3f4f6;border-bottom:1px solid #f3f4f6}
 .stat-box:nth-child(2n){border-right:none}
 .stat-box:nth-last-child(-n+2){border-bottom:none}
 .stat-box .n{font-family:'Fraunces',Georgia,serif;font-size:22px;font-weight:600;color:#0b1f3a;line-height:1}
 .stat-box .l{font-size:11px;color:#9ca3af;margin-top:3px}
-.spotlight{background:linear-gradient(135deg,#0b1f3a,#15294f);border-radius:8px;padding:1.2rem 1.1rem;margin-bottom:1.25rem;color:#fff}
-.spotlight h3{font-size:13px;font-weight:600;letter-spacing:.02em;margin-bottom:.5rem;color:#fbbf24;text-transform:uppercase}
-.spotlight p{font-size:13px;line-height:1.5;color:rgba(255,255,255,.85)}
 
 footer{background:#0b1f3a;padding:1.5rem 0}
 .footer-copy{font-size:11.5px;color:rgba(255,255,255,.42);line-height:1.55;width:100%;margin:0;text-align:justify}
@@ -98,9 +94,9 @@ footer{background:#0b1f3a;padding:1.5rem 0}
 <section class="hero">
   <div class="wrap">
     <div class="crumbs"><a href="../">Home</a> &nbsp;/&nbsp; Legislators</div>
-    <div class="hero-eyebrow">1st Legislature &middot; Unicameral</div>
-    <h1>Michigan Legislators</h1>
-    <p class="hero-sub">Michigan's Legislature is a single chamber. All 16 legislators sit together, debate together, and vote together on every bill. Find yours by name, district, or committee.</p>
+    <div class="hero-eyebrow">1st Legislature</div>
+    <h1>Legislators</h1>
+    <p class="hero-sub">The 16 members of the Michigan Legislature and their committee assignments. Search by name or filter by committee.</p>
   </div>
 </section>
 
@@ -108,12 +104,8 @@ footer{background:#0b1f3a;padding:1.5rem 0}
 <div class="page-body">
   <main>
     <div class="toolbar">
-      <input id="q" type="search" placeholder="Search by name, district, or region&hellip;" aria-label="Search legislators"/>
+      <input id="q" type="search" placeholder="Search by name&hellip;" aria-label="Search legislators"/>
       <select id="committee" aria-label="Filter by committee"><option value="">All committees</option></select>
-      <select id="sort" aria-label="Sort">
-        <option value="district">Sort by district</option>
-        <option value="name">Sort by name</option>
-      </select>
     </div>
     <p class="count" id="count"></p>
     <div class="grid" id="grid"></div>
@@ -121,19 +113,19 @@ footer{background:#0b1f3a;padding:1.5rem 0}
   </main>
 
   <aside aria-label="Sidebar">
-    <div class="spotlight">
-      <h3>One chamber</h3>
-      <p>Unlike most states, Michigan has no separate upper and lower house. Every bill gets one floor vote, and every legislator votes on all of them.</p>
-    </div>
-
     <div class="sidebar-card">
       <div class="sidebar-card-head"><h3>Legislature at a glance</h3></div>
       <div class="stats-grid">
         <div class="stat-box"><div class="n">16</div><div class="l">Legislators</div></div>
-        <div class="stat-box"><div class="n">1</div><div class="l">Chamber</div></div>
-        <div class="stat-box"><div class="n" id="stat-comm">0</div><div class="l">Committees</div></div>
         <div class="stat-box"><div class="n">1st</div><div class="l">Legislature</div></div>
+        <div class="stat-box"><div class="n">4</div><div class="l">Standing committees</div></div>
+        <div class="stat-box"><div class="n">2</div><div class="l">Special committees</div></div>
       </div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-card-head"><h3>Committees</h3></div>
+      <div id="committee-list"></div>
     </div>
 
     <div class="sidebar-card">
@@ -141,7 +133,6 @@ footer{background:#0b1f3a;padding:1.5rem 0}
       <a class="sc-link" href="../committees/">Committee meetings <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
       <a class="sc-link" href="../bills/">Recent bill activity <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
       <a class="sc-link" href="../journals/">Journals <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
-      <a class="sc-link" href="../calendar/">Floor calendar <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
     </div>
   </aside>
 </div>
@@ -157,29 +148,42 @@ footer{background:#0b1f3a;padding:1.5rem 0}
 
 <script>
 /* ============================================================
-   EDIT THIS LIST. One entry per legislator (16 total).
-   chair: true marks them as chair of their FIRST listed committee.
-   slug is used for the profile link: ./<slug>/
+   EDIT THESE.
+   Standing committees: every legislator sits on exactly two (8 members each).
+   Special committees: voluntary, at least 3 members each.
+   Use the short keys below in each legislator's lists.
    ============================================================ */
+const STANDING = {
+  JUD: "Committee on Judiciary",
+  GOV: "Committee on Government Operations",
+  OVR: "Committee on Oversight and Ethics",
+  PSS: "Committee on Public Safety and State Security"
+};
+const SPECIAL = {
+  APP: "Special Committee on Appropriations",
+  RUL: "Special Committee on Administrative Rules"
+};
+
 const LEGISLATORS = [
-  {name:"Jason Morgan",       district:1,  region:"Mid-Michigan",           office:"Capitol 201", committees:["Transportation & Infrastructure","Appropriations"], chair:true},
-  {name:"Curtis VanderWall",  district:2,  region:"West Michigan",          office:"Capitol 202", committees:["Regulatory Reform","Judiciary"], chair:true},
-  {name:"Steve Frisbie",      district:3,  region:"Northern Lower Peninsula",office:"Capitol 203", committees:["Agriculture & Rural Affairs","Natural Resources"], chair:false},
-  {name:"Legislator Name 4",  district:4,  region:"Upper Peninsula",        office:"Capitol 204", committees:["Natural Resources","Appropriations"], chair:true},
-  {name:"Legislator Name 5",  district:5,  region:"Southeast Michigan",     office:"Capitol 205", committees:["Education","Judiciary"], chair:false},
-  {name:"Legislator Name 6",  district:6,  region:"Southeast Michigan",     office:"Capitol 206", committees:["Technology & Energy","Regulatory Reform"], chair:false},
-  {name:"Legislator Name 7",  district:7,  region:"Southwest Michigan",     office:"Capitol 207", committees:["Agriculture & Rural Affairs","Transportation & Infrastructure"], chair:true},
-  {name:"Legislator Name 8",  district:8,  region:"Thumb",                  office:"Capitol 208", committees:["Education","Appropriations"], chair:true},
-  {name:"Legislator Name 9",  district:9,  region:"Detroit Metro",          office:"Capitol 209", committees:["Judiciary","Technology & Energy"], chair:true},
-  {name:"Legislator Name 10", district:10, region:"Detroit Metro",          office:"Capitol 210", committees:["Health & Human Services","Education"], chair:false},
-  {name:"Legislator Name 11", district:11, region:"Mid-Michigan",           office:"Capitol 211", committees:["Health & Human Services","Appropriations"], chair:true},
-  {name:"Legislator Name 12", district:12, region:"Northern Lower Peninsula",office:"Capitol 212", committees:["Natural Resources","Transportation & Infrastructure"], chair:false},
-  {name:"Legislator Name 13", district:13, region:"West Michigan",          office:"Capitol 213", committees:["Regulatory Reform","Technology & Energy"], chair:false},
-  {name:"Legislator Name 14", district:14, region:"Southwest Michigan",     office:"Capitol 214", committees:["Health & Human Services","Judiciary"], chair:false},
-  {name:"Legislator Name 15", district:15, region:"Upper Peninsula",        office:"Capitol 215", committees:["Agriculture & Rural Affairs","Education"], chair:false},
-  {name:"Legislator Name 16", district:16, region:"Southeast Michigan",     office:"Capitol 216", committees:["Technology & Energy","Health & Human Services"], chair:false}
+  {name:"Curtis VanderWall", standing:["JUD","GOV"], special:["RUL"]},
+  {name:"Legislator Name 2", standing:["JUD","GOV"], special:["APP"]},
+  {name:"Legislator Name 3", standing:["JUD","GOV"], special:[]},
+  {name:"Legislator Name 4", standing:["OVR","PSS"], special:["RUL"]},
+  {name:"Legislator Name 5", standing:["OVR","PSS"], special:[]},
+  {name:"Legislator Name 6", standing:["OVR","PSS"], special:[]},
+  {name:"Steve Frisbie",     standing:["JUD","OVR"], special:["APP"]},
+  {name:"Legislator Name 8", standing:["JUD","OVR"], special:["APP","RUL"]},
+  {name:"Legislator Name 9", standing:["JUD","OVR"], special:[]},
+  {name:"Jason Morgan",      standing:["GOV","PSS"], special:["APP"]},
+  {name:"Legislator Name 11",standing:["GOV","PSS"], special:["RUL"]},
+  {name:"Legislator Name 12",standing:["GOV","PSS"], special:[]},
+  {name:"Legislator Name 13",standing:["JUD","PSS"], special:["APP"]},
+  {name:"Legislator Name 14",standing:["JUD","PSS"], special:[]},
+  {name:"Legislator Name 15",standing:["GOV","OVR"], special:[]},
+  {name:"Legislator Name 16",standing:["GOV","OVR"], special:[]}
 ];
 
+const ALL = {...STANDING, ...SPECIAL};
 const slug = n => n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 const initials = n => n.replace(/^Legislator\s+/i,'').split(/\s+/).filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();
 const esc = s => s.replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -187,34 +191,47 @@ const esc = s => s.replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"'
 const grid = document.getElementById('grid');
 const q = document.getElementById('q');
 const sel = document.getElementById('committee');
-const sortSel = document.getElementById('sort');
 const countEl = document.getElementById('count');
 const emptyEl = document.getElementById('empty');
 
-const allCommittees = [...new Set(LEGISLATORS.flatMap(l=>l.committees))].sort();
-allCommittees.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o)});
-document.getElementById('stat-comm').textContent = allCommittees.length;
+/* committee filter */
+sel.insertAdjacentHTML('beforeend',
+  '<optgroup label="Standing committees">'+Object.entries(STANDING).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')+'</optgroup>'+
+  '<optgroup label="Special committees">'+Object.entries(SPECIAL).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')+'</optgroup>');
+
+/* sidebar committee list with live member counts */
+const members = k => LEGISLATORS.filter(l=>l.standing.includes(k)||l.special.includes(k)).length;
+document.getElementById('committee-list').innerHTML =
+  '<div class="sc-sub">Standing</div>'+
+  Object.entries(STANDING).map(([k,v])=>`<a class="sc-link" href="../committees/"><span>${v}</span><span class="n">${members(k)}</span></a>`).join('')+
+  '<div class="sc-sub">Special</div>'+
+  Object.entries(SPECIAL).map(([k,v])=>`<a class="sc-link" href="../committees/"><span>${v}</span><span class="n">${members(k)}</span></a>`).join('');
 
 function render(){
   const term = q.value.trim().toLowerCase();
   const comm = sel.value;
-  let list = LEGISLATORS.filter(l=>{
-    const hay = (l.name+' district '+l.district+' '+l.region).toLowerCase();
-    return (!term || hay.includes(term)) && (!comm || l.committees.includes(comm));
-  });
-  list.sort(sortSel.value==='name' ? (a,b)=>a.name.localeCompare(b.name) : (a,b)=>a.district-b.district);
+  const list = LEGISLATORS
+    .filter(l => (!term || l.name.toLowerCase().includes(term)) &&
+                 (!comm || l.standing.includes(comm) || l.special.includes(comm)))
+    .sort((a,b)=>a.name.localeCompare(b.name));
 
   grid.innerHTML = list.map(l=>`
     <article class="card">
       <div class="card-top">
         <div class="avatar" aria-hidden="true">${esc(initials(l.name))}</div>
-        <div><h3>${esc(l.name)}</h3><div class="role">Legislator &middot; District ${l.district}</div></div>
+        <div><h3>${esc(l.name)}</h3><div class="role">Legislator</div></div>
       </div>
       <div class="card-body">
-        <div class="meta"><span>District</span><span>${l.district}</span></div>
-        <div class="meta"><span>Region</span><span>${esc(l.region)}</span></div>
-        <div class="meta"><span>Office</span><span>${esc(l.office)}</span></div>
-        <div class="tags">${l.committees.map((c,i)=>`<span class="chip${l.chair&&i===0?' chair':''}">${esc(c)}${l.chair&&i===0?' &middot; Chair':''}</span>`).join('')}</div>
+        <div class="group">
+          <div class="group-label">Standing committees</div>
+          <div class="tags">${l.standing.map(k=>`<span class="chip">${esc(ALL[k])}</span>`).join('')}</div>
+        </div>
+        <div class="group">
+          <div class="group-label">Special committees</div>
+          ${l.special.length
+            ? `<div class="tags">${l.special.map(k=>`<span class="chip special">${esc(ALL[k])}</span>`).join('')}</div>`
+            : `<div class="none">None</div>`}
+        </div>
       </div>
       <div class="card-foot">
         <a href="./${slug(l.name)}/"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>Profile</a>
@@ -225,7 +242,7 @@ function render(){
   countEl.textContent = `Showing ${list.length} of ${LEGISLATORS.length} legislators`;
   emptyEl.style.display = list.length ? 'none' : 'block';
 }
-[q,sel,sortSel].forEach(el=>el.addEventListener('input',render));
+[q,sel].forEach(el=>el.addEventListener('input',render));
 render();
 </script>
 </body>
