@@ -31,25 +31,41 @@ a{color:inherit;text-decoration:none}
 .page-body{display:grid;grid-template-columns:1fr 300px;gap:2.5rem;align-items:start;padding:2.5rem 0}
 @media(max-width:900px){.page-body{grid-template-columns:1fr}}
 
+.section-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#9ca3af;margin-bottom:.75rem}
+
+/* Leadership */
+.leaders{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:#e5e7eb;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:2rem}
+.leader{background:#fff;padding:1rem 1.1rem}
+.leader .lt{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#b45309}
+.leader .ln{font-family:'Fraunces',Georgia,serif;font-size:17px;font-weight:600;color:#0b1f3a;line-height:1.25;margin-top:.15rem}
+.leader .ls{font-size:12px;color:#6b7280;margin-top:.15rem}
+
 .toolbar{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.1rem}
 .toolbar input,.toolbar select{padding:.65rem .9rem;font-size:14px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;color:#111827;outline:none;font-family:inherit}
 .toolbar input{flex:1;min-width:200px}
 .toolbar input:focus,.toolbar select:focus{border-color:#0b1f3a;box-shadow:0 0 0 3px rgba(11,31,58,.1)}
 .count{font-size:12.5px;color:#6b7280;margin-bottom:.9rem}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1rem}
 .card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .15s,transform .15s}
 .card:hover{box-shadow:0 8px 20px rgba(11,31,58,.1);transform:translateY(-2px)}
 .card-top{display:flex;align-items:center;gap:.9rem;padding:1.1rem 1.1rem .8rem}
 .avatar{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#0b1f3a,#15294f);color:#fbbf24;font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:19px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid #fbbf24}
 .card h3{font-size:15px;font-weight:600;color:#0b1f3a;line-height:1.25}
 .card .role{font-size:12px;color:#6b7280}
+.card .role.lead{color:#b45309;font-weight:600}
 .card-body{padding:0 1.1rem 1rem;flex:1}
-.group{border-top:1px solid #f3f4f6;padding-top:.55rem;margin-top:.55rem}
-.group-label{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#9ca3af;margin-bottom:.3rem}
-.tags{display:flex;flex-wrap:wrap;gap:.35rem}
-.chip{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;letter-spacing:.02em;text-transform:uppercase;background:rgba(11,31,58,.08);color:#0b1f3a}
-.chip.special{background:#fef3c7;color:#92400e}
+.meta{display:flex;justify-content:space-between;font-size:12.5px;padding:.45rem 0;border-top:1px solid #f3f4f6}
+.meta span:first-child{color:#9ca3af}
+.meta span:last-child{color:#374151;font-weight:500;text-align:right}
+.group{border-top:1px solid #f3f4f6;padding-top:.55rem;margin-top:.1rem;margin-bottom:.55rem}
+.group-label{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#9ca3af;margin-bottom:.35rem}
+.clist{display:flex;flex-direction:column;gap:.3rem}
+.crow{display:flex;align-items:center;justify-content:space-between;gap:.5rem;font-size:12.5px;color:#0b1f3a;line-height:1.35}
+.crow a:hover{text-decoration:underline}
+.badge{font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:3px;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap}
+.badge.chair{background:#fef3c7;color:#92400e}
+.badge.vice{background:rgba(11,31,58,.08);color:#0b1f3a}
 .none{font-size:12.5px;color:#9ca3af}
 .card-foot{display:flex;border-top:1px solid #f3f4f6}
 .card-foot a{flex:1;text-align:center;padding:.6rem;font-size:12.5px;font-weight:500;color:#0b1f3a;display:flex;align-items:center;justify-content:center;gap:.35rem;transition:background .1s}
@@ -96,16 +112,24 @@ footer{background:#0b1f3a;padding:1.5rem 0}
     <div class="crumbs"><a href="../">Home</a> &nbsp;/&nbsp; Legislators</div>
     <div class="hero-eyebrow">1st Legislature</div>
     <h1>Legislators</h1>
-    <p class="hero-sub">The 16 members of the Michigan Legislature and their committee assignments. Search by name or filter by committee.</p>
+    <p class="hero-sub">The 16 members of the Michigan Legislature, their leadership roles, and their committee assignments. Search by name or filter by committee.</p>
   </div>
 </section>
 
 <div class="wrap">
 <div class="page-body">
   <main>
+    <p class="section-label">Leadership &amp; officers</p>
+    <div class="leaders" id="leaders"></div>
+
+    <p class="section-label">All legislators</p>
     <div class="toolbar">
       <input id="q" type="search" placeholder="Search by name&hellip;" aria-label="Search legislators"/>
       <select id="committee" aria-label="Filter by committee"><option value="">All committees</option></select>
+      <select id="sort" aria-label="Sort">
+        <option value="name">Sort by name</option>
+        <option value="start">Sort by start date</option>
+      </select>
     </div>
     <p class="count" id="count"></p>
     <div class="grid" id="grid"></div>
@@ -130,7 +154,7 @@ footer{background:#0b1f3a;padding:1.5rem 0}
 
     <div class="sidebar-card">
       <div class="sidebar-card-head"><h3>Related</h3></div>
-      <a class="sc-link" href="../committees/">Committee meetings <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+      <a class="sc-link" href="https://migovt.org/legislature/committees/">Committee meetings <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
       <a class="sc-link" href="../bills/">Recent bill activity <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
       <a class="sc-link" href="../journals/">Journals <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
     </div>
@@ -151,61 +175,88 @@ footer{background:#0b1f3a;padding:1.5rem 0}
    EDIT THESE.
    Standing committees: every legislator sits on exactly two (8 members each).
    Special committees: voluntary, at least 3 members each.
-   Use the short keys below in each legislator's lists.
+   chair / vice must be members of that committee (use legislator names).
+   Committee links go to https://migovt.org/legislature/committees/#<slug of full name>
    ============================================================ */
-const STANDING = {
-  JUD: "Committee on Judiciary",
-  GOV: "Committee on Government Operations",
-  OVR: "Committee on Oversight and Ethics",
-  PSS: "Committee on Public Safety and State Security"
+const COMMITTEES = {
+  JUD: {name:"Committee on Judiciary",                           type:"standing", chair:"Priya Raman",       vice:"Rosalind Park"},
+  GOV: {name:"Committee on Government Operations",               type:"standing", chair:"Jason Morgan",      vice:"Fiona McAllister"},
+  OVR: {name:"Committee on Oversight and Ethics",                type:"standing", chair:"Naomi Whitfield",   vice:"Hank Abernathy"},
+  PSS: {name:"Committee on Public Safety and State Security",    type:"standing", chair:"Terrence Boyd",     vice:"Tamika Brooks"},
+  APP: {name:"Special Committee on Appropriations",              type:"special",  chair:"Steve Frisbie",     vice:"Samir Haddad"},
+  RUL: {name:"Special Committee on Administrative Rules",        type:"special",  chair:"Curtis VanderWall", vice:"Dolores Reyes"}
 };
-const SPECIAL = {
-  APP: "Special Committee on Appropriations",
-  RUL: "Special Committee on Administrative Rules"
+
+const CLERK = {name:"Margaret Ellison", start:"2026-01-05"};
+
+/* leadership: Speaker, Deputy Speaker, Speaker Pro Tempore */
+const LEADERSHIP = {
+  "Marcus Delaney": "Speaker of the Legislature",
+  "Elena Kowalski": "Deputy Speaker",
+  "Walter Nowak":   "Speaker Pro Tempore"
 };
 
 const LEGISLATORS = [
-  {name:"Curtis VanderWall", standing:["JUD","GOV"], special:["RUL"]},
-  {name:"Legislator Name 2", standing:["JUD","GOV"], special:["APP"]},
-  {name:"Legislator Name 3", standing:["JUD","GOV"], special:[]},
-  {name:"Legislator Name 4", standing:["OVR","PSS"], special:["RUL"]},
-  {name:"Legislator Name 5", standing:["OVR","PSS"], special:[]},
-  {name:"Legislator Name 6", standing:["OVR","PSS"], special:[]},
-  {name:"Steve Frisbie",     standing:["JUD","OVR"], special:["APP"]},
-  {name:"Legislator Name 8", standing:["JUD","OVR"], special:["APP","RUL"]},
-  {name:"Legislator Name 9", standing:["JUD","OVR"], special:[]},
-  {name:"Jason Morgan",      standing:["GOV","PSS"], special:["APP"]},
-  {name:"Legislator Name 11",standing:["GOV","PSS"], special:["RUL"]},
-  {name:"Legislator Name 12",standing:["GOV","PSS"], special:[]},
-  {name:"Legislator Name 13",standing:["JUD","PSS"], special:["APP"]},
-  {name:"Legislator Name 14",standing:["JUD","PSS"], special:[]},
-  {name:"Legislator Name 15",standing:["GOV","OVR"], special:[]},
-  {name:"Legislator Name 16",standing:["GOV","OVR"], special:[]}
+  {name:"Curtis VanderWall", start:"2026-01-05", standing:["JUD","GOV"], special:["RUL"]},
+  {name:"Marcus Delaney",    start:"2026-01-05", standing:["JUD","GOV"], special:["APP"]},
+  {name:"Priya Raman",       start:"2026-01-05", standing:["JUD","GOV"], special:[]},
+  {name:"Elena Kowalski",    start:"2026-01-05", standing:["OVR","PSS"], special:["RUL"]},
+  {name:"Terrence Boyd",     start:"2026-01-05", standing:["OVR","PSS"], special:[]},
+  {name:"Naomi Whitfield",   start:"2026-02-17", standing:["OVR","PSS"], special:[]},
+  {name:"Steve Frisbie",     start:"2026-01-05", standing:["JUD","OVR"], special:["APP"]},
+  {name:"Dolores Reyes",     start:"2026-01-05", standing:["JUD","OVR"], special:["APP","RUL"]},
+  {name:"Hank Abernathy",    start:"2026-01-05", standing:["JUD","OVR"], special:[]},
+  {name:"Jason Morgan",      start:"2026-01-05", standing:["GOV","PSS"], special:["APP"]},
+  {name:"Tamika Brooks",     start:"2026-03-09", standing:["GOV","PSS"], special:["RUL"]},
+  {name:"Gregory Lindqvist", start:"2026-01-05", standing:["GOV","PSS"], special:[]},
+  {name:"Samir Haddad",      start:"2026-01-05", standing:["JUD","PSS"], special:["APP"]},
+  {name:"Rosalind Park",     start:"2026-01-05", standing:["JUD","PSS"], special:[]},
+  {name:"Walter Nowak",      start:"2026-01-05", standing:["GOV","OVR"], special:[]},
+  {name:"Fiona McAllister",  start:"2026-02-17", standing:["GOV","OVR"], special:[]}
 ];
 
-const ALL = {...STANDING, ...SPECIAL};
 const slug = n => n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-const initials = n => n.replace(/^Legislator\s+/i,'').split(/\s+/).filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+const initials = n => n.split(/\s+/).filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();
 const esc = s => s.replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmtDate = iso => new Date(iso+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+const cUrl = k => 'https://migovt.org/legislature/committees/#'+slug(COMMITTEES[k].name);
+const roleOf = (l,k) => COMMITTEES[k].chair===l.name ? 'chair' : COMMITTEES[k].vice===l.name ? 'vice' : '';
 
 const grid = document.getElementById('grid');
 const q = document.getElementById('q');
 const sel = document.getElementById('committee');
+const sortSel = document.getElementById('sort');
 const countEl = document.getElementById('count');
 const emptyEl = document.getElementById('empty');
 
-/* committee filter */
-sel.insertAdjacentHTML('beforeend',
-  '<optgroup label="Standing committees">'+Object.entries(STANDING).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')+'</optgroup>'+
-  '<optgroup label="Special committees">'+Object.entries(SPECIAL).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')+'</optgroup>');
+/* leadership strip */
+const leaderCards = Object.entries(LEADERSHIP).map(([n,t])=>{
+  const l = LEGISLATORS.find(x=>x.name===n);
+  return `<div class="leader"><div class="lt">${esc(t)}</div><div class="ln">${esc(n)}</div><div class="ls">Serving since ${fmtDate(l.start)}</div></div>`;
+});
+leaderCards.push(`<div class="leader"><div class="lt">Clerk of the Legislature</div><div class="ln">${esc(CLERK.name)}</div><div class="ls">Serving since ${fmtDate(CLERK.start)} &middot; not a legislator</div></div>`);
+document.getElementById('leaders').innerHTML = leaderCards.join('');
 
-/* sidebar committee list with live member counts */
+/* committee filter + sidebar */
+const byType = t => Object.entries(COMMITTEES).filter(([,c])=>c.type===t);
+sel.insertAdjacentHTML('beforeend',
+  '<optgroup label="Standing committees">'+byType('standing').map(([k,c])=>`<option value="${k}">${c.name}</option>`).join('')+'</optgroup>'+
+  '<optgroup label="Special committees">'+byType('special').map(([k,c])=>`<option value="${k}">${c.name}</option>`).join('')+'</optgroup>');
+
 const members = k => LEGISLATORS.filter(l=>l.standing.includes(k)||l.special.includes(k)).length;
+const sideRow = ([k,c]) => `<a class="sc-link" href="${cUrl(k)}"><span>${c.name}</span><span class="n">${members(k)}</span></a>`;
 document.getElementById('committee-list').innerHTML =
-  '<div class="sc-sub">Standing</div>'+
-  Object.entries(STANDING).map(([k,v])=>`<a class="sc-link" href="../committees/"><span>${v}</span><span class="n">${members(k)}</span></a>`).join('')+
-  '<div class="sc-sub">Special</div>'+
-  Object.entries(SPECIAL).map(([k,v])=>`<a class="sc-link" href="../committees/"><span>${v}</span><span class="n">${members(k)}</span></a>`).join('');
+  '<div class="sc-sub">Standing</div>'+byType('standing').map(sideRow).join('')+
+  '<div class="sc-sub">Special</div>'+byType('special').map(sideRow).join('');
+
+function committeeRows(l, keys){
+  if(!keys.length) return '<div class="none">None</div>';
+  return '<div class="clist">'+keys.map(k=>{
+    const r = roleOf(l,k);
+    const b = r==='chair' ? '<span class="badge chair">Chair</span>' : r==='vice' ? '<span class="badge vice">Vice Chair</span>' : '';
+    return `<div class="crow"><a href="${cUrl(k)}">${esc(COMMITTEES[k].name)}</a>${b}</div>`;
+  }).join('')+'</div>';
+}
 
 function render(){
   const term = q.value.trim().toLowerCase();
@@ -213,36 +264,39 @@ function render(){
   const list = LEGISLATORS
     .filter(l => (!term || l.name.toLowerCase().includes(term)) &&
                  (!comm || l.standing.includes(comm) || l.special.includes(comm)))
-    .sort((a,b)=>a.name.localeCompare(b.name));
+    .sort(sortSel.value==='start'
+      ? (a,b)=>a.start.localeCompare(b.start)||a.name.localeCompare(b.name)
+      : (a,b)=>a.name.localeCompare(b.name));
 
-  grid.innerHTML = list.map(l=>`
-    <article class="card">
+  grid.innerHTML = list.map(l=>{
+    const lead = LEADERSHIP[l.name];
+    return `
+    <article class="card" id="${slug(l.name)}">
       <div class="card-top">
         <div class="avatar" aria-hidden="true">${esc(initials(l.name))}</div>
-        <div><h3>${esc(l.name)}</h3><div class="role">Legislator</div></div>
+        <div><h3>${esc(l.name)}</h3><div class="role${lead?' lead':''}">${esc(lead||'Legislator')}</div></div>
       </div>
       <div class="card-body">
+        <div class="meta"><span>Serving since</span><span>${fmtDate(l.start)}</span></div>
         <div class="group">
           <div class="group-label">Standing committees</div>
-          <div class="tags">${l.standing.map(k=>`<span class="chip">${esc(ALL[k])}</span>`).join('')}</div>
+          ${committeeRows(l,l.standing)}
         </div>
-        <div class="group">
+        <div class="group" style="margin-bottom:0">
           <div class="group-label">Special committees</div>
-          ${l.special.length
-            ? `<div class="tags">${l.special.map(k=>`<span class="chip special">${esc(ALL[k])}</span>`).join('')}</div>`
-            : `<div class="none">None</div>`}
+          ${committeeRows(l,l.special)}
         </div>
       </div>
       <div class="card-foot">
         <a href="./${slug(l.name)}/"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>Profile</a>
         <a href="../bills/?sponsor=${encodeURIComponent(slug(l.name))}"><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg>Bills</a>
       </div>
-    </article>`).join('');
+    </article>`;}).join('');
 
   countEl.textContent = `Showing ${list.length} of ${LEGISLATORS.length} legislators`;
   emptyEl.style.display = list.length ? 'none' : 'block';
 }
-[q,sel].forEach(el=>el.addEventListener('input',render));
+[q,sel,sortSel].forEach(el=>el.addEventListener('input',render));
 render();
 </script>
 </body>
