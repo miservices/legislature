@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Committees | Michigan Legislature</title>
+<link rel="icon" type="image/png" href="/legislature/legislature.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/header.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#111827;background:#f3f4f6;font-size:15px;line-height:1.6}
+a{color:inherit;text-decoration:none}
+.icon{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-0.125em;flex-shrink:0;display:inline-block}
+.wrap{max-width:1240px;margin:0 auto;padding:0 2.5rem}
+@media(max-width:720px){.wrap{padding:0 1.25rem}}
+
+.hero{position:relative;background:linear-gradient(155deg,#0b1f3a 0%,#0e2c52 55%,#123a63 100%);overflow:hidden;padding:2.6rem 0 2.4rem}
+.hero::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.06) 1px,transparent 0);background-size:22px 22px;opacity:.6;pointer-events:none}
+.hero .wrap{position:relative}
+.crumbs{font-size:12.5px;color:rgba(255,255,255,.6);margin-bottom:.9rem}
+.crumbs a{border-bottom:1px solid rgba(255,255,255,.25)}
+.crumbs a:hover{color:#fff}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#fbbf24;margin-bottom:.8rem}
+.hero-eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:#fbbf24;box-shadow:0 0 0 4px rgba(251,191,36,.18)}
+.hero h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:clamp(28px,3.4vw,38px);line-height:1.12;color:#fff;letter-spacing:-.01em;margin-bottom:.7rem}
+.hero-sub{font-size:14.5px;color:rgba(255,255,255,.72);max-width:62ch}
+
+.page-body{display:grid;grid-template-columns:1fr 300px;gap:2.5rem;align-items:start;padding:2.5rem 0}
+@media(max-width:900px){.page-body{grid-template-columns:1fr}}
+
+.section-head{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 .85rem}
+.section-head h2{font-family:'Fraunces',Georgia,serif;font-size:21px;font-weight:600;color:#0b1f3a}
+.section-head span{font-size:12.5px;color:#6b7280}
+.section-gap{margin-top:2.4rem}
+
+.committee{background:#fff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:1.25rem;scroll-margin-top:1.25rem;transition:box-shadow .2s,border-color .2s}
+.committee:target{border-color:#fbbf24;box-shadow:0 0 0 3px rgba(251,191,36,.3)}
+.c-head{padding:1.15rem 1.35rem;border-bottom:1px solid #f3f4f6;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.c-head h3{font-family:'Fraunces',Georgia,serif;font-size:19px;font-weight:600;color:#0b1f3a;line-height:1.25}
+.chip{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;letter-spacing:.02em;text-transform:uppercase;background:rgba(11,31,58,.08);color:#0b1f3a;white-space:nowrap}
+.chip.special{background:#fef3c7;color:#92400e}
+.c-desc{padding:1rem 1.35rem 0;font-size:14px;color:#374151;max-width:75ch}
+.c-juris{padding:.6rem 1.35rem 1.1rem;font-size:13px;color:#6b7280}
+.c-juris b{color:#374151;font-weight:600}
+
+.officers{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#e5e7eb;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb}
+@media(max-width:560px){.officers{grid-template-columns:1fr}}
+.officer{background:#fafafa;padding:.8rem 1.35rem}
+.officer .ot{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#b45309}
+.officer .on{font-size:15px;font-weight:600;color:#0b1f3a}
+.officer .on a:hover{text-decoration:underline}
+
+.members{padding:1rem 1.35rem 1.2rem}
+.members-label{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#9ca3af;margin-bottom:.55rem}
+.mlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.3rem 1.25rem;list-style:none}
+.mlist li{font-size:13.5px;display:flex;align-items:center;gap:.45rem}
+.mlist a{color:#0b1f3a}
+.mlist a:hover{text-decoration:underline}
+.badge{font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:3px;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap}
+.badge.chair{background:#fef3c7;color:#92400e}
+.badge.vice{background:rgba(11,31,58,.08);color:#0b1f3a}
+
+.sidebar-card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:1.25rem}
+.sidebar-card-head{padding:.65rem 1.1rem;background:#0b1f3a}
+.sidebar-card-head h3{font-size:13px;font-weight:600;color:#fff;letter-spacing:.02em}
+.sc-link{display:flex;align-items:center;justify-content:space-between;padding:.6rem 1.1rem;font-size:13px;color:#374151;transition:background .1s;border-bottom:1px solid #f3f4f6}
+.sc-link:last-child{border-bottom:none}
+.sc-link:hover{background:rgba(11,31,58,.05);color:#0b1f3a}
+.sc-link .icon{font-size:13px;color:#9ca3af}
+.sc-link .n{font-size:12px;color:#9ca3af;font-weight:500;margin-left:.5rem;white-space:nowrap}
+.sc-sub{padding:.5rem 1.1rem;font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#9ca3af;background:#fafafa;border-bottom:1px solid #f3f4f6}
+.rules{padding:1rem 1.1rem;font-size:13px;color:#374151;line-height:1.55}
+.rules ul{padding-left:1.1rem}
+.rules li{margin-bottom:.45rem}
+.rules li:last-child{margin-bottom:0}
+.sticky{position:sticky;top:1rem}
+@media(max-width:900px){.sticky{position:static}}
+
+footer{background:#0b1f3a;padding:1.5rem 0}
+.footer-copy{font-size:11.5px;color:rgba(255,255,255,.42);line-height:1.55;width:100%;margin:0;text-align:justify}
+</style>
+</head>
+<body>
+
+<script>window.ACTIVE_NAV = "committees";</script>
+<div id="site-header"></div>
+<script src="../shared/header.js"></script>
+
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <defs>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+  </defs>
+</svg>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../">Home</a> &nbsp;/&nbsp; Committees</div>
+    <div class="hero-eyebrow">1st Legislature</div>
+    <h1>Committees</h1>
+    <p class="hero-sub">The Legislature works through four standing committees and two special committees. Bills are referred to committee before they reach the floor.</p>
+  </div>
+</section>
+
+<div class="wrap">
+<div class="page-body">
+  <main>
+    <div class="section-head"><h2>Standing committees</h2><span>8 members each</span></div>
+    <div id="standing"></div>
+
+    <div class="section-head section-gap"><h2>Special committees</h2><span>Voluntary membership</span></div>
+    <div id="special"></div>
+  </main>
+
+  <aside aria-label="Sidebar">
+    <div class="sticky">
+      <div class="sidebar-card">
+        <div class="sidebar-card-head"><h3>Jump to committee</h3></div>
+        <div id="jump"></div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-card-head"><h3>How assignments work</h3></div>
+        <div class="rules">
+          <ul>
+            <li>The Speaker proposes a committee roster at the start of each term, and the Legislature approves it by majority vote.</li>
+            <li>Every legislator serves on exactly two standing committees.</li>
+            <li>Special committees are voluntary, need at least three members, and do not count toward the two standing seats.</li>
+            <li>A legislator may be removed from a committee only by the Speaker with the Legislature's approval.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-card-head"><h3>Related</h3></div>
+        <a class="sc-link" href="../legislators/">Legislators <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+        <a class="sc-link" href="../bills/">Recent bill activity <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+        <a class="sc-link" href="../journals/">Journals <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+      </div>
+    </div>
+  </aside>
+</div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p class="footer-copy">
+      This website is a free service of the Legislative Service Bureau in cooperation with the Michigan Legislature and Library of Michigan. This site is intended to provide accurate and timely legislative information to the citizens of the State of Michigan and other interested parties. Pursuant to Public Act 6, the Revised Statutes of 1846, the information codified under the Michigan Compiled Laws (MCL), Michigan Administrative Code (MAC), public acts (PA), executive orders, and executive reorganization orders constitutes the substance of Michigan law and is legally binding and considered the official record of state law, except in rare and narrowly defined circumstances recognized under applicable law. This information is subject to revision. If you believe this information is inaccurate, out-of-date, or incomplete, please contact us. This site is a simulated legislative interface and does not represent any real government body or authority.
+    </p>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   EDIT THESE. Keep in sync with the legislators page.
+   Each committee's id on this page = slug of its full name, e.g.
+   #committee-on-judiciary  (legislators page links to these).
+   ============================================================ */
+const COMMITTEES = {
+  JUD: {name:"Committee on Judiciary", type:"standing", chair:"Priya Raman", vice:"Rosalind Park",
+    desc:"Reviews legislation affecting the courts, civil and criminal law, and the administration of justice.",
+    juris:"Courts, criminal and civil procedure, judicial administration, and constitutional questions."},
+  GOV: {name:"Committee on Government Operations", type:"standing", chair:"Jason Morgan", vice:"Fiona McAllister",
+    desc:"Reviews legislation on how state government is organized, staffed, and run.",
+    juris:"State agencies, executive reorganization, public employment, procurement, and elections administration."},
+  OVR: {name:"Committee on Oversight and Ethics", type:"standing", chair:"Naomi Whitfield", vice:"Hank Abernathy",
+    desc:"Examines the conduct of public officials and the performance of state programs, and reviews ethics matters.",
+    juris:"Ethics and conflicts of interest, investigations, transparency and open records, and program audits."},
+  PSS: {name:"Committee on Public Safety and State Security", type:"standing", chair:"Terrence Boyd", vice:"Tamika Brooks",
+    desc:"Reviews legislation on policing, emergency response, corrections, and the security of the state.",
+    juris:"Law enforcement, emergency management, corrections, homeland security, and critical infrastructure."},
+  APP: {name:"Special Committee on Appropriations", type:"special", chair:"Steve Frisbie", vice:"Samir Haddad",
+    desc:"Reviews proposals that spend or raise state money before they go to the floor.",
+    juris:"State budget, supplemental spending, and grant and fund creation."},
+  RUL: {name:"Special Committee on Administrative Rules", type:"special", chair:"Curtis VanderWall", vice:"Dolores Reyes",
+    desc:"Reviews rules issued by state agencies to make sure they follow the law the Legislature passed.",
+    juris:"Proposed and existing administrative rules and the Michigan Administrative Code."}
+};
+
+const LEGISLATORS = [
+  {name:"Curtis VanderWall", standing:["JUD","GOV"], special:["RUL"]},
+  {name:"Marcus Delaney",    standing:["JUD","GOV"], special:["APP"]},
+  {name:"Priya Raman",       standing:["JUD","GOV"], special:[]},
+  {name:"Elena Kowalski",    standing:["OVR","PSS"], special:["RUL"]},
+  {name:"Terrence Boyd",     standing:["OVR","PSS"], special:[]},
+  {name:"Naomi Whitfield",   standing:["OVR","PSS"], special:[]},
+  {name:"Steve Frisbie",     standing:["JUD","OVR"], special:["APP"]},
+  {name:"Dolores Reyes",     standing:["JUD","OVR"], special:["APP","RUL"]},
+  {name:"Hank Abernathy",    standing:["JUD","OVR"], special:[]},
+  {name:"Jason Morgan",      standing:["GOV","PSS"], special:["APP"]},
+  {name:"Tamika Brooks",     standing:["GOV","PSS"], special:["RUL"]},
+  {name:"Gregory Lindqvist", standing:["GOV","PSS"], special:[]},
+  {name:"Samir Haddad",      standing:["JUD","PSS"], special:["APP"]},
+  {name:"Rosalind Park",     standing:["JUD","PSS"], special:[]},
+  {name:"Walter Nowak",      standing:["GOV","OVR"], special:[]},
+  {name:"Fiona McAllister",  standing:["GOV","OVR"], special:[]}
+];
+
+const slug = n => n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const esc = s => s.replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const person = n => `<a href="../legislators/#${slug(n)}">${esc(n)}</a>`;
+const membersOf = k => LEGISLATORS.filter(l=>l.standing.includes(k)||l.special.includes(k)).map(l=>l.name).sort((a,b)=>a.localeCompare(b));
+
+function render(k){
+  const c = COMMITTEES[k];
+  const ms = membersOf(k);
+  const label = c.type==='standing' ? 'Standing' : 'Special';
+  return `
+  <section class="committee" id="${slug(c.name)}">
+    <div class="c-head">
+      <h3>${esc(c.name)}</h3>
+      <span class="chip${c.type==='special'?' special':''}">${label} &middot; ${ms.length} members</span>
+    </div>
+    <p class="c-desc">${esc(c.desc)}</p>
+    <p class="c-juris"><b>Jurisdiction:</b> ${esc(c.juris)}</p>
+    <div class="officers">
+      <div class="officer"><div class="ot">Chair</div><div class="on">${person(c.chair)}</div></div>
+      <div class="officer"><div class="ot">Vice Chair</div><div class="on">${person(c.vice)}</div></div>
+    </div>
+    <div class="members">
+      <div class="members-label">Members</div>
+      <ul class="mlist">${ms.map(n=>{
+        const b = n===c.chair ? '<span class="badge chair">Chair</span>' : n===c.vice ? '<span class="badge vice">Vice Chair</span>' : '';
+        return `<li>${person(n)}${b}</li>`;
+      }).join('')}</ul>
+    </div>
+  </section>`;
+}
+
+const keys = t => Object.keys(COMMITTEES).filter(k=>COMMITTEES[k].type===t);
+document.getElementById('standing').innerHTML = keys('standing').map(render).join('');
+document.getElementById('special').innerHTML  = keys('special').map(render).join('');
+
+const jumpRow = k => `<a class="sc-link" href="#${slug(COMMITTEES[k].name)}"><span>${COMMITTEES[k].name}</span><span class="n">${membersOf(k).length}</span></a>`;
+document.getElementById('jump').innerHTML =
+  '<div class="sc-sub">Standing</div>'+keys('standing').map(jumpRow).join('')+
+  '<div class="sc-sub">Special</div>'+keys('special').map(jumpRow).join('');
+</script>
+</body>
+</html>
