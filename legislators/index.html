@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Legislators | Michigan Legislature</title>
+<link rel="icon" type="image/png" href="/legislature/legislature.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/header.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#111827;background:#f3f4f6;font-size:15px;line-height:1.6}
+a{color:inherit;text-decoration:none}
+.icon{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-0.125em;flex-shrink:0;display:inline-block}
+.wrap{max-width:1240px;margin:0 auto;padding:0 2.5rem}
+@media(max-width:720px){.wrap{padding:0 1.25rem}}
+
+/* HERO */
+.hero{position:relative;background:linear-gradient(155deg,#0b1f3a 0%,#0e2c52 55%,#123a63 100%);overflow:hidden;padding:2.6rem 0 2.4rem}
+.hero::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.06) 1px,transparent 0);background-size:22px 22px;opacity:.6;pointer-events:none}
+.hero .wrap{position:relative}
+.crumbs{font-size:12.5px;color:rgba(255,255,255,.6);margin-bottom:.9rem}
+.crumbs a{border-bottom:1px solid rgba(255,255,255,.25)}
+.crumbs a:hover{color:#fff}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#fbbf24;margin-bottom:.8rem}
+.hero-eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:#fbbf24;box-shadow:0 0 0 4px rgba(251,191,36,.18)}
+.hero h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:clamp(28px,3.4vw,38px);line-height:1.12;color:#fff;letter-spacing:-.01em;margin-bottom:.7rem}
+.hero-sub{font-size:14.5px;color:rgba(255,255,255,.72);max-width:60ch}
+
+/* BODY */
+.page-body{display:grid;grid-template-columns:1fr 300px;gap:2.5rem;align-items:start;padding:2.5rem 0}
+@media(max-width:900px){.page-body{grid-template-columns:1fr}}
+
+.toolbar{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.1rem}
+.toolbar input,.toolbar select{padding:.65rem .9rem;font-size:14px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;color:#111827;outline:none;font-family:inherit}
+.toolbar input{flex:1;min-width:200px}
+.toolbar input:focus,.toolbar select:focus{border-color:#0b1f3a;box-shadow:0 0 0 3px rgba(11,31,58,.1)}
+.count{font-size:12.5px;color:#6b7280;margin-bottom:.9rem}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1rem}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .15s,transform .15s}
+.card:hover{box-shadow:0 8px 20px rgba(11,31,58,.1);transform:translateY(-2px)}
+.card-top{display:flex;align-items:center;gap:.9rem;padding:1.1rem 1.1rem .8rem}
+.avatar{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#0b1f3a,#15294f);color:#fbbf24;font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:19px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid #fbbf24}
+.card h3{font-size:15px;font-weight:600;color:#0b1f3a;line-height:1.25}
+.card .role{font-size:12px;color:#6b7280}
+.card-body{padding:0 1.1rem 1rem;flex:1}
+.meta{display:flex;justify-content:space-between;font-size:12.5px;padding:.45rem 0;border-top:1px solid #f3f4f6}
+.meta span:first-child{color:#9ca3af}
+.meta span:last-child{color:#374151;font-weight:500;text-align:right}
+.tags{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.55rem}
+.chip{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;letter-spacing:.02em;text-transform:uppercase;background:rgba(11,31,58,.08);color:#0b1f3a}
+.chip.chair{background:#fef3c7;color:#92400e}
+.card-foot{display:flex;border-top:1px solid #f3f4f6}
+.card-foot a{flex:1;text-align:center;padding:.6rem;font-size:12.5px;font-weight:500;color:#0b1f3a;display:flex;align-items:center;justify-content:center;gap:.35rem;transition:background .1s}
+.card-foot a+a{border-left:1px solid #f3f4f6}
+.card-foot a:hover{background:rgba(11,31,58,.05)}
+.empty{display:none;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:2rem;text-align:center;color:#6b7280}
+
+/* SIDEBAR */
+.sidebar-card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:1.25rem}
+.sidebar-card-head{padding:.65rem 1.1rem;background:#0b1f3a}
+.sidebar-card-head h3{font-size:13px;font-weight:600;color:#fff;letter-spacing:.02em}
+.sc-link{display:flex;align-items:center;justify-content:space-between;padding:.6rem 1.1rem;font-size:13px;color:#374151;transition:background .1s;border-bottom:1px solid #f3f4f6}
+.sc-link:last-child{border-bottom:none}
+.sc-link:hover{background:rgba(11,31,58,.05);color:#0b1f3a}
+.sc-link .icon{font-size:13px;color:#9ca3af}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr}
+.stat-box{padding:.9rem 1.1rem;text-align:center;border-right:1px solid #f3f4f6;border-bottom:1px solid #f3f4f6}
+.stat-box:nth-child(2n){border-right:none}
+.stat-box:nth-last-child(-n+2){border-bottom:none}
+.stat-box .n{font-family:'Fraunces',Georgia,serif;font-size:22px;font-weight:600;color:#0b1f3a;line-height:1}
+.stat-box .l{font-size:11px;color:#9ca3af;margin-top:3px}
+.spotlight{background:linear-gradient(135deg,#0b1f3a,#15294f);border-radius:8px;padding:1.2rem 1.1rem;margin-bottom:1.25rem;color:#fff}
+.spotlight h3{font-size:13px;font-weight:600;letter-spacing:.02em;margin-bottom:.5rem;color:#fbbf24;text-transform:uppercase}
+.spotlight p{font-size:13px;line-height:1.5;color:rgba(255,255,255,.85)}
+
+footer{background:#0b1f3a;padding:1.5rem 0}
+.footer-copy{font-size:11.5px;color:rgba(255,255,255,.42);line-height:1.55;width:100%;margin:0;text-align:justify}
+</style>
+</head>
+<body>
+
+<script>window.ACTIVE_NAV = "legislators";</script>
+<div id="site-header"></div>
+<script src="../shared/header.js"></script>
+
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <defs>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/></symbol>
+  </defs>
+</svg>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../">Home</a> &nbsp;/&nbsp; Legislators</div>
+    <div class="hero-eyebrow">1st Legislature &middot; Unicameral</div>
+    <h1>Michigan Legislators</h1>
+    <p class="hero-sub">Michigan's Legislature is a single chamber. All 16 legislators sit together, debate together, and vote together on every bill. Find yours by name, district, or committee.</p>
+  </div>
+</section>
+
+<div class="wrap">
+<div class="page-body">
+  <main>
+    <div class="toolbar">
+      <input id="q" type="search" placeholder="Search by name, district, or region&hellip;" aria-label="Search legislators"/>
+      <select id="committee" aria-label="Filter by committee"><option value="">All committees</option></select>
+      <select id="sort" aria-label="Sort">
+        <option value="district">Sort by district</option>
+        <option value="name">Sort by name</option>
+      </select>
+    </div>
+    <p class="count" id="count"></p>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty">No legislators match your search.</div>
+  </main>
+
+  <aside aria-label="Sidebar">
+    <div class="spotlight">
+      <h3>One chamber</h3>
+      <p>Unlike most states, Michigan has no separate upper and lower house. Every bill gets one floor vote, and every legislator votes on all of them.</p>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-card-head"><h3>Legislature at a glance</h3></div>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="n">16</div><div class="l">Legislators</div></div>
+        <div class="stat-box"><div class="n">1</div><div class="l">Chamber</div></div>
+        <div class="stat-box"><div class="n" id="stat-comm">0</div><div class="l">Committees</div></div>
+        <div class="stat-box"><div class="n">1st</div><div class="l">Legislature</div></div>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-card-head"><h3>Related</h3></div>
+      <a class="sc-link" href="../committees/">Committee meetings <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+      <a class="sc-link" href="../bills/">Recent bill activity <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+      <a class="sc-link" href="../journals/">Journals <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+      <a class="sc-link" href="../calendar/">Floor calendar <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+    </div>
+  </aside>
+</div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p class="footer-copy">
+      This website is a free service of the Legislative Service Bureau in cooperation with the Michigan Legislature and Library of Michigan. This site is intended to provide accurate and timely legislative information to the citizens of the State of Michigan and other interested parties. Pursuant to Public Act 6, the Revised Statutes of 1846, the information codified under the Michigan Compiled Laws (MCL), Michigan Administrative Code (MAC), public acts (PA), executive orders, and executive reorganization orders constitutes the substance of Michigan law and is legally binding and considered the official record of state law, except in rare and narrowly defined circumstances recognized under applicable law. This information is subject to revision. If you believe this information is inaccurate, out-of-date, or incomplete, please contact us. This site is a simulated legislative interface and does not represent any real government body or authority.
+    </p>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   EDIT THIS LIST. One entry per legislator (16 total).
+   chair: true marks them as chair of their FIRST listed committee.
+   slug is used for the profile link: ./<slug>/
+   ============================================================ */
+const LEGISLATORS = [
+  {name:"Jason Morgan",       district:1,  region:"Mid-Michigan",           office:"Capitol 201", committees:["Transportation & Infrastructure","Appropriations"], chair:true},
+  {name:"Curtis VanderWall",  district:2,  region:"West Michigan",          office:"Capitol 202", committees:["Regulatory Reform","Judiciary"], chair:true},
+  {name:"Steve Frisbie",      district:3,  region:"Northern Lower Peninsula",office:"Capitol 203", committees:["Agriculture & Rural Affairs","Natural Resources"], chair:false},
+  {name:"Legislator Name 4",  district:4,  region:"Upper Peninsula",        office:"Capitol 204", committees:["Natural Resources","Appropriations"], chair:true},
+  {name:"Legislator Name 5",  district:5,  region:"Southeast Michigan",     office:"Capitol 205", committees:["Education","Judiciary"], chair:false},
+  {name:"Legislator Name 6",  district:6,  region:"Southeast Michigan",     office:"Capitol 206", committees:["Technology & Energy","Regulatory Reform"], chair:false},
+  {name:"Legislator Name 7",  district:7,  region:"Southwest Michigan",     office:"Capitol 207", committees:["Agriculture & Rural Affairs","Transportation & Infrastructure"], chair:true},
+  {name:"Legislator Name 8",  district:8,  region:"Thumb",                  office:"Capitol 208", committees:["Education","Appropriations"], chair:true},
+  {name:"Legislator Name 9",  district:9,  region:"Detroit Metro",          office:"Capitol 209", committees:["Judiciary","Technology & Energy"], chair:true},
+  {name:"Legislator Name 10", district:10, region:"Detroit Metro",          office:"Capitol 210", committees:["Health & Human Services","Education"], chair:false},
+  {name:"Legislator Name 11", district:11, region:"Mid-Michigan",           office:"Capitol 211", committees:["Health & Human Services","Appropriations"], chair:true},
+  {name:"Legislator Name 12", district:12, region:"Northern Lower Peninsula",office:"Capitol 212", committees:["Natural Resources","Transportation & Infrastructure"], chair:false},
+  {name:"Legislator Name 13", district:13, region:"West Michigan",          office:"Capitol 213", committees:["Regulatory Reform","Technology & Energy"], chair:false},
+  {name:"Legislator Name 14", district:14, region:"Southwest Michigan",     office:"Capitol 214", committees:["Health & Human Services","Judiciary"], chair:false},
+  {name:"Legislator Name 15", district:15, region:"Upper Peninsula",        office:"Capitol 215", committees:["Agriculture & Rural Affairs","Education"], chair:false},
+  {name:"Legislator Name 16", district:16, region:"Southeast Michigan",     office:"Capitol 216", committees:["Technology & Energy","Health & Human Services"], chair:false}
+];
+
+const slug = n => n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const initials = n => n.replace(/^Legislator\s+/i,'').split(/\s+/).filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+const esc = s => s.replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const grid = document.getElementById('grid');
+const q = document.getElementById('q');
+const sel = document.getElementById('committee');
+const sortSel = document.getElementById('sort');
+const countEl = document.getElementById('count');
+const emptyEl = document.getElementById('empty');
+
+const allCommittees = [...new Set(LEGISLATORS.flatMap(l=>l.committees))].sort();
+allCommittees.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o)});
+document.getElementById('stat-comm').textContent = allCommittees.length;
+
+function render(){
+  const term = q.value.trim().toLowerCase();
+  const comm = sel.value;
+  let list = LEGISLATORS.filter(l=>{
+    const hay = (l.name+' district '+l.district+' '+l.region).toLowerCase();
+    return (!term || hay.includes(term)) && (!comm || l.committees.includes(comm));
+  });
+  list.sort(sortSel.value==='name' ? (a,b)=>a.name.localeCompare(b.name) : (a,b)=>a.district-b.district);
+
+  grid.innerHTML = list.map(l=>`
+    <article class="card">
+      <div class="card-top">
+        <div class="avatar" aria-hidden="true">${esc(initials(l.name))}</div>
+        <div><h3>${esc(l.name)}</h3><div class="role">Legislator &middot; District ${l.district}</div></div>
+      </div>
+      <div class="card-body">
+        <div class="meta"><span>District</span><span>${l.district}</span></div>
+        <div class="meta"><span>Region</span><span>${esc(l.region)}</span></div>
+        <div class="meta"><span>Office</span><span>${esc(l.office)}</span></div>
+        <div class="tags">${l.committees.map((c,i)=>`<span class="chip${l.chair&&i===0?' chair':''}">${esc(c)}${l.chair&&i===0?' &middot; Chair':''}</span>`).join('')}</div>
+      </div>
+      <div class="card-foot">
+        <a href="./${slug(l.name)}/"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>Profile</a>
+        <a href="../bills/?sponsor=${encodeURIComponent(slug(l.name))}"><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg>Bills</a>
+      </div>
+    </article>`).join('');
+
+  countEl.textContent = `Showing ${list.length} of ${LEGISLATORS.length} legislators`;
+  emptyEl.style.display = list.length ? 'none' : 'block';
+}
+[q,sel,sortSel].forEach(el=>el.addEventListener('input',render));
+render();
+</script>
+</body>
+</html>
