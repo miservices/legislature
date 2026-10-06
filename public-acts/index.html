@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Public Acts | Michigan Legislature</title>
+<link rel="icon" type="image/png" href="/legislature/legislature.png">
+<link rel="stylesheet" href="../shared/header.css">
+<link rel="stylesheet" href="../shared/pages.css">
+</head>
+<body>
+<script>window.ACTIVE_NAV = "public-acts";</script>
+<div id="site-header"></div>
+<script src="../shared/header.js"></script>
+<div id="app"></div>
+<script type="module">
+  import { mountShell } from "../shared/shell.js";
+  import { startBrowser, docConfig } from "../shared/browser.js";
+  import { esc, asList } from "../shared/util.js";
+
+  mountShell({ eyebrow: "Laws", title: "Public Acts", sub: "Bills that have been signed into law, with their enrolled text and the sections of law they change." });
+
+  startBrowser(docConfig({
+    collection: "publicActs", back: "Public Acts", noun: "public act",
+    placeholder: "Search by public act number, title, or bill…",
+    idOf: r => String(r.number ?? r._id),
+    sort: (a, b) => Number(b.number) - Number(a.number),
+    num: r => `Public Act ${r.number}${r.year ? " of " + r.year : ""}`,
+    name: r => r.title || "",
+    meta: r => r.billNumber ? `Bill No. ${r.billNumber}` : "",
+    searchKeys: ["billNumber", "year"],
+    docLabel: "Open the enrolled act",
+    fields: [
+      { label: "Signed", key: "signedDate", type: "date" },
+      { label: "Effective", key: "effectiveDate", type: "date" }
+    ],
+    filters: [
+      { label: "All years", get: r => r.year ? String(r.year) : "" },
+      { label: "All statuses", get: r => r.status }
+    ],
+    extra: r => {
+      const amends = asList(r.amends);
+      return (r.billNumber || amends.length) ? `<div class="section-head">Related</div><div class="rel">
+        ${r.billNumber ? `<div>Source bill: <a href="../bills/#${esc(r.billNumber)}">Bill No. ${esc(r.billNumber)}</a></div>` : ""}
+        ${amends.length ? `<div>Amends: ${amends.map(c => `<a href="../mcl/#${esc(c)}">MCL ${esc(c)}</a>`).join(", ")}</div>` : ""}
+      </div>` : "";
+    }
+  }));
+</script>
+</body>
+</html>

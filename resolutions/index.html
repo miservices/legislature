@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Bills | Michigan Legislature</title>
+<title>Resolutions | Michigan Legislature</title>
 <link rel="icon" type="image/png" href="/legislature/legislature.png">
 <link rel="stylesheet" href="../shared/header.css">
 <link rel="stylesheet" href="../shared/pages.css">
 </head>
 <body>
-<script>window.ACTIVE_NAV = "bills";</script>
+<script>window.ACTIVE_NAV = "resolutions";</script>
 <div id="site-header"></div>
 <script src="../shared/header.js"></script>
 <div id="app"></div>
@@ -17,8 +17,8 @@
   import { mountShell } from "../shared/shell.js";
   import { startBrowser } from "../shared/browser.js";
   import { billsConfig } from "../shared/bills-view.js";
-  mountShell({ eyebrow: "Legislation", title: "Bill Tracker", sub: "Search and track legislation introduced in the Michigan Legislature whenever and wherever you want." });
-  startBrowser(billsConfig("bill"));
+  mountShell({ eyebrow: "Legislation", title: "Resolutions", sub: "Search and track resolutions introduced in the Michigan Legislature." });
+  startBrowser(billsConfig("resolution"));
 </script>
 </body>
 </html>

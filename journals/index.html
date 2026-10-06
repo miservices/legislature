@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Journals | Michigan Legislature</title>
+<link rel="icon" type="image/png" href="/legislature/legislature.png">
+<link rel="stylesheet" href="../shared/header.css">
+<link rel="stylesheet" href="../shared/pages.css">
+</head>
+<body>
+<script>window.ACTIVE_NAV = "journals";</script>
+<div id="site-header"></div>
+<script src="../shared/header.js"></script>
+<div id="app"></div>
+<script type="module">
+  import { mountShell } from "../shared/shell.js";
+  import { startBrowser, docConfig } from "../shared/browser.js";
+  import { fmtDate } from "../shared/util.js";
+
+  mountShell({ eyebrow: "Official record", title: "Journals", sub: "The official record of each legislative session: motions, votes, and proceedings." });
+
+  startBrowser(docConfig({
+    collection: "journals", back: "Journals", noun: "journal",
+    placeholder: "Search journals by number, date, or keyword…",
+    idOf: r => String(r.number ?? r._id),
+    sort: (a, b) => String(b.date || "").localeCompare(String(a.date || "")) || Number(b.number) - Number(a.number),
+    num: r => `Journal No. ${r.number}`,
+    name: r => r.title || (r.date ? `Journal of ${fmtDate(r.date)}` : ""),
+    meta: r => fmtDate(r.date),
+    badge: "sessionType",
+    searchKeys: ["date", "summary", "sessionType"],
+    docLabel: "Open the full journal",
+    fields: [
+      { label: "Session date", key: "date", type: "date" },
+      { label: "Session type", key: "sessionType" }
+    ],
+    filters: [{ label: "All session types", get: r => r.sessionType }],
+    extra: r => r.summary ? `<div class="section-head">Highlights</div><div class="prose-box">${r.summary.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]))}</div>` : ""
+  }));
+</script>
+</body>
+</html>

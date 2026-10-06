@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Michigan Administrative Code | Michigan Legislature</title>
+<link rel="icon" type="image/png" href="/legislature/legislature.png">
+<link rel="stylesheet" href="../shared/header.css">
+<link rel="stylesheet" href="../shared/pages.css">
+</head>
+<body>
+<script>window.ACTIVE_NAV = "mac";</script>
+<div id="site-header"></div>
+<script src="../shared/header.js"></script>
+<div id="app"></div>
+<script type="module">
+  import { mountShell } from "../shared/shell.js";
+  import { startBrowser, docConfig } from "../shared/browser.js";
+  import { natCompare } from "../shared/util.js";
+
+  mountShell({ eyebrow: "Michigan Administrative Code", title: "Administrative Code", sub: "Rules issued by state agencies. Search by rule number, agency, or keyword." });
+
+  startBrowser(docConfig({
+    collection: "macRules", back: "Administrative Code", noun: "rule",
+    placeholder: "Try “R 408.10101”, an agency name, or a keyword…",
+    idOf: r => r.cite || r._id,
+    sort: (a, b) => natCompare(a.cite, b.cite),
+    num: r => r.cite,
+    name: r => r.title || "",
+    meta: r => r.agency || "",
+    badge: false,
+    searchKeys: ["agency", "history"],
+    fields: [
+      { label: "Agency", key: "agency" },
+      { label: "History", key: "history" }
+    ],
+    filters: [{ label: "All agencies", get: r => r.agency }]
+  }));
+</script>
+</body>
+</html>
