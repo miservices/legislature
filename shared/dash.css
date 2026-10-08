@@ -1,0 +1,30 @@
+/* Dashboard shell + pages */
+.dash{display:grid;grid-template-columns:230px minmax(0,1fr);gap:1.5rem;align-items:start}
+@media(max-width:860px){.dash{grid-template-columns:1fr}}
+.dnav{background:#fff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden}
+.dnav a{display:block;padding:.6rem 1rem;font-size:13px;color:#374151;border-bottom:1px solid #f3f4f6;cursor:pointer;text-decoration:none}
+.dnav a:hover{background:rgba(11,31,58,.05)}
+.dnav a.on{background:#0b1f3a;color:#fff;font-weight:600}
+.dnav .grp{padding:.45rem 1rem;font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#9ca3af;background:#fafafa;border-bottom:1px solid #f3f4f6}
+.who{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.who .av{width:48px;height:48px;border-radius:50%;background:#0b1f3a;color:#fbbf24;font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:18px;display:flex;align-items:center;justify-content:center;border:2px solid #fbbf24}
+.who b{display:block;font-size:16px;color:#0b1f3a}
+.cm-info{margin-top:.7rem;font-size:13.5px;color:#374151}
+.signin-card{max-width:460px;margin:1rem auto}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#9ca3af;padding:.5rem .6rem;border-bottom:1px solid #e5e7eb}
+.tbl td{padding:.6rem;border-bottom:1px solid #f3f4f6;vertical-align:top}
+.tbl tr:hover td{background:#f9fafb}
+.bar{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
+.bar input{flex:1;min-width:180px;padding:.55rem .75rem;font:inherit;font-size:13.5px;border:1px solid #d1d5db;border-radius:6px;outline:none}
+.bar h2{margin:0 auto 0 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 1rem}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+.prop{border:1px solid #e5e7eb;border-radius:8px;padding:1rem 1.1rem;margin-bottom:.9rem;background:#fff}
+.prop-top{display:flex;justify-content:space-between;gap:.6rem;flex-wrap:wrap;align-items:center}
+.prop h3{font-size:15px;color:#111827;margin:.3rem 0}
+.prop p{font-size:13px;color:#4b5563;white-space:pre-wrap}
+.prop .meta{font-size:12px;color:#9ca3af}
+.prop .row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.8rem}
+.prop .row .field{margin:0}
+.prop .row input,.prop .row select{padding:.45rem .6rem;font-size:13px}

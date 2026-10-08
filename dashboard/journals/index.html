@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Journals—Dashboard | Michigan Legislature</title>
+<link rel="icon" type="image/png" href="/legislature/legislature.png">
+<link rel="stylesheet" href="../../shared/header.css">
+<link rel="stylesheet" href="../../shared/pages.css">
+<link rel="stylesheet" href="../../shared/dash.css">
+</head>
+<body>
+<script>window.ACTIVE_NAV = "dashboard";</script>
+<div id="site-header"></div>
+<script src="../../shared/header.js"></script>
+<div id="app"></div>
+<script type="module">
+  import { startDash } from "../../shared/dash-shell.js";
+  import { mountRecords } from "../../shared/dash-records.js";
+  startDash({ page: "journals", render: mountRecords });
+</script>
+</body>
+</html>
