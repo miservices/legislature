@@ -15,9 +15,8 @@
 <script src="../shared/header.js"></script>
 <div id="app"></div>
 <script type="module">
-  import { startDash } from "../shared/dash-shell.js";
-  import { overview } from "../shared/dash-overview.js";
-  startDash({ page: "overview", render: overview });
+  import { start } from "../shared/dash-pages.js";
+  start("overview");
 </script>
 </body>
 </html>

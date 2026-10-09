@@ -15,9 +15,8 @@
 <script src="../../shared/header.js"></script>
 <div id="app"></div>
 <script type="module">
-  import { startDash } from "../../shared/dash-shell.js";
-  import { mountWorkflow } from "../../shared/dash-bills.js";
-  startDash({ page: "resolutions", render: ctx => mountWorkflow(ctx, "resolution") });
+  import { start } from "../../shared/dash-pages.js";
+  start("resolutions");
 </script>
 </body>
 </html>

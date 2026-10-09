@@ -3,42 +3,20 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Executive Orders | Michigan Legislature</title>
+<title>Executive Orders—Dashboard | Michigan Legislature</title>
 <link rel="icon" type="image/png" href="/legislature/legislature.png">
-<link rel="stylesheet" href="../shared/header.css">
-<link rel="stylesheet" href="../shared/pages.css">
+<link rel="stylesheet" href="../../shared/header.css">
+<link rel="stylesheet" href="../../shared/pages.css">
+<link rel="stylesheet" href="../../shared/dash.css">
 </head>
 <body>
-<script>window.ACTIVE_NAV = "executive-orders";</script>
+<script>window.ACTIVE_NAV = "dashboard";</script>
 <div id="site-header"></div>
-<script src="../shared/header.js"></script>
+<script src="../../shared/header.js"></script>
 <div id="app"></div>
 <script type="module">
-  import { mountShell } from "../shared/shell.js";
-  import { startBrowser, docConfig } from "../shared/browser.js";
-
-  mountShell({ eyebrow: "Governor", title: "Executive Orders", sub: "Directives issued by the Governor, with their current status." });
-
-  startBrowser(docConfig({
-    collection: "executiveOrders", back: "Executive Orders", noun: "executive order",
-    placeholder: "Search by order number or title…",
-    idOf: r => String(r.number ?? r._id),
-    sort: (a, b) => String(b.number).localeCompare(String(a.number), undefined, { numeric: true }),
-    num: r => `Executive Order No. ${r.number}`,
-    name: r => r.title || "",
-    meta: r => r.signedDate ? `Signed ${new Date(r.signedDate + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}` : "",
-    searchKeys: ["rescindedBy"],
-    docLabel: "Open the full order",
-    fields: [
-      { label: "Signed", key: "signedDate", type: "date" },
-      { label: "Effective", key: "effectiveDate", type: "date" },
-      { label: "Rescinded or superseded by", key: "rescindedBy" }
-    ],
-    filters: [
-      { label: "All years", get: r => String(r.number || "").split("-")[0] },
-      { label: "All statuses", get: r => r.status }
-    ]
-  }));
+  import { start } from "../../shared/dash-pages.js";
+  start("executiveOrders");
 </script>
 </body>
 </html>

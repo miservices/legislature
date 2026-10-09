@@ -15,9 +15,8 @@
 <script src="../../shared/header.js"></script>
 <div id="app"></div>
 <script type="module">
-  import { startDash } from "../../shared/dash-shell.js";
-  import { mountRecords } from "../../shared/dash-records.js";
-  startDash({ page: "publicActs", render: mountRecords });
+  import { start } from "../../shared/dash-pages.js";
+  start("publicActs");
 </script>
 </body>
 </html>
