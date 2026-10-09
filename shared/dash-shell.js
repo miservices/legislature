@@ -9,7 +9,7 @@ import { esc } from "./util.js";
 
 const MIGOVT_LOGIN_URL = "https://migovt.org/login/";
 const SITE_NAME = "Michigan Legislature Dashboard";
-const BASE = new URL("../dashboard/", import.meta.url).href;   // absolute URL of /dashboard/
+export const BASE = new URL("../dashboard/", import.meta.url).href;   // absolute URL of /dashboard/
 
 /* Every dashboard page. slug = folder under /dashboard/. admin = Speaker / Deputy / Pro Tem / Clerk only.
    coll = the Firestore collection a record-editor page manages. */
@@ -33,6 +33,7 @@ export const isAdminRole = role => ADMIN_ROLES.includes(role);
 
 export async function startDash({ page, render }) {
   const entry = PAGES[page];
+  document.body.classList.add("dash-page");
   mountShell({ eyebrow: "Legislature dashboard", title: entry.title || entry.label, sub: entry.sub || "", filters: false, card: false });
   const root = document.getElementById("content");
   let acct = null, uid = null, signingIn = false;

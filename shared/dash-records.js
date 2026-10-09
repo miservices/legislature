@@ -172,4 +172,5 @@ export async function mountRecords(ctx) {
     }
   });
   await list();
+  if (new URLSearchParams(location.search).has("new")) openForm(null);
 }

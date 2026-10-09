@@ -44,7 +44,8 @@ export function buildForm(fields, item, env, { lockKey, seed } = {}) {
       case "list": case "refs": case "tags": case "people": el = `<div id="${id}" class="widget"></div>`; break;
       default: el = `<input id="${id}" type="${f.type || "text"}" value="${esc(v)}" ${locked ? "disabled" : ""} ${f.type === "number" ? 'step="any"' : ""}>`;
     }
-    return `<div class="field" data-field="${f.key}" ${f.full ? 'style="grid-column:1/-1"' : ""}><label for="${id}">${esc(f.label)}${f.req ? " *" : ""}</label>${el}${f.hint ? `<div class="hint">${esc(f.hint)}</div>` : ""}</div>`;
+    const span = f.full ? 6 : f.span || ({ number: 2, date: 2, time: 2, select: 3, text: 3, undefined: 3 }[f.type] ?? 6);
+    return `<div class="field" data-field="${f.key}" style="grid-column:span ${span}"><label for="${id}">${esc(f.label)}${f.req ? " *" : ""}</label>${el}${f.hint ? `<div class="hint">${esc(f.hint)}</div>` : ""}</div>`;
   }).join("");
 
   function init(root) {
