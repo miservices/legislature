@@ -28,3 +28,47 @@
 .prop .row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.8rem}
 .prop .row .field{margin:0}
 .prop .row input,.prop .row select{padding:.45rem .6rem;font-size:13px}
+
+/* ---- shared form widgets ---- */
+.form-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.75rem}
+.bar-sel{padding:.5rem .6rem;font:inherit;font-size:13px;border:1px solid #d1d5db;border-radius:6px;background:#fff}
+.tbl.click tbody tr{cursor:pointer}
+.tbl.click tbody tr:hover td{background:#f3f6fb}
+.mono{font-family:'JetBrains Mono',monospace;font-size:12.5px}
+.crumbs{font-size:13px;color:#6b7280;margin-bottom:.9rem}
+.crumbs a{color:#1f5fae;cursor:pointer}.crumbs a.small{font-size:12px;margin-left:.5rem}
+.plain{margin:0 0 1rem 1.1rem;font-size:13.5px;color:#374151}
+.dtitle{font-size:16px;color:#111827;margin:.2rem 0 .3rem}
+.dmeta{font-size:12.5px;color:#6b7280}
+.dmeta a{color:#1f5fae}
+.card h2+.lead{margin-top:.2rem}
+
+/* repeating rows */
+.rep-row{display:flex;gap:.4rem;margin-bottom:.4rem}
+.rep-row input{flex:1}
+.rep-x{border:0;background:none;color:#9ca3af;font-size:20px;line-height:1;cursor:pointer;padding:0 .4rem}
+.rep-x:hover{color:#a32d2d}
+
+/* chip picker */
+.pk{position:relative}
+.pk-box{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center;padding:.3rem .45rem;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:text;min-height:38px}
+.pk-box:focus-within{border-color:#0b1f3a;box-shadow:0 0 0 3px rgba(11,31,58,.1)}
+.pk-chips{display:contents}
+.pk-chip{display:inline-flex;align-items:center;gap:.2rem;background:#eaf0f8;color:#0b1f3a;border-radius:4px;padding:.15rem .2rem .15rem .5rem;font-size:12.5px;max-width:100%}
+.pk-chip button{border:0;background:none;color:#5b6b82;font-size:15px;cursor:pointer;line-height:1;padding:0 .25rem}
+.pk-chip button:hover{color:#a32d2d}
+.field .pk-in{flex:1;min-width:120px;border:0;box-shadow:none;padding:.2rem;font-size:14px;outline:none;width:auto}
+.field .pk-in:focus{box-shadow:none}
+.pk-menu{position:absolute;z-index:20;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #d1d5db;border-radius:6px;box-shadow:0 8px 24px rgba(11,31,58,.14);max-height:260px;overflow:auto}
+.pk-item{padding:.45rem .7rem;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;gap:.6rem}
+.pk-item small{color:#9ca3af}
+.pk-item.hi,.pk-item:hover{background:#eaf0f8}
+
+/* workflow */
+.step-row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.step-row .or{font-size:12.5px;color:#9ca3af}
+.tally{font-size:12.5px;color:#374151;display:flex;align-items:center;gap:.35rem}
+.tally input{width:70px;padding:.4rem .5rem;font:inherit;border:1px solid #d1d5db;border-radius:6px}
+.tl-row{display:flex;justify-content:space-between;gap:.6rem;padding:.45rem 0;border-bottom:1px solid #f3f4f6;font-size:13.5px;color:#374151}
+.inline-add{display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap}
+.inline-add input,.inline-add select{flex:1;min-width:200px;padding:.5rem .65rem;font:inherit;font-size:13.5px;border:1px solid #d1d5db;border-radius:6px;background:#fff}
