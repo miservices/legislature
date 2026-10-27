@@ -4,6 +4,7 @@ import {
   db, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, query, where, getDocs, writeBatch, serverTimestamp
 } from "./fb.js";
 import { esc, asList, natCompare, badgeClass, tsDate, isDriveUrl, COMMITTEES, docEmbed } from "./util.js";
+import { mountDrafter } from "./dash-drafter.js";
 import { BILL_STATUSES, RES_STATUSES } from "./bills-view.js";
 import {
   startDash, BASE, todayISO, longDate, addDays, load, invalidate, stamp, dated, appendHistory, syncAmendments, writePublicAct,
@@ -854,7 +855,7 @@ async function mountMcl(ctx) {
    ================================================================ */
 const RENDER = {
   overview, proposals, review,
-  bills: ctx => mountWorkflow(ctx, "bill"), resolutions: ctx => mountWorkflow(ctx, "resolution"), mcl: mountMcl,
+  bills: ctx => mountWorkflow(ctx, "bill"), resolutions: ctx => mountWorkflow(ctx, "resolution"), mcl: mountMcl, drafter: mountDrafter,
   publicActs: mountRecords, macRules: mountRecords, executiveOrders: mountRecords, execReorgOrders: mountRecords, journals: mountRecords, calendar: mountRecords
 };
 export const start = page => startDash({ page, render: RENDER[page] });

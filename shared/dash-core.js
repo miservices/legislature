@@ -328,6 +328,7 @@ export const BASE = new URL("../dashboard/", import.meta.url).href;   // absolut
 export const PAGES = {
   overview:  { slug: "",            label: "Overview",        title: "Dashboard", group: "Dashboard", sub: "Your account and committee assignments." },
   proposals: { slug: "proposals/",  label: "My proposals",    group: "Dashboard", sub: "Submit bills and resolutions as Google Drive links." },
+  drafter:   { slug: "drafter/",    label: "Bill drafter",    group: "Dashboard", sub: "Fill in the details and download a formatted bill PDF." },
   review:    { slug: "review/",     label: "Review proposals", group: "Dashboard", admin: true, sub: "Introduce or reject proposals from legislators." },
 
   bills:        { slug: "bills/",        label: "Bills",          group: "Official record", admin: true, coll: "bills", sub: "Move bills through the process; the timeline and links update themselves." },
