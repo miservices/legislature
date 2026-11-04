@@ -29,8 +29,8 @@ const showErr = (m) => { $("status").innerHTML = '<div class="err">' + String(m)
 window.addEventListener("error", e => showErr("Script error: " + e.message));
 window.addEventListener("unhandledrejection", e => showErr("Error: " + ((e.reason && e.reason.message) || e.reason)));
 let F;
-try { F = await import("../../shared/fb.js"); }
-catch (e) { showErr("Could not load shared/fb.js from " + new URL("../../shared/fb.js", location.href).href + " (" + e.message + "). This page must be uploaded to dashboard/migrate/index.html on your site, not opened from your computer."); throw e; }
+try { F = await import("/legislature/shared/fb.js"); }
+catch (e) { showErr("Could not load shared/fb.js from " + "/legislature/shared/fb.js" + " (" + e.message + "). Check the file exists at that address."); throw e; }
 const { auth, db, onAuthStateChanged, doc, getDoc, getDocs, collection, writeBatch, serverTimestamp, ADMIN_ROLES } = F;
 
 const fail = html => { $("status").innerHTML = `<div class="err">${html}</div>`; };
