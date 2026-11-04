@@ -2,9 +2,9 @@
    Drafts live in the `drafts` collection (private to their author); submitting creates a proposal for the Clerk's office.
    Admins can also open a bill's latest text here to write a substitute (?substitute=<bill number>). */
 import { db, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, query, where, getDocs, writeBatch, serverTimestamp } from "./fb.js";
-import { esc, COMMITTEES } from "./util.js";
-import { blocks, parseInline, serializeRuns, runsText, clean, dirLine, parseAct, cleanMd, fromDraft, billHtml, billPdf, preambleParts, introDate, fitPages, docTitle } from "./docs.js?v=2";
-import { todayISO } from "./dash-core.js";
+import { esc, COMMITTEES } from "./util.js?v=2";
+import { blocks, carryMarks, parseInline, serializeRuns, runsText, clean, dirLine, parseAct, cleanMd, fromDraft, billHtml, billPdf, preambleParts, introDate, fitPages, docTitle } from "./docs.js?v=2";
+import { todayISO } from "./dash-core.js?v=2";
 
 const SECRE = /^\s*(Sec\.\s*)(\d+[A-Za-z]*)(\.)/;
 const NB = / /g;
@@ -30,7 +30,7 @@ const withSecBold = runs => {
   }
   return out;
 };
-const mdToHtml = md => String(md || "").replace(/\r/g, "").split("\n").map(line => {
+const mdToHtml = md => carryMarks(md).split("\n").map(line => {
   const b = blocks(line)[0];
   if (b.k === "dir") return dirHtml(b.op, b.act, b.sec);
   if (b.k === "blank") return "<div><br></div>";
@@ -366,7 +366,8 @@ export async function mountDrafter(ctx) {
   root.addEventListener("paste", e => {
     if (e.target.id !== "ed") return; e.preventDefault();
     const html = e.clipboardData.getData("text/html"), text = e.clipboardData.getData("text/plain");
-    const lines = html ? linesFromHtml(html) : text.split(/\r?\n/).map(l => [{ t: clean(l), b: 0, i: 0, u: 0, s: 0 }]);
+    const isMd = /\*\*|~~|<u>/.test(text);
+    const lines = isMd ? carryMarks(text).split("\n").map(l => parseInline(l.replace(/\s+$/, ""))) : html ? linesFromHtml(html) : text.split(/\r?\n/).map(l => [{ t: clean(l), b: 0, i: 0, u: 0, s: 0 }]);
     const out = lines.map(l => `<div>${l.length ? withSecBold(l).map(runHtml).join("") : "<br>"}</div>`);
     document.execCommand("insertHTML", false, out.length === 1 ? out[0].replace(/^<div>|<\/div>$/g, "") : out.join(""));
   });
