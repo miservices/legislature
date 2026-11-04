@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>One-time data migration | Michigan Legislature</title>
+<meta name="robots" content="noindex">
+<style>
+body{font:15px/1.5 system-ui,sans-serif;background:#f3f4f6;color:#111827;margin:0;padding:2rem 1rem}
+.card{max-width:720px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:1.5rem}
+h1{font-size:20px;margin:0 0 .25rem;color:#0b1f3a}
+ul{padding-left:1.2rem} li{margin:.25rem 0}
+button{background:#0b1f3a;color:#fff;border:0;border-radius:6px;padding:.7rem 1.2rem;font-size:15px;font-weight:600;cursor:pointer}
+button:disabled{opacity:.5;cursor:default}
+.warn{background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;padding:.7rem .9rem;margin:1rem 0}
+.err{background:#fee2e2;border:1px solid #ef4444;border-radius:6px;padding:.7rem .9rem;margin:1rem 0}
+pre{background:#0b1f3a;color:#e5e7eb;border-radius:6px;padding:.8rem;max-height:260px;overflow:auto;font-size:12.5px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>One-time data migration</h1>
+  <div id="status">Checking your sign-in…</div>
+  <div id="body"></div>
+</div>
+<script type="module">
+import { auth, db, onAuthStateChanged, doc, getDoc, getDocs, collection, writeBatch, serverTimestamp, ADMIN_ROLES } from "../../shared/fb.js";
+
+const DATE = "2026-07-01", LONG = "July 1, 2026", YEAR = 2026;
+const MCL_HISTORY = "Add. Act 15, Imd. Eff. July 1, 2026";
+const $ = id => document.getElementById(id);
+const log = m => { const p = $("log"); if (p) { p.textContent += m + "\n"; p.scrollTop = p.scrollHeight; } };
+
+onAuthStateChanged(auth, async user => {
+  if (!user) return fail('You are not signed in. <a href="../">Sign in on the dashboard</a>, then reload this page.');
+  const me = await getDoc(doc(db, "accounts", user.uid)).catch(() => null);
+  const acct = me && me.exists() ? me.data() : null;
+  if (!acct || !ADMIN_ROLES.includes(acct.role)) return fail("Only the Speaker, Deputy Speaker, Speaker Pro Tempore or Clerk of the Legislature can run this.");
+  ready(acct);
+});
+const fail = html => { $("status").innerHTML = `<div class="err">${html}</div>`; };
+
+async function ready(acct) {
+  $("status").textContent = "Loading bills and MCL sections…";
+  const [bills, secs] = await Promise.all([getDocs(collection(db, "bills")), getDocs(collection(db, "mclSections"))]);
+  const mcl = secs.docs.filter(d => { const x = d.data(); return String(x.chapter || String(x.cite || d.id).split(".")[0]) === "750"; });
+  $("status").innerHTML = "";
+  $("body").innerHTML = `
+    <p>This will rewrite data in the live database:</p>
+    <ul>
+      <li><b>${bills.size}</b> bill(s): introduced ${LONG}, referred to their current committee, reported, passed, signed (quorum contingency clause) and filed with the Secretary of State, all on ${LONG}. Status becomes <b>Enacted</b> and the timeline is replaced.</li>
+      <li>A <b>${YEAR}</b> public act is created for each bill, numbered with the bill number (existing acts with the same number are updated).</li>
+      <li><b>${mcl.length}</b> MCL section(s) in chapter 750: history set to “${MCL_HISTORY}”.</li>
+    </ul>
+    <div class="warn">This overwrites each bill's status, timeline and public act number. It can't be undone from here. Export your database first if you want a backup.</div>
+    <button id="go">Run migration</button>
+    <pre id="log" hidden></pre>`;
+  $("go").onclick = async () => {
+    if (!confirm(`Rewrite ${bills.size} bills, create ${bills.size} public acts and update ${mcl.length} MCL sections?`)) return;
+    $("go").disabled = true; $("log").hidden = false;
+    try { await run(bills.docs, mcl, acct.name || "Migration"); log("\nDone."); }
+    catch (e) { log("\nFAILED: " + e.message + "\nRe-running is safe; it rewrites the same values."); $("go").disabled = false; }
+  };
+}
+
+async function run(billDocs, mclDocs, who) {
+  const ops = [];
+  for (const d of billDocs) {
+    const b = d.data(), n = Number(b.number ?? d.id), cm = String(b.committee || "").trim();
+    const history = [
+      `Introduced — ${LONG}`,
+      `Referred to ${cm || "committee"} — ${LONG}`,
+      `Reported from committee — ${LONG}`,
+      `Passed floor vote pursuant to quorum contingency clause — ${LONG}`,
+      `Signed into law pursuant to quorum contingency clause — ${LONG}`,
+      `Filed with the Secretary of State — ${LONG}`
+    ];
+    ops.push(batch => batch.update(doc(db, "bills", d.id), {
+      introducedDate: DATE, status: "Enacted", paNumber: n, history, signedDate: DATE, updatedAt: serverTimestamp(), updatedBy: who
+    }));
+    const url = b.enrolledUrl || b.driveUrl || "";
+    ops.push(batch => batch.set(doc(db, "publicActs", String(n)), {
+      number: n, year: YEAR, billNumber: n, title: b.title || "", status: "In effect",
+      signedDate: DATE, effectiveDate: DATE, ...(url ? { driveUrl: url } : {}), updatedAt: serverTimestamp(), updatedBy: who
+    }, { merge: true }));
+  }
+  for (const d of mclDocs) ops.push(batch => batch.update(doc(db, "mclSections", d.id), { history: MCL_HISTORY, updatedAt: serverTimestamp(), updatedBy: who }));
+
+  log(`${ops.length} writes in ${Math.ceil(ops.length / 400)} batch(es)…`);
+  for (let i = 0; i < ops.length; i += 400) {
+    const batch = writeBatch(db);
+    ops.slice(i, i + 400).forEach(f => f(batch));
+    await batch.commit();
+    log(`Committed ${Math.min(i + 400, ops.length)} / ${ops.length}`);
+  }
+}
+</script>
+</body>
+</html>
