@@ -73,8 +73,28 @@ const SECSTART = /^\s*Sec\.\s*(\d+[A-Za-z]*)\./;
 export const dirLine = (op, act, sec) => `<!--${op} act=${act} sec=${sec}-->`;
 
 /* Markdown body -> blocks: {k:"dir",op,act,sec} | {k:"blank"} | {k:"p",runs,sec} */
-export function blocks(md) {
+/* Marks left open at the end of a line (e.g. **bold across several lines**) carry on to the following lines until a blank line or directive. */
+export function carryMarks(md) {
+  let st = { b: 0, i: 0, u: 0, s: 0 };
   return String(md || "").replace(/\r/g, "").split("\n").map(line => {
+    const t = line.trim();
+    if (!t || DIR.test(t)) { st = { b: 0, i: 0, u: 0, s: 0 }; return line; }
+    const open = (st.b ? "**" : "") + (st.i ? "*" : "") + (st.s ? "~~" : "") + (st.u ? "<u>" : "");
+    for (let k = 0; k < line.length; k++) {
+      const c = line[k];
+      if (c === "\\") { k++; continue; }
+      if (c === "*" && line[k + 1] === "*") { st.b ^= 1; k++; continue; }
+      if (c === "~" && line[k + 1] === "~") { st.s ^= 1; k++; continue; }
+      if (c === "*") { st.i ^= 1; continue; }
+      if (line.startsWith("<u>", k)) { st.u = 1; k += 2; continue; }
+      if (line.startsWith("</u>", k)) { st.u = 0; k += 3; continue; }
+    }
+    const close = (st.u ? "</u>" : "") + (st.s ? "~~" : "") + (st.i ? "*" : "") + (st.b ? "**" : "");
+    return open + line.replace(/\s+$/, "") + close;
+  }).join("\n");
+}
+export function blocks(md) {
+  return carryMarks(md).split("\n").map(line => {
     const t = line.trim(), m = t.match(DIR);
     if (m) return { k: "dir", op: m[1], act: Number(m[2]), sec: m[3] };
     if (!t) return { k: "blank" };
@@ -82,7 +102,7 @@ export function blocks(md) {
     return { k: "p", runs, sec: sm ? sm[1] : null };
   });
 }
-export const cleanMd = md => String(md || "").replace(/\r/g, "").split("\n").map(line => {
+export const cleanMd = md => carryMarks(md).split("\n").map(line => {
   if (DIR.test(line.trim()) || !line.trim()) return line.trim();
   return serializeRuns(cleanRuns(parseInline(line)));
 }).join("\n");
@@ -286,6 +306,7 @@ export function parseAct(md) {
     if (m) { cur = { n: m[1], hist: (m[2].match(/hist="([^"]*)"/) || [])[1] || "", repealed: /\srepealed/.test(m[2]), lines: [] }; secs.push(cur); }
     else if (cur && line.trim()) cur.lines.push(line.trim());
   }
+  for (const s of secs) if (s.lines.length) s.lines = carryMarks(s.lines.join("\n")).split("\n");
   return secs;
 }
 export const serializeAct = secs => secs.map(s => `<!--sec ${s.n}${s.repealed ? " repealed" : ""}${s.hist ? ` hist="${s.hist.replace(/"/g, "'")}"` : ""}-->\n${s.lines.join("\n")}`).join("\n\n") + "\n";
