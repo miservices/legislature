@@ -3,7 +3,7 @@
    Admins can also open a bill's latest text here to write a substitute (?substitute=<bill number>). */
 import { db, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, query, where, getDocs, writeBatch, serverTimestamp } from "./fb.js";
 import { esc, COMMITTEES } from "./util.js?v=2";
-import { blocks, carryMarks, parseInline, serializeRuns, runsText, clean, dirLine, parseAct, cleanMd, fromDraft, billHtml, billPdf, preambleParts, introDate, fitPages, docTitle } from "./docs.js?v=2";
+import { blocks, carryMarks, parseInline, serializeRuns, runsText, clean, dirLine, parseAct, cleanMd, fromDraft, billHtml, billPdf, preambleParts, introDate, fitPages, docTitle } from "./docs.js?v=3";
 import { todayISO } from "./dash-core.js?v=2";
 
 const SECRE = /^\s*(Sec\.\s*)(\d+[A-Za-z]*)(\.)/;
@@ -128,7 +128,7 @@ export async function mountDrafter(ctx) {
     try {
       const snap = await getDocs(query(collection(db, "drafts"), where("ownerUid", "==", uid)));
       const rows = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0));
-      $("#dl").innerHTML = rows.length ? rows.map(r => `<div class="row"><div class="t"><b>${esc(r.name || "Untitled")}</b><small>${esc(r.substituteFor ? "Substitute for Bill No. " + r.substituteFor : r.type)} · edited ${r.updatedAt?.seconds ? esc(new Date(r.updatedAt.seconds * 1000).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })) : "just now"}</small></div>
+      $("#dl").innerHTML = rows.length ? rows.map(r => `<div class="row"><div class="t"><b>${esc(r.name || "Untitled")}</b><small>${esc(r.substituteFor ? (r.vtype === "amended" ? "Amended version of Bill No. " : "Substitute for Bill No. ") + r.substituteFor : r.type)} · edited ${r.updatedAt?.seconds ? esc(new Date(r.updatedAt.seconds * 1000).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })) : "just now"}</small></div>
           <button class="btn btn-primary btn-sm" data-act="openDraft" data-id="${esc(r.id)}">Open</button><button class="btn btn-danger btn-sm" data-act="delDraft" data-id="${esc(r.id)}">Delete</button></div>`).join("")
         : '<div class="empty-state" style="padding:1rem 0">No drafts yet. Start a new bill above.</div>';
     } catch (e) { console.error(e); $("#dl").innerHTML = '<div class="msg err">Couldn\'t load your drafts.</div>'; }
@@ -150,7 +150,7 @@ export async function mountDrafter(ctx) {
     root.innerHTML = `<div class="dr">
       <div class="dr-top"><button class="btn btn-outline btn-sm" data-act="toList">&larr; Drafts</button>
         <input class="dr-name" id="dName" value="${esc(draft.name || "")}" maxlength="120" aria-label="Draft name"><span class="dr-state" id="dState">Saved</span>
-        <button class="btn btn-primary btn-sm" data-act="submit">${sub ? "Publish substitute" : "Submit"}</button></div>
+        <button class="btn btn-primary btn-sm" data-act="submit">${sub ? (draft.vtype === "amended" ? "Publish amended version" : "Publish substitute") : "Submit"}</button></div>
       <div class="dr-tabs"><button data-act="tab" data-t="edit" class="${tab === "edit" ? "on" : ""}">Edit</button><button data-act="tab" data-t="preview" class="${tab === "preview" ? "on" : ""}">Preview as ${res ? "resolution" : "bill"}</button></div>
       <div class="dr-tool" id="tool">
         <button data-cmd="undo" title="Undo (Ctrl+Z)">&#8630;</button><button data-cmd="redo" title="Redo (Ctrl+Y)">&#8631;</button><span class="sep"></span>
@@ -318,7 +318,7 @@ export async function mountDrafter(ctx) {
       if (draft.action !== "create" && !draft.target) return ctx.flash("Enter the act being amended or repealed in the details panel.", "err");
     }
     if (!draft.purpose) return ctx.flash("Add a purpose so the bill has a description.", "err");
-    if (!confirm(draft.substituteFor ? `Publish this as a substitute for Bill No. ${draft.substituteFor}?` : "Submit this for introduction? You won't be able to edit the submitted copy.")) return;
+    if (!confirm(draft.substituteFor ? `Publish this as ${draft.vtype === "amended" ? "an amended version" : "a substitute"} of Bill No. ${draft.substituteFor}?` : "Submit this for introduction? You won't be able to edit the submitted copy.")) return;
     btn.disabled = true;
     try {
       if (draft.substituteFor) await publishSubstitute();
@@ -329,7 +329,7 @@ export async function mountDrafter(ctx) {
         });
         await deleteDoc(doc(db, "drafts", draft.id));
       }
-      const msg = draft.substituteFor ? "Substitute published." : "Submitted. The Clerk's office will review it.";
+      const msg = draft.substituteFor ? (draft.vtype === "amended" ? "Amended version published." : "Substitute published.") : "Submitted. The Clerk's office will review it.";
       draft = null; dirty = false; await showList(); ctx.flash(msg);
     } catch (e) { console.error(e); btn.disabled = false; ctx.flash("Couldn't submit: " + (e.code === "permission-denied" ? "you don't have permission." : e.message), "err"); }
   }
@@ -337,11 +337,12 @@ export async function mountDrafter(ctx) {
     const n = draft.substituteFor, ref = `bill-${n}`, bref = doc(db, "bills", String(n));
     const [bs, ds] = await Promise.all([getDoc(bref), getDocs(query(collection(db, "documents"), where("ref", "==", ref)))]);
     if (!bs.exists()) throw new Error("Bill not found.");
-    const b = bs.data(), k = ds.docs.filter(d => d.data().type === "substitute").length + 1, label = `Substitute (S-${k})`, id = `${ref}-s${k}`;
+    const am = draft.vtype === "amended", ty = am ? "amended" : "substitute", b = bs.data(), seq = ds.docs.filter(d => ["substitute", "amended"].includes(d.data().type)).length + 1,
+      k = ds.docs.filter(d => d.data().type === ty).length + 1, label = am ? `Amended (A-${k})` : `Substitute (S-${k})`, id = `${ref}-${am ? "a" : "s"}${k}`;
     const batch = writeBatch(db);
-    batch.set(doc(db, "documents", id), { ref, type: "substitute", kind: "bill", sub: k, label, number: Number(n), title: draft.actTitle || "", action: draft.action || "create", target: draft.target || "", purpose: draft.purpose,
+    batch.set(doc(db, "documents", id), { ref, type: ty, kind: "bill", sub: seq, label, number: Number(n), title: draft.actTitle || "", action: draft.action || "create", target: draft.target || "", purpose: draft.purpose,
       sponsors: b.sponsors || "", committee: b.committee || "", date: todayISO(), md: draft.md, createdBy: me, updatedAt: serverTimestamp() });
-    batch.update(bref, { docLinks: [...(b.docLinks || []).filter(l => l.id !== id), { label, id }], history: [...(b.history || []), `${label} offered — ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`], updatedAt: serverTimestamp(), updatedBy: me });
+    batch.update(bref, { docLinks: [...(b.docLinks || []).filter(l => l.id !== id), { label, id }], history: [...(b.history || []), `${label} ${am ? "adopted" : "offered"} — ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`], updatedAt: serverTimestamp(), updatedBy: me });
     batch.delete(doc(db, "drafts", draft.id));
     await batch.commit();
   }
@@ -390,14 +391,14 @@ export async function mountDrafter(ctx) {
   });
 
   /* ------------------------------------------------------------ start */
-  const q = new URLSearchParams(location.search), subN = q.get("substitute"), h = decodeURIComponent(location.hash.slice(1));
+  const q = new URLSearchParams(location.search), subN = q.get("substitute") || q.get("amended"), vtype = q.get("amended") ? "amended" : "substitute", h = decodeURIComponent(location.hash.slice(1));
   if (subN && ctx.isAdmin) {
     try {
       const ds = await getDocs(query(collection(db, "documents"), where("ref", "==", `bill-${subN}`)));
-      const vs = ds.docs.map(d => d.data()).filter(d => d.type === "introduced" || d.type === "substitute").sort((a, b) => (a.sub || 0) - (b.sub || 0));
+      const vs = ds.docs.map(d => d.data()).filter(d => d.type === "introduced" || d.type === "substitute" || d.type === "amended").sort((a, b) => (a.sub || 0) - (b.sub || 0));
       const base = vs[vs.length - 1];
-      if (base) { history.replaceState(null, "", location.pathname); return newDraft("Bill", { name: `Substitute for Bill No. ${subN}`, substituteFor: Number(subN), action: base.action || "create", actTitle: base.title || "", target: base.target || "", purpose: base.purpose || "", committee: base.committee || "", md: base.md || "" }); }
-      ctx.flash(`Bill No. ${subN} has no digital text to build a substitute from.`, "err");
+      if (base) { history.replaceState(null, "", location.pathname); return newDraft("Bill", { name: `${vtype === "amended" ? "Amended version of" : "Substitute for"} Bill No. ${subN}`, substituteFor: Number(subN), vtype, action: base.action || "create", actTitle: base.title || "", target: base.target || "", purpose: base.purpose || "", committee: base.committee || "", md: base.md || "" }); }
+      ctx.flash(`Bill No. ${subN} has no digital text to build a new version from.`, "err");
     } catch (e) { console.error(e); ctx.flash("Couldn't start the substitute.", "err"); }
   }
   if (h) return openDraft(h);

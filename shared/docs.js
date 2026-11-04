@@ -161,7 +161,7 @@ export function preambleParts(d) {
 const introLine = d => {
   const sp = joinNames((d.sponsors ? (Array.isArray(d.sponsors) ? d.sponsors : String(d.sponsors).split(/,\s*/)) : []).map(s => clean(s).trim()).filter(Boolean));
   const cm = clean(d.committee).trim().toLowerCase();
-  if (d.type === "substitute") return `${d.label || "Substitute"} offered${sp ? " by " + sp : ""}, ${introDate(d.date)}.`;
+  if (d.type === "substitute" || d.type === "amended") return `${d.label || "Substitute"} offered${sp ? " by " + sp : ""}, ${introDate(d.date)}.`;
   return `${introDate(d.date)}${sp ? ", introduced by " + sp : ", introduced"}${cm ? " and referred to the " + cm : ""}.`;
 };
 
@@ -171,6 +171,7 @@ export function layoutBill(d) {
   const p1 = pages[0].items;
   const numLabel = d.number ? `${kindWord(d)} NO. ${d.number}` : `${kindWord(d)} NO. ___`;
   if (d.type === "substitute") p1.push({ t: "title", text: `SUBSTITUTE ${(d.label || "").replace(/^Substitute\s*/i, "")} FOR`.replace(/\s+/g, " "), size: 16, y: 40 });
+  else if (d.type === "amended") p1.push({ t: "title", text: `AS AMENDED ${(d.label || "").replace(/^Amended\s*/i, "")}`.replace(/\s+/g, " ").trim().toUpperCase(), size: 16, y: 40 });
   p1.push({ t: "title", text: numLabel, size: 40, y: 80 });
   const para = (text, { indent = 0, justify = true, bold = false } = {}) => {
     const lines = wrapWords(plainWords(text, bold), indent, COLS);
@@ -376,7 +377,7 @@ export const fromDraft = x => ({
 export const renderDoc = d => d.type === "enrolled" ? enrolledHtml(d) : d.type === "act" ? actHtml(d) : billHtml(d);
 export const docTitle = d => {
   const w = d.kind === "resolution" ? "Resolution" : "Bill";
-  return d.type === "enrolled" ? `Enrolled ${w} No. ${d.number}` : d.type === "act" ? `Public Act ${d.actNumber} of ${d.year}` : `${d.type === "substitute" ? d.label + " — " : ""}${w} No. ${d.number || "(draft)"}`;
+  return d.type === "enrolled" ? `Enrolled ${w} No. ${d.number}` : d.type === "act" ? `Public Act ${d.actNumber} of ${d.year}` : `${d.type === "substitute" || d.type === "amended" ? d.label + " — " : ""}${w} No. ${d.number || "(draft)"}`;
 };
 
 /* Scale a rendered .bp page to fit its container (pages are laid out at 612x792). */

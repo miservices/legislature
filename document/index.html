@@ -23,7 +23,7 @@
 
   mountShell({ eyebrow: "Official documents", title: "Document", sub: "Bills, enrolled acts and public acts.", filters: false, card: false });
   const root = document.getElementById("content");
-  const RANK = { introduced: 0, substitute: 1, enrolled: 2, act: 3 };
+  const RANK = { introduced: 0, substitute: 1, amended: 1, enrolled: 2, act: 3 };
   const idOf = h => { h = decodeURIComponent(h.replace(/^#/, "")).replace(/^\/+/, ""); const m = h.match(/^(bill|res|act|enrolled)\/(\d+)$/); return m ? (m[1] === "enrolled" ? `bill-${m[2]}-enrolled` : `${m[1]}-${m[2]}`) : h; };
   const signedIn = new Promise(res => { const off = onAuthStateChanged(auth, () => { off(); res(); }); });
 

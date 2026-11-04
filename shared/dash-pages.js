@@ -3,14 +3,14 @@
 import {
   db, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, query, where, getDocs, writeBatch, serverTimestamp
 } from "./fb.js";
-import { esc, asList, natCompare, badgeClass, tsDate, COMMITTEES, docEmbed, docVersionLinks } from "./util.js";
-import { extractDirectives, billToActMd, applyDirective, cleanMd, fullDate } from "./docs.js?v=2";
+import { esc, asList, natCompare, badgeClass, tsDate, COMMITTEES, docEmbed, docVersionLinks } from "./util.js?v=2";
+import { extractDirectives, billToActMd, applyDirective, cleanMd, fullDate } from "./docs.js?v=3";
 import { mountDrafter } from "./dash-drafter.js?v=2";
-import { BILL_STATUSES, RES_STATUSES } from "./bills-view.js";
+import { BILL_STATUSES, RES_STATUSES } from "./bills-view.js?v=2";
 import {
   startDash, BASE, todayISO, longDate, addDays, load, invalidate, stamp, dated, appendHistory, syncAmendments, writePublicAct,
   prepare, buildForm, fmt, headerHtml, factsHtml, proseHtml, docsHtml, auditHtml, prepActions, actionBarHtml, pickAction
-} from "./dash-core.js";
+} from "./dash-core.js?v=2";
 
 /* ================================================================
    Overview
@@ -547,7 +547,7 @@ async function mountWorkflow(ctx, kind) {
     return `<div class="sec"><h3 class="sub">Documents</h3>
       ${links ? `<div class="docs-list" style="margin-bottom:.6rem">${links}</div>` : '<p class="lead" style="margin:0 0 .6rem">No document text is on file for this ' + word.toLowerCase() + '.</p>'}
       ${legacy ? `<details class="legacy"><summary>Older Google Drive links</summary>${legacy}</details>` : ""}
-      ${!final && (r.docLinks || []).length ? `<a class="btn btn-outline btn-sm" href="${BASE}drafter/?substitute=${esc(r.number)}">Write a substitute</a>` : ""}</div>`;
+      ${!final && (r.docLinks || []).length ? `<a class="btn btn-outline btn-sm" href="${BASE}drafter/?substitute=${esc(r.number)}">Write a substitute</a> <a class="btn btn-outline btn-sm" href="${BASE}drafter/?amended=${esc(r.number)}">Write an amended version</a>` : ""}</div>`;
   };
 
   /* The "what happens next" bar: only the buttons that make sense for the current status. */
