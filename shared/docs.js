@@ -70,15 +70,17 @@ export const cleanRuns = runs => {
 
 const DIR = /^<!--\s*(amend|repeal|add)\s+act=(\d+)\s+sec=(\S+?)\s*-->$/;
 const SECSTART = /^\s*Sec\.\s*(\d+[A-Za-z]*)\./;
+const CHAP = /^<!--\s*chapter\s+([^|\s]+)\s*(?:\|\s*(.*?))?\s*-->$/i;
+export const chapterLine = (num, title) => `<!--chapter ${String(num).trim()}|${String(title || "").replace(/[<>]/g, "").trim()}-->`;
 export const dirLine = (op, act, sec) => `<!--${op} act=${act} sec=${sec}-->`;
 
 /* Markdown body -> blocks: {k:"dir",op,act,sec} | {k:"blank"} | {k:"p",runs,sec} */
-/* Marks left open at the end of a line (e.g. **bold across several lines**) carry on to the following lines until a blank line or directive. */
+/* Marks left open at the end of a line (e.g. **bold across many lines and sections**) carry on to the following lines until the mark is closed. */
 export function carryMarks(md) {
   let st = { b: 0, i: 0, u: 0, s: 0 };
   return String(md || "").replace(/\r/g, "").split("\n").map(line => {
     const t = line.trim();
-    if (!t || DIR.test(t)) { st = { b: 0, i: 0, u: 0, s: 0 }; return line; }
+    if (!t || DIR.test(t) || CHAP.test(t)) return line;
     const open = (st.b ? "**" : "") + (st.i ? "*" : "") + (st.s ? "~~" : "") + (st.u ? "<u>" : "");
     for (let k = 0; k < line.length; k++) {
       const c = line[k];
@@ -94,16 +96,26 @@ export function carryMarks(md) {
   }).join("\n");
 }
 export function blocks(md) {
-  return carryMarks(md).split("\n").map(line => {
-    const t = line.trim(), m = t.match(DIR);
-    if (m) return { k: "dir", op: m[1], act: Number(m[2]), sec: m[3] };
-    if (!t) return { k: "blank" };
+  const ls = carryMarks(md).split("\n"), out = [], plain = l => runsText(parseInline(l)).trim();
+  for (let i = 0; i < ls.length; i++) {
+    const line = ls[i], t = line.trim();
+    let m = t.match(DIR);
+    if (m) { out.push({ k: "dir", op: m[1], act: Number(m[2]), sec: m[3] }); continue; }
+    if ((m = t.match(CHAP))) { out.push({ k: "chapter", num: m[1], title: (m[2] || "").trim() }); continue; }
+    if (!t) { out.push({ k: "blank" }); continue; }
+    const pt = plain(line);
+    if ((m = pt.match(/^CHAPTER\s+(\S+)$/i))) {   /* plain "CHAPTER 19" + title line */
+      const nx = ls[i + 1] != null ? plain(ls[i + 1]) : "";
+      const title = nx && !SECSTART.test(nx) && !/^\(/.test(nx) && nx === nx.toUpperCase() ? nx : "";
+      out.push({ k: "chapter", num: m[1], title }); if (title) i++; continue;
+    }
     const runs = parseInline(line), sm = runsText(runs).match(SECSTART);
-    return { k: "p", runs, sec: sm ? sm[1] : null };
-  });
+    out.push({ k: "p", runs, sec: sm ? sm[1] : null });
+  }
+  return out;
 }
 export const cleanMd = md => carryMarks(md).split("\n").map(line => {
-  if (DIR.test(line.trim()) || !line.trim()) return line.trim();
+  if (DIR.test(line.trim()) || CHAP.test(line.trim()) || !line.trim()) return line.trim();
   return serializeRuns(cleanRuns(parseInline(line)));
 }).join("\n");
 
@@ -191,10 +203,16 @@ export function layoutBill(d) {
   const bodyStart = y + 25;
 
   /* numbered body lines */
-  const body = [];
+  const body = []; let skipBlank = false;
   for (const b of blocks(d.md)) {
     if (b.k === "dir") continue;
-    if (b.k === "blank") { body.push({ blank: true }); continue; }
+    if (b.k === "chapter") {
+      if (body.length && !body[body.length - 1].blank) body.push({ blank: true });
+      for (const text of [`CHAPTER ${b.num}`.toUpperCase(), b.title.toUpperCase()].filter(Boolean)) body.push({ words: toWords([{ t: text, b: 0, i: 0, u: 1, s: 0 }]), first: true, center: true });
+      body.push({ blank: true }); skipBlank = true; continue;
+    }
+    if (b.k === "blank") { if (skipBlank) { skipBlank = false; continue; } if (body.length && body[body.length - 1].blank) continue; body.push({ blank: true }); continue; }
+    skipBlank = false;
     wrapWords(toWords(b.runs), L.indent, COLS).forEach((ln, i, all) => body.push({ words: ln, first: i === 0, just: i < all.length - 1 }));
   }
   while (body.length && body[body.length - 1].blank) body.pop();
@@ -208,8 +226,13 @@ export function layoutBill(d) {
     const yy = y0 + (ln - 1) * L.pitch;
     page.items.push({ t: "num", n: ln, y: yy });
     if (!it.blank) {
-      const ind = it.first ? L.indent * L.cw : 0;
-      page.items.push({ t: "text", x: L.left + ind, y: yy, w: (L.right - L.left) - ind, words: it.words, just: it.just });
+      if (it.center) {
+        const wd = (it.words.reduce((n, w) => n + w.len, 0) + it.words.length - 1) * L.cw;
+        page.items.push({ t: "text", x: L.left + ((L.right - L.left) - wd) / 2, y: yy, w: wd + L.cw, words: it.words, just: false });
+      } else {
+        const ind = it.first ? L.indent * L.cw : 0;
+        page.items.push({ t: "text", x: L.left + ind, y: yy, w: (L.right - L.left) - ind, words: it.words, just: it.just });
+      }
     }
   }
   return { pages, footer: { label: numLabel, printed: printed(d.date) } };
@@ -318,7 +341,7 @@ const secCmp = (a, b) => { const [x, xs] = secKey(a), [y, ys] = secKey(b); retur
 export function billToActMd(md, { year, number, date }) {
   const secs = []; let cur = null;
   for (const b of blocks(md)) {
-    if (b.k === "dir") continue;
+    if (b.k === "dir" || b.k === "chapter") continue;
     if (b.k === "p" && b.sec) { cur = { n: b.sec, hist: `${year} PA ${number}, Eff. ${fullDate(date)}`, repealed: false, lines: [] }; secs.push(cur); }
     if (b.k === "p" && cur) cur.lines.push(serializeRuns(cleanRuns(b.runs)));
   }

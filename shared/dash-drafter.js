@@ -3,7 +3,7 @@
    Admins can also open a bill's latest text here to write a substitute (?substitute=<bill number>). */
 import { db, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, query, where, getDocs, writeBatch, serverTimestamp } from "./fb.js";
 import { esc, COMMITTEES } from "./util.js?v=2";
-import { blocks, carryMarks, parseInline, serializeRuns, runsText, clean, dirLine, parseAct, cleanMd, fromDraft, billHtml, billPdf, preambleParts, introDate, fitPages, docTitle } from "./docs.js?v=3";
+import { blocks, carryMarks, parseInline, serializeRuns, runsText, clean, dirLine, chapterLine, parseAct, cleanMd, fromDraft, billHtml, billPdf, preambleParts, introDate, fitPages, docTitle } from "./docs.js?v=4";
 import { todayISO } from "./dash-core.js?v=2";
 
 const SECRE = /^\s*(Sec\.\s*)(\d+[A-Za-z]*)(\.)/;
@@ -17,6 +17,7 @@ const runHtml = r => {
 };
 const dirLabel = (op, act, sec) => `${op === "amend" ? "Amends" : op === "repeal" ? "Repeals" : "Adds"} Public Act ${act}, Sec. ${sec}`;
 const dirHtml = (op, act, sec) => `<div class="dir" contenteditable="false" data-op="${op}" data-act="${act}" data-sec="${esc(sec)}">${esc(dirLabel(op, act, sec))}<i title="Remove">&times;</i></div>`;
+const chapHtml = (num, title) => `<div class="dir ch" contenteditable="false" data-chapter="${esc(num)}" data-title="${esc(title || "")}">Chapter ${esc(num)}${title ? " — " + esc(title) : ""}<i title="Remove">&times;</i></div>`;
 /* Auto-bold "Sec. 12." at the start of a line. */
 const withSecBold = runs => {
   const text = runsText(runs), m = text.match(SECRE);
@@ -33,6 +34,7 @@ const withSecBold = runs => {
 const mdToHtml = md => carryMarks(md).split("\n").map(line => {
   const b = blocks(line)[0];
   if (b.k === "dir") return dirHtml(b.op, b.act, b.sec);
+  if (b.k === "chapter") return chapHtml(b.num, b.title);
   if (b.k === "blank") return "<div><br></div>";
   return `<div>${withSecBold(b.runs).map(runHtml).join("")}</div>`;
 }).join("") || "<div><br></div>";
@@ -64,7 +66,7 @@ function domToMd(ed) {
   const walk = node => {
     if (node.nodeType === 3) { inline.push({ t: node.nodeValue.replace(NB, " "), b: 0, i: 0, u: 0, s: 0 }); return; }
     if (node.nodeType !== 1) return;
-    if (node.classList.contains("dir")) { flush(); lines.push(dirLine(node.dataset.op, node.dataset.act, node.dataset.sec)); return; }
+    if (node.classList.contains("dir")) { flush(); lines.push(node.dataset.chapter ? chapterLine(node.dataset.chapter, node.dataset.title) : dirLine(node.dataset.op, node.dataset.act, node.dataset.sec)); return; }
     if (node.tagName === "BR") { flush(); lines.push(""); return; }
     if (BLOCKS.has(node.tagName)) {
       flush();
@@ -156,7 +158,7 @@ export async function mountDrafter(ctx) {
         <button data-cmd="undo" title="Undo (Ctrl+Z)">&#8630;</button><button data-cmd="redo" title="Redo (Ctrl+Y)">&#8631;</button><span class="sep"></span>
         <button data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button><button data-cmd="italic" title="Italic (Ctrl+I)"><i>I</i></button>
         <button data-cmd="underline" title="Underline (Ctrl+U) — new text in an amended section"><u>U</u></button><button data-cmd="strikeThrough" title="Strikethrough (Ctrl+Shift+X) — deleted text"><s>S</s></button><span class="sep"></span>
-        <button class="txt" data-act="addSec" title="Add the next numbered section">+ Section</button><button class="txt" data-act="renumber" title="Renumber sections 1, 2, 3…">Renumber</button>
+        <button class="txt" data-act="addSec" title="Add the next numbered section">+ Section</button><button class="txt" data-act="addChap" title="Insert a chapter heading">+ Chapter</button><button class="txt" data-act="renumber" title="Renumber sections 1, 2, 3…">Renumber</button>
         ${res ? "" : '<span class="sep"></span><button class="txt" data-act="amendDlg" title="Amend, repeal or add a section of an existing public act">Amend an act…</button>'}
       </div>
       <div id="paneEdit" class="dr-body" ${tab === "edit" ? "" : "hidden"}>
@@ -265,6 +267,26 @@ export async function mountDrafter(ctx) {
     if (acts) return acts;
     const snap = await getDocs(collection(db, "publicActs"));
     return (acts = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => Number(a.number) - Number(b.number)));
+  }
+  function chapterDialog() {
+    const have = [...$("#ed").querySelectorAll(".dir.ch")].map(e => parseInt(e.dataset.chapter, 10)).filter(Number.isFinite);
+    const bg = document.createElement("div"); bg.className = "modal-bg";
+    bg.innerHTML = `<div class="modal"><h3>Add a chapter</h3>
+      <div class="field"><label for="cNum">Chapter number</label><input id="cNum" type="number" min="1" value="${have.length ? Math.max(...have) + 1 : 1}"></div>
+      <div class="field"><label for="cTitle">Chapter title</label><input id="cTitle" maxlength="90" placeholder="e.g. Computer crimes"></div>
+      <div class="hint">Shown centered and underlined in the bill, in capital letters.</div>
+      <div class="form-actions"><button class="btn btn-primary" id="cGo">Insert</button><button class="btn btn-outline" id="cX">Cancel</button></div></div>`;
+    document.body.appendChild(bg);
+    const q = x => bg.querySelector(x); q("#cTitle").focus();
+    q("#cX").onclick = () => bg.remove(); bg.addEventListener("mousedown", e => { if (e.target === bg) bg.remove(); });
+    q("#cGo").onclick = () => {
+      const num = q("#cNum").value.trim(); if (!num) return;
+      const ed = $("#ed"), has = ed.textContent.trim() || ed.querySelector(".dir");
+      const nodes = insertBlocks((has ? "<div><br></div>" : "") + chapHtml(num, q("#cTitle").value.trim()) + "<div><br></div>");
+      bg.remove(); toggleEmpty(); queueSave();
+      const last = nodes[nodes.length - 1]; if (last) caretToEnd(last);
+    };
+    bg.addEventListener("keydown", e => { if (e.key === "Enter") q("#cGo").click(); if (e.key === "Escape") bg.remove(); });
   }
   async function amendDialog() {
     const list = await loadActs();
@@ -383,7 +405,7 @@ export async function mountDrafter(ctx) {
     async delDraft(b) { if (!confirm("Delete this draft permanently?")) return; await deleteDoc(doc(db, "drafts", b.dataset.id)); showList(); },
     toList: () => showList(),
     tab(b) { readMeta(); tab = b.dataset.t; root.querySelectorAll(".dr-tabs button").forEach(x => x.classList.toggle("on", x === b)); $("#paneEdit").hidden = tab !== "edit"; $("#panePrev").hidden = tab !== "preview"; $("#tool").style.visibility = tab === "edit" ? "" : "hidden"; if (tab === "preview") drawPreview(); },
-    addSec: addSection, renumber, amendDlg: amendDialog, submit,
+    addSec: addSection, addChap: chapterDialog, renumber, amendDlg: amendDialog, submit,
     async pdf() {
       if (!window.jspdf) { try { await new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); } catch { return ctx.flash("Couldn't load the PDF library.", "err"); } }
       billPdf(window.jspdf.jsPDF, asDoc()).save(`${draft.name || "Draft"}.pdf`);
