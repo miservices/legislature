@@ -1,225 +1,404 @@
-/* Bill drafter: fill in the form, get a PDF laid out like an official bill (Courier, 49 numbered lines a page,
-   BILL NO. / PAGE / PRINTED footer). Used by the "Bill drafter" dashboard page. */
+/* Bill drafter: a word-processor-style editor that saves as you type and submits a bill or resolution as Markdown.
+   Drafts live in the `drafts` collection (private to their author); submitting creates a proposal for the Clerk's office.
+   Admins can also open a bill's latest text here to write a substitute (?substitute=<bill number>). */
+import { db, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, query, where, getDocs, writeBatch, serverTimestamp } from "./fb.js";
 import { esc, COMMITTEES } from "./util.js";
-import { todayISO, load, prepare, buildForm } from "./dash-core.js";
+import { blocks, parseInline, serializeRuns, runsText, clean, dirLine, parseAct, cleanMd, fromDraft, billHtml, billPdf, preambleParts, introDate, fitPages, docTitle } from "./docs.js";
+import { todayISO } from "./dash-core.js";
 
-/* ---------------------------------------------------------------- text helpers */
-const clean = s => String(s ?? "")
-  .replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, "-")
-  .replace(/…/g, "...").replace(/ /g, " ").replace(/[^\x20-\x7E\xA0-\xFF]/g, "").replace(/[ \t]+/g, " ").trim();
+const SECRE = /^\s*(Sec\.\s*)(\d+[A-Za-z]*)(\.)/;
+const NB = / /g;
 
-const ordinal = n => { const v = n % 100; return n + (["th", "st", "nd", "rd"][(v - 20) % 10] || ["th", "st", "nd", "rd"][v] || "th"); };
-const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const parts = iso => { const [y, m, d] = String(iso || todayISO()).split("-").map(Number); return { y, m, d }; };
-export const introDate = iso => { const { y, m, d } = parts(iso); return `${MONTHS[m - 1]} ${ordinal(d)} of ${y}`; };
-const printed = iso => { const { y, m, d } = parts(iso); return `${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}-${y}`; };
-const joinNames = a => a.length < 2 ? a.join("") : a.length === 2 ? a.join(" and ") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
-const withPeriod = s => /[.;:]$/.test(s) ? s : s + ".";
-
-/* ---------------------------------------------------------------- PDF layout (points, US Letter) */
-const L = { left: 79, right: 558, num: 48, size: 12, cw: 7.2, pitch: 13.8, top: 66, bottom: 728, p1Bottom: 718, perPage: 49, indent: 4 };
-const COLS = Math.floor((L.right - L.left) / L.cw);
-
-/* Greedy monospace wrap. `words` = [{t, b}] ; returns lines of words. */
-function wrap(words, firstIndent) {
-  const lines = []; let cur = [], len = 0, room = COLS - firstIndent;
-  for (const w of words) {
-    const add = (cur.length ? 1 : 0) + w.t.length;
-    if (cur.length && len + add > room) { lines.push(cur); cur = []; len = 0; room = COLS; }
-    len += (cur.length ? 1 : 0) + w.t.length; cur.push(w);
+/* ---------------------------------------------------------------- editor <-> Markdown */
+const runHtml = r => {
+  let h = esc(r.t).replace(/ {2}/g, " &nbsp;");
+  if (r.s) h = `<s>${h}</s>`; if (r.u) h = `<u>${h}</u>`; if (r.i) h = `<i>${h}</i>`; if (r.b) h = `<b>${h}</b>`;
+  return h;
+};
+const dirLabel = (op, act, sec) => `${op === "amend" ? "Amends" : op === "repeal" ? "Repeals" : "Adds"} Public Act ${act}, Sec. ${sec}`;
+const dirHtml = (op, act, sec) => `<div class="dir" contenteditable="false" data-op="${op}" data-act="${act}" data-sec="${esc(sec)}">${esc(dirLabel(op, act, sec))}<i title="Remove">&times;</i></div>`;
+/* Auto-bold "Sec. 12." at the start of a line. */
+const withSecBold = runs => {
+  const text = runsText(runs), m = text.match(SECRE);
+  if (!m) return runs;
+  const len = m[0].length, out = []; let used = 0;
+  for (const r of runs) {
+    if (used >= len) { out.push(r); continue; }
+    const take = Math.min(len - used, r.t.length);
+    out.push({ ...r, t: r.t.slice(0, take), b: 1 }); if (take < r.t.length) out.push({ ...r, t: r.t.slice(take) });
+    used += take;
   }
-  if (cur.length) lines.push(cur);
-  return lines;
+  return out;
+};
+const mdToHtml = md => String(md || "").replace(/\r/g, "").split("\n").map(line => {
+  const b = blocks(line)[0];
+  if (b.k === "dir") return dirHtml(b.op, b.act, b.sec);
+  if (b.k === "blank") return "<div><br></div>";
+  return `<div>${withSecBold(b.runs).map(runHtml).join("")}</div>`;
+}).join("") || "<div><br></div>";
+
+/* Inline style flags carried down the DOM tree. */
+function styleOf(el, st) {
+  const s = { ...st }, tag = el.tagName, css = el.style || {};
+  const fw = css.fontWeight, td = (css.textDecoration || css.textDecorationLine || "");
+  if (tag === "B" || tag === "STRONG") s.b = fw === "normal" || fw === "400" ? 0 : 1;
+  if (fw && fw !== "normal" && (fw === "bold" || Number(fw) >= 600)) s.b = 1;
+  if (tag === "I" || tag === "EM" || css.fontStyle === "italic") s.i = 1;
+  if (tag === "U" || /underline/.test(td)) s.u = 1;
+  if (tag === "S" || tag === "STRIKE" || tag === "DEL" || /line-through/.test(td)) s.s = 1;
+  return s;
 }
-const toWords = (label, text) => [...(label ? [{ t: label, b: true }] : []), ...text.split(" ").filter(Boolean).map(t => ({ t, b: false }))];
-
-/* Draw a line of words, justified to the full width when asked. */
-function drawLine(doc, words, x, y, width, justify) {
-  let gap = L.cw;
-  if (justify && words.length > 1) {
-    const chars = words.reduce((n, w) => n + w.t.length, 0);
-    gap = (width - chars * L.cw) / (words.length - 1);
+function collectRuns(node, st, out) {
+  for (const c of node.childNodes) {
+    if (c.nodeType === 3) { const t = c.nodeValue.replace(NB, " "); if (t) out.push({ t, ...st }); }
+    else if (c.nodeType === 1 && c.tagName !== "BR" && !c.classList.contains("dir")) collectRuns(c, styleOf(c, st), out);
   }
-  for (const w of words) {
-    doc.setFont("courier", w.b ? "bold" : "normal");
-    doc.text(w.t, x, y);
-    x += w.t.length * L.cw + gap;
-  }
+  return out;
 }
-
-/* data: {number, date, sponsors[], committee, kind, title, target, purpose, sections:[string]} */
-export function buildBillPdf(JsPDF, data) {
-  const doc = new JsPDF({ unit: "pt", format: "letter" });
-  const num = data.number, pd = printed(data.date);
-  doc.setProperties({ title: `BILL NO. ${num}` });
-
-  /* ---- first page: title block */
-  doc.setFont("helvetica", "bold"); doc.setFontSize(40);
-  doc.text(`BILL NO. ${num}`, 306, 80, { align: "center" });
-  doc.setFontSize(L.size);
-
-  const PRE = 15.5; let y = 153;
-  const para = (text, { indent = 0, justify = true, bold = false } = {}) => {
-    const lines = wrap(text.split(" ").filter(Boolean).map(t => ({ t, b: bold })), indent);
-    lines.forEach((ln, i) => {
-      const ind = i === 0 ? indent : 0, last = i === lines.length - 1;
-      drawLine(doc, ln, L.left + ind * L.cw, y, (L.right - L.left) - ind * L.cw, justify && !last);
-      y += PRE;
-    });
+const BLOCKS = new Set(["DIV", "P", "LI", "H1", "H2", "H3", "H4", "UL", "OL", "TR"]);
+/* Each top-level block becomes one Markdown line. */
+function domToMd(ed) {
+  const lines = []; let inline = [];
+  const flush = () => { if (inline.length) { lines.push(serializeRuns(mergeRuns(inline)).trimEnd()); inline = []; } };
+  const lineOf = node => lines.push(serializeRuns(mergeRuns(collectRuns(node, { b: 0, i: 0, u: 0, s: 0 }, []))).trimEnd());
+  const walk = node => {
+    if (node.nodeType === 3) { inline.push({ t: node.nodeValue.replace(NB, " "), b: 0, i: 0, u: 0, s: 0 }); return; }
+    if (node.nodeType !== 1) return;
+    if (node.classList.contains("dir")) { flush(); lines.push(dirLine(node.dataset.op, node.dataset.act, node.dataset.sec)); return; }
+    if (node.tagName === "BR") { flush(); lines.push(""); return; }
+    if (BLOCKS.has(node.tagName)) {
+      flush();
+      if ([...node.children].some(c => BLOCKS.has(c.tagName) || c.classList.contains("dir"))) [...node.childNodes].forEach(walk);
+      else lineOf(node);
+    } else inline.push(...collectRuns({ childNodes: [node] }, { b: 0, i: 0, u: 0, s: 0 }, []));
   };
-  const sponsors = joinNames((data.sponsors || []).map(clean).filter(Boolean));
-  const cm = clean(data.committee).toLowerCase();
-  para(`${introDate(data.date)}${sponsors ? ", introduced by " + sponsors : ""}${cm ? " and referred to the " + cm : ""}.`.replace(/^(.*?), introduced/, "$1, introduced"), { indent: 5 });
-  y += PRE;
+  [...ed.childNodes].forEach(walk); flush();
+  while (lines.length && lines[lines.length - 1] === "") lines.pop();
+  return lines.join("\n");
+}
+const mergeRuns = runs => runs.reduce((a, r) => { const l = a[a.length - 1]; if (l && ["b", "i", "u", "s"].every(k => !!l[k] === !!r[k])) l.t += r.t; else a.push({ ...r }); return a; }, []);
 
-  const title = clean(data.title), target = clean(data.target), purpose = clean(data.purpose).replace(/[.;]+$/, "");
-  if (data.kind === "create" || !data.kind) {
-    para("A bill to create a new act entitled", { justify: false });
-    para(`"${title}";`, { indent: 5, justify: false, bold: true });
-    if (purpose) para(withPeriod(purpose.charAt(0).toLowerCase() === purpose.charAt(0) ? purpose : purpose));
-  } else {
-    const verb = data.kind === "repeal" ? "repeal" : "amend";
-    para(withPeriod(`A bill to ${verb} ${target}${purpose ? "; " + purpose : ""}`.replace(/[.;]+$/, "")));
+/* Pasted HTML (Google Docs, Word, web) -> lines of runs, keeping bold/italic/underline/strike. */
+function linesFromHtml(html) {
+  const body = new DOMParser().parseFromString(html, "text/html").body, lines = []; let cur = [];
+  const push = () => { if (cur.length) lines.push(cur); else if (lines.length) lines.push([]); cur = []; };
+  const walk = (node, st) => {
+    for (const c of node.childNodes) {
+      if (c.nodeType === 3) { const t = clean(c.nodeValue.replace(/\s+/g, " ")); if (t) cur.push({ t, ...st }); }
+      else if (c.nodeType === 1) {
+        const tag = c.tagName; if (tag === "STYLE" || tag === "SCRIPT") continue;
+        if (tag === "BR") { push(); continue; }
+        const s = styleOf(c, st);
+        if (BLOCKS.has(tag)) { if (cur.length) push(); walk(c, s); push(); } else walk(c, s);
+      }
+    }
+  };
+  walk(body, { b: 0, i: 0, u: 0, s: 0 }); if (cur.length) lines.push(cur);
+  return lines.map(l => { const m = mergeRuns(l); if (m.length) { m[0].t = m[0].t.replace(/^\s+/, ""); } return m; });
+}
+
+/* Caret helpers: character offsets inside a block. */
+function offsetIn(block, node, off) { const r = document.createRange(); r.selectNodeContents(block); r.setEnd(node, off); return r.toString().length; }
+function posAt(block, offset) {
+  const w = document.createTreeWalker(block, NodeFilter.SHOW_TEXT); let n, left = offset, last = null;
+  while ((n = w.nextNode())) { last = n; if (left <= n.nodeValue.length) return { node: n, off: left }; left -= n.nodeValue.length; }
+  return last ? { node: last, off: last.nodeValue.length } : { node: block, off: 0 };
+}
+function setSel(block, a, b = a) {
+  const s = posAt(block, a), e = posAt(block, b), r = document.createRange(), sel = getSelection();
+  r.setStart(s.node, s.off); r.setEnd(e.node, e.off); sel.removeAllRanges(); sel.addRange(r);
+}
+
+/* ---------------------------------------------------------------- the page */
+export async function mountDrafter(ctx) {
+  const root = ctx.panel, uid = ctx.uid, me = ctx.acct.name;
+  let draft = null, nameTouched = false, dirty = false, timer = null, tab = "edit", saving = Promise.resolve(), acts = null;
+  const $ = s => root.querySelector(s);
+  const hash = id => history.replaceState(null, "", location.pathname + (id ? "#" + id : ""));
+  const stamp = () => new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  if (!document.querySelector("link[data-doccss]")) { const l = document.createElement("link"); l.rel = "stylesheet"; l.href = new URL("doc.css", import.meta.url).href; l.setAttribute("data-doccss", ""); document.head.appendChild(l); }
+
+  /* ------------------------------------------------------------ drafts list */
+  async function showList() {
+    await flushSave(); draft = null; hash("");
+    root.innerHTML = `<div class="card dr-list"><div class="bar"><h2>My drafts</h2><span class="grow"></span>
+        <button class="btn btn-gold btn-sm" data-act="newBill">+ New bill</button><button class="btn btn-outline btn-sm" data-act="newRes">+ New resolution</button></div>
+      <p class="lead">Write your bill here instead of in Google Docs. Your work saves automatically. When it's ready, submit it and the Clerk's office will introduce it.</p>
+      <div id="dl"><div class="skel" style="height:14px;width:50%"></div></div></div>`;
+    try {
+      const snap = await getDocs(query(collection(db, "drafts"), where("ownerUid", "==", uid)));
+      const rows = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0));
+      $("#dl").innerHTML = rows.length ? rows.map(r => `<div class="row"><div class="t"><b>${esc(r.name || "Untitled")}</b><small>${esc(r.substituteFor ? "Substitute for Bill No. " + r.substituteFor : r.type)} · edited ${r.updatedAt?.seconds ? esc(new Date(r.updatedAt.seconds * 1000).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })) : "just now"}</small></div>
+          <button class="btn btn-primary btn-sm" data-act="openDraft" data-id="${esc(r.id)}">Open</button><button class="btn btn-danger btn-sm" data-act="delDraft" data-id="${esc(r.id)}">Delete</button></div>`).join("")
+        : '<div class="empty-state" style="padding:1rem 0">No drafts yet. Start a new bill above.</div>';
+    } catch (e) { console.error(e); $("#dl").innerHTML = '<div class="msg err">Couldn\'t load your drafts.</div>'; }
   }
-  y += PRE * 1.4;
+  async function newDraft(type, extra = {}) {
+    const base = { ownerUid: uid, ownerName: me, type, name: type === "Resolution" ? "Untitled resolution" : "Untitled bill", action: "create", actTitle: "", target: "", purpose: "", committee: "", md: "", createdAt: serverTimestamp(), updatedAt: serverTimestamp(), ...extra };
+    const ref = await addDoc(collection(db, "drafts"), base);
+    return openDraft(ref.id);
+  }
+  async function openDraft(id) {
+    const snap = await getDoc(doc(db, "drafts", id));
+    if (!snap.exists()) return showList();
+    draft = { id, ...snap.data() }; nameTouched = !/^Untitled /.test(draft.name || "") ; hash(id); tab = "edit"; drawEditor();
+  }
 
-  doc.setFont("courier", "bold"); doc.setFontSize(13.5);
-  doc.text("THE PEOPLE OF THE STATE OF MICHIGAN ENACT:", 306, y, { align: "center" });
-  doc.setFontSize(L.size);
-  const bodyStart = y + 25;
+  /* ------------------------------------------------------------ editor */
+  function drawEditor() {
+    const sub = draft.substituteFor, res = draft.type === "Resolution";
+    root.innerHTML = `<div class="dr">
+      <div class="dr-top"><button class="btn btn-outline btn-sm" data-act="toList">&larr; Drafts</button>
+        <input class="dr-name" id="dName" value="${esc(draft.name || "")}" maxlength="120" aria-label="Draft name"><span class="dr-state" id="dState">Saved</span>
+        <button class="btn btn-primary btn-sm" data-act="submit">${sub ? "Publish substitute" : "Submit"}</button></div>
+      <div class="dr-tabs"><button data-act="tab" data-t="edit" class="${tab === "edit" ? "on" : ""}">Edit</button><button data-act="tab" data-t="preview" class="${tab === "preview" ? "on" : ""}">Preview as ${res ? "resolution" : "bill"}</button></div>
+      <div class="dr-tool" id="tool">
+        <button data-cmd="undo" title="Undo (Ctrl+Z)">&#8630;</button><button data-cmd="redo" title="Redo (Ctrl+Y)">&#8631;</button><span class="sep"></span>
+        <button data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button><button data-cmd="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+        <button data-cmd="underline" title="Underline (Ctrl+U) — new text in an amended section"><u>U</u></button><button data-cmd="strikeThrough" title="Strikethrough (Ctrl+Shift+X) — deleted text"><s>S</s></button><span class="sep"></span>
+        <button class="txt" data-act="addSec" title="Add the next numbered section">+ Section</button><button class="txt" data-act="renumber" title="Renumber sections 1, 2, 3…">Renumber</button>
+        ${res ? "" : '<span class="sep"></span><button class="txt" data-act="amendDlg" title="Amend, repeal or add a section of an existing public act">Amend an act…</button>'}
+      </div>
+      <div id="paneEdit" class="dr-body" ${tab === "edit" ? "" : "hidden"}>
+        <div class="dr-paper"><div class="dr-head">${res ? "RESOLUTION" : "BILL"} NO. ___</div><div class="dr-sub">The number and date are assigned when it is introduced.</div>
+          <div class="dr-pre" id="pre"></div><div class="dr-enact">${res ? "THE LEGISLATURE RESOLVES:" : "THE PEOPLE OF THE STATE OF MICHIGAN ENACT:"}</div>
+          <div class="ed" id="ed" contenteditable="true" spellcheck="true"></div></div>
+        <aside class="dr-side">
+          <div class="card"><h3>${res ? "Resolution" : "Bill"} details</h3>
+            ${res ? "" : `<div class="field"><label>This bill will</label><select id="dAction"><option value="create">Create a new act</option><option value="amend">Amend an existing act</option><option value="repeal">Repeal an act</option></select></div>
+            <div class="field" id="fTitle"><label>Title of the new act</label><input id="dTitle" placeholder="Michigan code of criminal procedure act"></div>
+            <div class="field" id="fTarget"><label>Act being amended or repealed</label><input id="dTarget" placeholder='1931 PA 328, entitled "Michigan penal code act,"'></div>`}
+            <div class="field"><label>${res ? "Resolution reads" : "Purpose"}</label><textarea id="dPurpose" rows="5" placeholder="${res ? "to urge… / to commend…" : "to govern criminal procedure; to provide for bail; and to repeal inconsistent acts"}"></textarea></div>
+            <div class="field"><label>Suggested committee</label><select id="dCom"><option value="">No preference</option>${COMMITTEES.map(c => `<option>${esc(c)}</option>`).join("")}</select></div></div>
+          <div class="card"><h3>Writing tips</h3><div class="hint" style="line-height:1.55">• One paragraph per line; <b>Sec. 1.</b> bolds itself.<br>• <b>+ Section</b> adds the next number. <b>Renumber</b> fixes the order.<br>• To change existing law use <b>Amend an act…</b>: it inserts the current text; <s>strike</s> what goes and <u>underline</u> what's new.<br>• Keep an amended section's lines together; a blank line ends it.</div></div>
+        </aside></div>
+      <div id="panePrev" class="dr-prev" ${tab === "preview" ? "" : "hidden"}></div></div>`;
+    const ed = $("#ed");
+    ed.innerHTML = mdToHtml(draft.md); toggleEmpty();
+    if (!res) { $("#dAction").value = draft.action || "create"; $("#dTitle").value = draft.actTitle || ""; $("#dTarget").value = draft.target || ""; }
+    $("#dPurpose").value = draft.purpose || ""; $("#dCom").value = draft.committee || "";
+    syncFields(); drawPre();
+    document.execCommand("defaultParagraphSeparator", false, "div");
+    if (tab === "preview") drawPreview();
+  }
+  const syncFields = () => {
+    const a = $("#dAction")?.value || "create";
+    if ($("#fTitle")) { $("#fTitle").hidden = a !== "create"; $("#fTarget").hidden = a === "create"; }
+  };
+  const toggleEmpty = () => { const ed = $("#ed"); if (ed) ed.classList.toggle("empty", !ed.textContent.trim() && !ed.querySelector(".dir")); };
+  function readMeta() {
+    if (draft.type !== "Resolution") { draft.action = $("#dAction").value; draft.actTitle = $("#dTitle").value.trim(); draft.target = $("#dTarget").value.trim(); }
+    if (!nameTouched && draft.actTitle && draft.action === "create") $("#dName").value = draft.actTitle;
+    draft.name = $("#dName").value.trim() || (draft.type === "Resolution" ? "Untitled resolution" : "Untitled bill");
+    draft.purpose = $("#dPurpose").value.trim(); draft.committee = $("#dCom").value;
+    if (tab === "edit" && $("#ed")) draft.md = domToMd($("#ed"));
+  }
+  const asDoc = () => ({ ...fromDraft({ ...draft, sponsors: me }), actTitle: undefined, title: draft.actTitle, kind: draft.type === "Resolution" ? "resolution" : "bill", date: "" });
+  function drawPre() {
+    const d = asDoc(), pp = preambleParts(d);
+    $("#pre").innerHTML = `${esc(introDate(""))}, introduced by <b>${esc(me)}</b>.<br>${pp.lead ? esc(pp.lead) + "<br>&nbsp;&nbsp;<b>" + esc(pp.title) + "</b><br>" : ""}${esc(pp.text)}`;
+  }
+  function drawPreview() {
+    readMeta();
+    $("#panePrev").innerHTML = `${billHtml(asDoc())}
+      <div class="dr-foot" style="justify-content:center"><button class="btn btn-outline btn-sm" data-act="pdf">Download PDF</button></div>`;
+    fitPages($("#panePrev"));
+  }
 
-  /* ---- body: list of numbered lines */
-  const items = [];
-  data.sections.forEach((txt, si) => {
-    if (si) items.push({ blank: true });
-    const paras = txt.split("\n").map(clean).filter(Boolean);
-    if (!paras.length) paras.push("");
-    paras.forEach((p, pi) => {
-      const lines = wrap(toWords(pi === 0 ? `Sec. ${si + 1}.` : "", p), L.indent);
-      lines.forEach((ln, li) => items.push({ words: ln, first: li === 0, justify: li < lines.length - 1 }));
-    });
+  /* ------------------------------------------------------------ saving */
+  const setState = (t, err) => { const s = $("#dState"); if (s) { s.textContent = t; s.classList.toggle("err", !!err); } };
+  function queueSave() { dirty = true; setState("Saving…"); clearTimeout(timer); timer = setTimeout(save, 1200); }
+  function save() {
+    clearTimeout(timer); if (!draft || !dirty) return saving;
+    readMeta(); dirty = false;
+    const d = { name: draft.name, action: draft.action || "create", actTitle: draft.actTitle || "", target: draft.target || "", purpose: draft.purpose, committee: draft.committee, md: draft.md, updatedAt: serverTimestamp() };
+    saving = updateDoc(doc(db, "drafts", draft.id), d).then(() => setState("Saved " + stamp())).catch(e => { console.error(e); dirty = true; setState("Couldn't save", true); });
+    return saving;
+  }
+  const flushSave = async () => { if (draft && dirty) await save(); await saving; };
+  window.addEventListener("beforeunload", () => { if (draft && dirty) save(); });
+
+  /* ------------------------------------------------------------ editing behaviour */
+  const edBlock = () => { const ed = $("#ed"), sel = getSelection(); if (!ed || !sel.rangeCount) return null; let n = sel.anchorNode; while (n && n.parentNode !== ed) n = n.parentNode; return n && n.nodeType === 1 ? n : null; };
+  const isBoldAll = (block, len) => { const w = document.createTreeWalker(block, NodeFilter.SHOW_TEXT); let n, seen = 0; while ((n = w.nextNode()) && seen < len) { if (!n.parentElement.closest("b,strong")) return false; seen += n.nodeValue.length; } return true; };
+  function autoBold(block) {
+    if (!block || block.classList.contains("dir")) return;
+    const text = block.textContent.replace(NB, " "), m = text.match(SECRE);
+    if (!m) return;
+    const len = m[0].length;
+    if (isBoldAll(block, len)) return;
+    const sel = getSelection(), caret = sel.rangeCount ? offsetIn(block, sel.anchorNode, sel.anchorOffset) : len;
+    setSel(block, 0, len); document.execCommand("bold"); setSel(block, caret);
+    if (caret <= len && document.queryCommandState("bold")) document.execCommand("bold");
+  }
+  const secNums = () => { const out = []; let scope = false; for (const b of $("#ed").children) { if (b.classList.contains("dir")) { scope = true; continue; } if (!b.textContent.trim()) { scope = false; continue; } const m = b.textContent.replace(NB, " ").match(SECRE); if (m && !scope) out.push({ b, n: m[2] }); } return out; };
+  const nextSec = () => secNums().reduce((m, x) => Math.max(m, parseInt(x.n, 10) || 0), 0) + 1;
+  /* Append blocks at the end of the document (replacing the placeholder line when it's empty). */
+  function insertBlocks(html) {
+    const ed = $("#ed"), t = document.createElement("div"); t.innerHTML = html;
+    const nodes = [...t.childNodes];
+    if (!ed.textContent.trim() && !ed.querySelector(".dir")) ed.innerHTML = "";
+    nodes.forEach(n => ed.appendChild(n)); return nodes;
+  }
+  function caretToEnd(block) {
+    const r = document.createRange(), sel = getSelection();
+    r.selectNodeContents(block); r.collapse(false); sel.removeAllRanges(); sel.addRange(r); $("#ed").focus();
+  }
+  function addSection() {
+    const ed = $("#ed"), n = nextSec(), has = ed.textContent.trim() || ed.querySelector(".dir");
+    const nodes = insertBlocks(`${has ? "<div><br></div>" : ""}<div><b>Sec. ${n}.</b>&nbsp;</div>`);
+    caretToEnd(nodes[nodes.length - 1]); toggleEmpty(); queueSave();
+  }
+  function renumber() {
+    let n = 0;
+    for (const { b } of secNums()) {
+      n++; const runs = []; collectRuns(b, { b: 0, i: 0, u: 0, s: 0 }, runs);
+      let done = false;
+      const fixed = runs.map(r => done ? r : { ...r, t: r.t.replace(/^(\s*Sec\.\s*)\d+[A-Za-z]*/, (m, p) => { done = true; return p + n; }) });
+      b.innerHTML = withSecBold(mergeRuns(fixed)).map(runHtml).join("");
+    }
+    queueSave(); ctx.flash(n ? `Renumbered ${n} section${n === 1 ? "" : "s"}.` : "No sections to renumber.", n ? "ok" : "err");
+  }
+
+  /* ------------------------------------------------------------ amend an act */
+  async function loadActs() {
+    if (acts) return acts;
+    const snap = await getDocs(collection(db, "publicActs"));
+    return (acts = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => Number(a.number) - Number(b.number)));
+  }
+  async function amendDialog() {
+    const list = await loadActs();
+    const bg = document.createElement("div"); bg.className = "modal-bg";
+    bg.innerHTML = `<div class="modal"><h3>Amend an existing act</h3>
+      <div class="field"><label>Public act</label><select id="mAct"><option value="">Choose an act…</option>${list.map(a => `<option value="${esc(a.number)}">${esc(a.year)} PA ${esc(a.number)} — ${esc(a.title)}</option>`).join("")}</select></div>
+      <div class="field"><label>What to do</label><select id="mOp"><option value="amend">Amend a section (rewrite it)</option><option value="repeal">Repeal a section</option><option value="add">Add a new section</option></select></div>
+      <div class="field" id="mSecW"><label>Section</label><select id="mSec"></select></div>
+      <div class="field" id="mNewW" hidden><label>New section number</label><input id="mNew" placeholder="e.g. 3a"></div>
+      <div id="mNote" class="hint"></div>
+      <div class="form-actions"><button class="btn btn-primary" id="mGo" disabled>Insert</button><button class="btn btn-outline" id="mX">Cancel</button></div></div>`;
+    document.body.appendChild(bg);
+    const q = s => bg.querySelector(s); let secs = [], actDoc = null;
+    const refresh = () => {
+      const op = q("#mOp").value; q("#mSecW").hidden = op === "add"; q("#mNewW").hidden = op !== "add";
+      q("#mSec").innerHTML = secs.filter(s => !s.repealed).map(s => `<option value="${esc(s.n)}">Sec. ${esc(s.n)}</option>`).join("");
+      q("#mGo").disabled = !actDoc || (op !== "add" && !q("#mSec").value);
+    };
+    q("#mAct").onchange = async () => {
+      const n = q("#mAct").value; secs = []; actDoc = null; q("#mNote").textContent = ""; refresh(); if (!n) return;
+      const s = await getDoc(doc(db, "documents", "act-" + n));
+      if (s.exists()) { actDoc = s.data(); secs = parseAct(actDoc.md); } else q("#mNote").textContent = "This act has no digital text on file, so its sections can't be amended from here.";
+      refresh();
+    };
+    q("#mOp").onchange = refresh; q("#mX").onclick = () => bg.remove(); bg.addEventListener("mousedown", e => { if (e.target === bg) bg.remove(); });
+    q("#mGo").onclick = () => {
+      const n = q("#mAct").value, op = q("#mOp").value, act = list.find(a => String(a.number) === n), name = `${actDoc.title || act.title} (${act.year} PA ${act.number})`;
+      const sec = op === "add" ? q("#mNew").value.trim() : q("#mSec").value;
+      if (!sec) { q("#mNote").textContent = "Enter the new section number."; return; }
+      const num = nextSec(), ed = $("#ed"), has = ed.textContent.trim() || ed.querySelector(".dir");
+      let html = has ? "<div><br></div>" : "";
+      if (op === "amend") {
+        const s = secs.find(x => x.n === sec);
+        html += `<div><b>Sec. ${num}.</b>&nbsp;Section ${esc(sec)} of the ${esc(name)} is amended to read as follows:</div>${dirHtml("amend", n, sec)}${mdToHtml(cleanMd(s.lines.join("\n")))}<div><br></div>`;
+      } else if (op === "repeal") html += `<div><b>Sec. ${num}.</b>&nbsp;Section ${esc(sec)} of the ${esc(name)} is repealed.</div>${dirHtml("repeal", n, sec)}<div><br></div>`;
+      else html += `<div><b>Sec. ${num}.</b>&nbsp;The ${esc(name)} is amended by adding section ${esc(sec)} to read as follows:</div>${dirHtml("add", n, sec)}<div><b>Sec. ${esc(sec)}.</b>&nbsp;</div><div><br></div>`;
+      const nodes = insertBlocks(html);
+      bg.remove(); toggleEmpty(); queueSave();
+      const target = [...nodes].reverse().find(x => x.textContent.trim() && !x.classList.contains("dir")); if (target) caretToEnd(target);
+      if (document.querySelector("#dAction") && $("#dAction").value === "create" && !$("#dTitle").value) { $("#dAction").value = "amend"; syncFields(); }
+    };
+  }
+
+  /* ------------------------------------------------------------ submit */
+  async function submit(btn) {
+    await flushSave(); readMeta();
+    const lines = blocks(draft.md), hasSec = lines.some(b => b.k === "p" && b.sec);
+    if (!hasSec) return ctx.flash("Add at least one numbered section (use + Section).", "err");
+    if (draft.type !== "Resolution") {
+      if (draft.action === "create" && !draft.actTitle) return ctx.flash("Enter the title of the new act in the details panel.", "err");
+      if (draft.action !== "create" && !draft.target) return ctx.flash("Enter the act being amended or repealed in the details panel.", "err");
+    }
+    if (!draft.purpose) return ctx.flash("Add a purpose so the bill has a description.", "err");
+    if (!confirm(draft.substituteFor ? `Publish this as a substitute for Bill No. ${draft.substituteFor}?` : "Submit this for introduction? You won't be able to edit the submitted copy.")) return;
+    btn.disabled = true;
+    try {
+      if (draft.substituteFor) await publishSubstitute();
+      else {
+        await addDoc(collection(db, "proposals"), {
+          type: draft.type, title: draft.name, actTitle: draft.actTitle || "", action: draft.action || "create", target: draft.target || "", purpose: draft.purpose,
+          description: draft.purpose, committee: draft.committee || "", md: draft.md, sponsorUid: uid, sponsorName: me, status: "Pending", createdAt: serverTimestamp()
+        });
+        await deleteDoc(doc(db, "drafts", draft.id));
+      }
+      const msg = draft.substituteFor ? "Substitute published." : "Submitted. The Clerk's office will review it.";
+      draft = null; dirty = false; await showList(); ctx.flash(msg);
+    } catch (e) { console.error(e); btn.disabled = false; ctx.flash("Couldn't submit: " + (e.code === "permission-denied" ? "you don't have permission." : e.message), "err"); }
+  }
+  async function publishSubstitute() {
+    const n = draft.substituteFor, ref = `bill-${n}`, bref = doc(db, "bills", String(n));
+    const [bs, ds] = await Promise.all([getDoc(bref), getDocs(query(collection(db, "documents"), where("ref", "==", ref)))]);
+    if (!bs.exists()) throw new Error("Bill not found.");
+    const b = bs.data(), k = ds.docs.filter(d => d.data().type === "substitute").length + 1, label = `Substitute (S-${k})`, id = `${ref}-s${k}`;
+    const batch = writeBatch(db);
+    batch.set(doc(db, "documents", id), { ref, type: "substitute", kind: "bill", sub: k, label, number: Number(n), title: draft.actTitle || "", action: draft.action || "create", target: draft.target || "", purpose: draft.purpose,
+      sponsors: b.sponsors || "", committee: b.committee || "", date: todayISO(), md: draft.md, createdBy: me, updatedAt: serverTimestamp() });
+    batch.update(bref, { docLinks: [...(b.docLinks || []).filter(l => l.id !== id), { label, id }], history: [...(b.history || []), `${label} offered — ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`], updatedAt: serverTimestamp(), updatedBy: me });
+    batch.delete(doc(db, "drafts", draft.id));
+    await batch.commit();
+  }
+
+  /* ------------------------------------------------------------ events */
+  root.addEventListener("input", e => {
+    if (!draft) return;
+    if (e.target.id === "ed") { if (!(e.inputType || "").startsWith("history")) autoBold(edBlock()); toggleEmpty(); queueSave(); }
+    else if (/^(dName|dAction|dTitle|dTarget|dPurpose|dCom)$/.test(e.target.id)) { if (e.target.id === "dName") nameTouched = true; syncFields(); readMeta(); drawPre(); queueSave(); }
+  });
+  root.addEventListener("change", e => { if (draft && /^(dAction|dCom)$/.test(e.target.id)) { syncFields(); readMeta(); drawPre(); queueSave(); } });
+  root.addEventListener("mousedown", e => { if (e.target.closest("#tool button")) e.preventDefault(); });
+  root.addEventListener("click", e => {
+    const x = e.target.closest(".dir i"); if (x) { x.parentElement.remove(); toggleEmpty(); queueSave(); return; }
+    const c = e.target.closest("[data-cmd]"); if (c) { $("#ed").focus(); document.execCommand(c.dataset.cmd); queueSave(); }
+  });
+  root.addEventListener("keydown", e => {
+    if (e.target.id !== "ed") return;
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "x") { e.preventDefault(); document.execCommand("strikeThrough"); queueSave(); }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") { e.preventDefault(); save(); }
+  });
+  root.addEventListener("paste", e => {
+    if (e.target.id !== "ed") return; e.preventDefault();
+    const html = e.clipboardData.getData("text/html"), text = e.clipboardData.getData("text/plain");
+    const lines = html ? linesFromHtml(html) : text.split(/\r?\n/).map(l => [{ t: clean(l), b: 0, i: 0, u: 0, s: 0 }]);
+    const out = lines.map(l => `<div>${l.length ? withSecBold(l).map(runHtml).join("") : "<br>"}</div>`);
+    document.execCommand("insertHTML", false, out.length === 1 ? out[0].replace(/^<div>|<\/div>$/g, "") : out.join(""));
+  });
+  document.addEventListener("selectionchange", () => {
+    if (!draft || tab !== "edit") return; const t = $("#tool"); if (!t) return;
+    for (const b of t.querySelectorAll("[data-cmd]")) { let on = false; try { on = document.queryCommandState(b.dataset.cmd); } catch {} b.classList.toggle("on", on && !/undo|redo/.test(b.dataset.cmd)); }
   });
 
-  const cap1 = Math.min(L.perPage, Math.floor((L.p1Bottom - bodyStart) / L.pitch) + 1);
-  const footer = n => {
-    doc.setFontSize(9);
-    doc.setFont("courier", "normal"); doc.text(`BILL NO. ${num}`, L.num, 745);
-    doc.setFont("courier", "bold"); doc.text(`PAGE ${n}`, 306, 745, { align: "center" });
-    doc.setFont("courier", "normal"); doc.text(`PRINTED ${pd}`, L.right - 2, 745, { align: "right" });
-    doc.setFontSize(L.size);
-  };
-
-  let page = 1, ln = 0, cap = cap1, y0 = bodyStart;
-  for (const it of items) {
-    if (ln === cap) { footer(page); doc.addPage(); page++; ln = 0; cap = L.perPage; y0 = L.top; }
-    if (it.blank && ln === 0 && page > 1) continue;
-    ln++;
-    const yy = y0 + (ln - 1) * L.pitch;
-    doc.setFont("helvetica", "bold"); doc.setFontSize(L.size);
-    doc.text(String(ln), L.num, yy);
-    doc.setFont("courier", "normal");
-    if (!it.blank) {
-      const ind = it.first ? L.indent * L.cw : 0;
-      drawLine(doc, it.words, L.left + ind, yy, (L.right - L.left) - ind, it.justify);
+  ctx.on({
+    newBill: () => newDraft("Bill"), newRes: () => newDraft("Resolution"),
+    openDraft: b => openDraft(b.dataset.id),
+    async delDraft(b) { if (!confirm("Delete this draft permanently?")) return; await deleteDoc(doc(db, "drafts", b.dataset.id)); showList(); },
+    toList: () => showList(),
+    tab(b) { readMeta(); tab = b.dataset.t; root.querySelectorAll(".dr-tabs button").forEach(x => x.classList.toggle("on", x === b)); $("#paneEdit").hidden = tab !== "edit"; $("#panePrev").hidden = tab !== "preview"; $("#tool").style.visibility = tab === "edit" ? "" : "hidden"; if (tab === "preview") drawPreview(); },
+    addSec: addSection, renumber, amendDlg: amendDialog, submit,
+    async pdf() {
+      if (!window.jspdf) { try { await new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); } catch { return ctx.flash("Couldn't load the PDF library.", "err"); } }
+      billPdf(window.jspdf.jsPDF, asDoc()).save(`${draft.name || "Draft"}.pdf`);
     }
-  }
-  footer(page);
-  return doc;
-}
+  });
 
-/* ---------------------------------------------------------------- library loader */
-let jsPdfPromise;
-const loadJsPdf = () => jsPdfPromise ||= new Promise((res, rej) => {
-  if (window.jspdf) return res(window.jspdf.jsPDF);
-  const s = document.createElement("script");
-  s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-  s.onload = () => res(window.jspdf.jsPDF); s.onerror = () => { jsPdfPromise = null; rej(new Error("Could not load the PDF library.")); };
-  document.head.appendChild(s);
-});
-
-/* ---------------------------------------------------------------- the dashboard page */
-export async function mountDrafter(ctx) {
-  const bills = await load("bills").catch(() => []);
-  const fields = [
-    { key: "number", label: "Bill number", type: "number", span: 2, req: true, auto: "number" },
-    { key: "date", label: "Date introduced", type: "date", span: 2, req: true, default: "today" },
-    { key: "committee", label: "Referred to committee", type: "select", span: 2, options: COMMITTEES, default: "Committee on Judiciary" },
-    { key: "sponsors", label: "Introduced by", type: "people", asString: false, full: true, default: ctx.acct.name ? [ctx.acct.name] : [], hint: "Pick legislators or type a name; add as many as needed." },
-    { key: "kind", label: "Bill type (create, amend or repeal an act)", type: "select", span: 2, options: ["create", "amend", "repeal"].map(String), default: "create" },
-    { key: "title", label: "Act title", req: true, span: 4, showIf: { key: "kind", in: ["create"] }, placeholder: "Michigan code of criminal procedure act" },
-    { key: "target", label: "Act being amended or repealed", req: true, span: 4, showIf: { key: "kind", in: ["amend", "repeal"] }, hint: 'e.g. 1931 PA 328, entitled "Michigan penal code act," MCL 750.1 to 750.568' },
-    { key: "purpose", label: "Purpose clause", type: "textarea", rows: 3, full: true, hint: "Starts after \"A bill to create a new act entitled “Title”;\" e.g. “to govern criminal procedure; to provide for bail; and to repeal inconsistent acts.”" }
-  ];
-  const env = await prepare(fields, bills);
-  const form = buildForm(fields, null, env);
-  let secs = [""], pdfUrl = null, doc = null;
-
-  ctx.panel.innerHTML = `<div class="card"><div class="bar"><h2>Draft a bill</h2></div>
-    <div id="dfForm" class="grid2">${form.html}</div>
-    <div class="section-head">Sections</div>
-    <div class="hint" style="margin:0 0 .7rem;font-size:13px">Sections are numbered for you. Write one paragraph per line (start lines with (1), (a), etc. as in the final bill). A blank line is added between sections automatically.</div>
-    <div id="dfSecs"></div>
-    <div class="form-actions"><button class="btn btn-outline btn-sm" data-act="add">+ Section</button>
-      <button class="btn btn-outline btn-sm" data-act="paste">Paste full text…</button></div>
-    <div id="dfPaste" hidden style="margin-top:.6rem"><textarea id="dfPasteTa" style="width:100%;box-sizing:border-box" rows="8" placeholder="Paste the whole bill body. Text after each “Sec. 1.”, “Sec. 2.” … becomes its own section."></textarea>
-      <div class="form-actions"><button class="btn btn-gold btn-sm" data-act="split">Split into sections</button></div></div>
-    <div class="form-actions"><button class="btn btn-primary" data-act="gen">Generate PDF</button>
-      <button class="btn btn-gold" data-act="dl" disabled>Download PDF</button></div></div>
-    <div class="card" id="dfPrev" hidden><div class="bar"><h2>Preview</h2><span class="small" id="dfInfo"></span></div>
-      <iframe id="dfFrame" style="width:100%;height:80vh;border:1px solid #dfe3ea;border-radius:6px;background:#fff"></iframe></div>`;
-  form.init(ctx.panel.querySelector("#dfForm"));
-
-  const secBox = ctx.panel.querySelector("#dfSecs");
-  const syncSecs = () => secBox.querySelectorAll("textarea").forEach((t, i) => secs[i] = t.value);
-  function drawSecs() {
-    secBox.innerHTML = secs.map((t, i) => `<div class="card" style="padding:.7rem;margin-bottom:.6rem;box-shadow:none;border:1px solid #e3e7ee">
-      <div class="bar" style="margin-bottom:.4rem"><b>Sec. ${i + 1}.</b>
-        <span style="margin-left:auto;display:flex;gap:.3rem">
-          <button class="btn btn-outline btn-sm" data-act="up" data-i="${i}" ${i ? "" : "disabled"}>↑</button>
-          <button class="btn btn-outline btn-sm" data-act="down" data-i="${i}" ${i < secs.length - 1 ? "" : "disabled"}>↓</button>
-          <button class="btn btn-outline btn-sm" data-act="del" data-i="${i}" ${secs.length > 1 ? "" : "disabled"}>Remove</button></span></div>
-      <textarea style="width:100%;box-sizing:border-box" rows="${Math.max(4, Math.min(14, t.split("\n").length + 1))}" placeholder="${i === 0 ? "This act shall be known and may be cited as the “…”." : "(1) …"}">${esc(t)}</textarea></div>`).join("");
-  }
-  drawSecs();
-
-  function collect() {
-    syncSecs();
-    const { data, errs } = form.collect(ctx.panel.querySelector("#dfForm"));
-    const sections = secs.map(s => s.trim()).filter(Boolean);
-    if (!sections.length) errs.push("Add at least one section.");
-    return { data: { ...data, sections }, errs };
-  }
-  async function generate() {
-    const { data, errs } = collect();
-    if (errs.length) return ctx.flash(errs[0], "err");
+  /* ------------------------------------------------------------ start */
+  const q = new URLSearchParams(location.search), subN = q.get("substitute"), h = decodeURIComponent(location.hash.slice(1));
+  if (subN && ctx.isAdmin) {
     try {
-      const JsPDF = await loadJsPdf();
-      doc = buildBillPdf(JsPDF, data);
-    } catch (e) { return ctx.flash(e.message || "Could not build the PDF.", "err"); }
-    if (pdfUrl) URL.revokeObjectURL(pdfUrl);
-    pdfUrl = URL.createObjectURL(doc.output("blob"));
-    ctx.panel.querySelector("#dfFrame").src = pdfUrl;
-    ctx.panel.querySelector("#dfPrev").hidden = false;
-    ctx.panel.querySelector("#dfInfo").textContent = `${doc.getNumberOfPages()} page${doc.getNumberOfPages() === 1 ? "" : "s"}`;
-    ctx.panel.querySelector('[data-act="dl"]').disabled = false;
-    ctx.panel.querySelector("#dfPrev").scrollIntoView({ behavior: "smooth" });
+      const ds = await getDocs(query(collection(db, "documents"), where("ref", "==", `bill-${subN}`)));
+      const vs = ds.docs.map(d => d.data()).filter(d => d.type === "introduced" || d.type === "substitute").sort((a, b) => (a.sub || 0) - (b.sub || 0));
+      const base = vs[vs.length - 1];
+      if (base) { history.replaceState(null, "", location.pathname); return newDraft("Bill", { name: `Substitute for Bill No. ${subN}`, substituteFor: Number(subN), action: base.action || "create", actTitle: base.title || "", target: base.target || "", purpose: base.purpose || "", committee: base.committee || "", md: base.md || "" }); }
+      ctx.flash(`Bill No. ${subN} has no digital text to build a substitute from.`, "err");
+    } catch (e) { console.error(e); ctx.flash("Couldn't start the substitute.", "err"); }
   }
-
-  const act = {
-    add() { syncSecs(); secs.push(""); drawSecs(); },
-    del(b) { syncSecs(); secs.splice(Number(b.dataset.i), 1); drawSecs(); },
-    up(b) { const i = Number(b.dataset.i); syncSecs(); [secs[i], secs[i - 1]] = [secs[i - 1], secs[i]]; drawSecs(); },
-    down(b) { const i = Number(b.dataset.i); syncSecs(); [secs[i], secs[i + 1]] = [secs[i + 1], secs[i]]; drawSecs(); },
-    paste() { const p = ctx.panel.querySelector("#dfPaste"); p.hidden = !p.hidden; },
-    split() {
-      const txt = ctx.panel.querySelector("#dfPasteTa").value;
-      const chunks = txt.split(/(?:^|\n)\s*Sec\.\s*\d+[a-z]?\.\s*/i).map(s => s.trim()).filter(Boolean);
-      if (!chunks.length) return ctx.flash("Nothing to split.", "err");
-      secs = chunks.map(c => c.replace(/\s*\n\s*(?=\(\w{1,3}\))/g, "\n").replace(/\n(?!\(\w{1,3}\))/g, " "));
-      ctx.panel.querySelector("#dfPaste").hidden = true; drawSecs();
-    },
-    gen: generate,
-    dl() { if (doc) doc.save(`Bill No. ${collect().data.number}.pdf`); }
-  };
-  ctx.on(act);
+  if (h) return openDraft(h);
+  await showList();
 }

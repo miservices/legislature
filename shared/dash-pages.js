@@ -3,7 +3,8 @@
 import {
   db, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, query, where, getDocs, writeBatch, serverTimestamp
 } from "./fb.js";
-import { esc, asList, natCompare, badgeClass, tsDate, isDriveUrl, COMMITTEES, docEmbed } from "./util.js";
+import { esc, asList, natCompare, badgeClass, tsDate, COMMITTEES, docEmbed, docVersionLinks } from "./util.js";
+import { extractDirectives, billToActMd, applyDirective, cleanMd, fullDate } from "./docs.js";
 import { mountDrafter } from "./dash-drafter.js";
 import { BILL_STATUSES, RES_STATUSES } from "./bills-view.js";
 import {
@@ -64,6 +65,8 @@ async function overview(ctx) {
 /* ================================================================
    My proposals
    ================================================================ */
+const DOCS = new URL("../document/", BASE).href;          // /legislature/document/
+const docHref = id => `${DOCS}#${id}`;
 /* Shared with the review page. */
 function propCard(p, mineView) {
   const when = tsDate(p.createdAt);
@@ -74,24 +77,15 @@ function propCard(p, mineView) {
     ${p.description ? `<p>${esc(p.description)}</p>` : ""}
     <div class="meta" style="margin:.4rem 0">${p.committee ? "Suggested committee: " + esc(p.committee) : ""}</div>
     ${p.reviewNote ? `<div class="msg warn" style="margin:.5rem 0">${esc(p.reviewNote)}</div>` : ""}
-    ${docEmbed("Open draft", p.driveUrl)}
+    ${p.md ? `<a class="btn btn-outline btn-sm" href="${docHref("proposal/" + esc(p.id))}" target="_blank" rel="noopener">Read the ${esc(p.type.toLowerCase())} text &nearr;</a>` : ""}${docEmbed("Open draft", p.driveUrl)}
     ${mineView && p.status === "Pending" ? `<div style="margin-top:.7rem"><button class="btn btn-danger btn-sm" data-act="withdraw" data-id="${esc(p.id)}">Withdraw</button></div>` : ""}
   </div>`;
 }
 
 async function proposals(ctx) {
   async function draw() {
-    ctx.panel.innerHTML = `<div class="card"><h2>Submit a proposal</h2>
-      <p class="lead">Upload your draft to Google Drive, set sharing to “Anyone with the link can view”, then paste the link here.</p>
-      <div class="grid2">
-        <div class="field"><label for="p_type">Type</label><select id="p_type"><option>Bill</option><option>Resolution</option></select></div>
-        <div class="field"><label for="p_com">Suggested committee</label><select id="p_com"><option value="">No preference</option>${COMMITTEES.map(c => `<option>${esc(c)}</option>`).join("")}</select></div>
-      </div>
-      <div class="field"><label for="p_title">Title</label><input id="p_title" maxlength="200"></div>
-      <div class="field"><label for="p_desc">Short description</label><textarea id="p_desc" rows="3" maxlength="1500"></textarea></div>
-      <div class="field"><label for="p_url">Google Drive link</label><input id="p_url" type="url" placeholder="https://drive.google.com/…"></div>
-      <button class="btn btn-primary" data-act="submitProposal">Submit proposal</button>
-    </div>
+    ctx.panel.innerHTML = `<div class="card"><div class="bar"><h2>Write a bill or resolution</h2><span class="grow"></span><a class="btn btn-gold btn-sm" href="${BASE}drafter/">Open the drafter</a></div>
+      <p class="lead" style="margin:0">Draft in the website's editor (it saves as you go), then submit it for introduction. Submitted proposals appear below.</p></div>
     <div class="card"><h2>My proposals</h2><div id="mineList"><div class="skel" style="height:14px;width:50%"></div></div></div>`;
     try {
       const snap = await getDocs(query(collection(db, "proposals"), where("sponsorUid", "==", ctx.uid)));
@@ -99,19 +93,7 @@ async function proposals(ctx) {
       document.getElementById("mineList").innerHTML = list.length ? list.map(p => propCard(p, true)).join("") : '<div class="empty-state" style="padding:1rem 0">You haven\'t submitted anything yet.</div>';
     } catch (e) { console.error(e); document.getElementById("mineList").innerHTML = '<div class="msg err">Couldn\'t load your proposals.</div>'; }
   }
-
   ctx.on({
-    async submitProposal(btn) {
-      const g = id => document.getElementById(id).value.trim();
-      const title = g("p_title"), url = g("p_url");
-      if (!title) return ctx.flash("Enter a title.", "err");
-      if (!isDriveUrl(url)) return ctx.flash("Paste a Google Drive or Google Docs link (drive.google.com or docs.google.com).", "err");
-      btn.disabled = true;
-      try {
-        await addDoc(collection(db, "proposals"), { type: g("p_type"), title, description: g("p_desc"), committee: g("p_com"), driveUrl: url, sponsorUid: ctx.uid, sponsorName: ctx.acct.name, status: "Pending", createdAt: serverTimestamp() });
-        await draw(); ctx.flash("Proposal submitted. The Clerk's office will review it.");
-      } catch (e) { console.error(e); btn.disabled = false; ctx.flash("Couldn't submit: " + (e.code === "permission-denied" ? "you don't have permission." : e.message), "err"); }
-    },
     async withdraw(btn) {
       if (!confirm("Withdraw this proposal?")) return;
       try { await deleteDoc(doc(db, "proposals", btn.dataset.id)); await draw(); ctx.flash("Proposal withdrawn."); }
@@ -158,14 +140,21 @@ async function review(ctx) {
       btn.disabled = true;
       try {
         if ((await getDoc(doc(db, coll, String(num)))).exists()) { btn.disabled = false; return ctx.flash(`${p.type} No. ${num} already exists. Pick a different number.`, "err"); }
-        const today = new Date().toISOString().slice(0, 10);
-        const batch = writeBatch(db);
+        const today = todayISO(), res = p.type === "Resolution", ref = (res ? "res-" : "bill-") + num;
+        const batch = writeBatch(db), dirs = p.md ? extractDirectives(p.md) : [];
+        const links = p.md ? [{ label: "Introduced", id: ref }] : [];
         batch.set(doc(db, coll, String(num)), {
           number: num, title: p.title, status: com ? "In committee" : "Introduced", committee: com, sponsors: p.sponsorName || "",
-          introducedDate: today, description: p.description || "", driveUrl: p.driveUrl, substituteUrls: [], enrolledUrl: "",
-          history: [`Introduced by ${p.sponsorName || "a legislator"}`, ...(com ? [`Referred to the ${com}`] : [])],
+          introducedDate: today, description: p.description || p.purpose || "", driveUrl: p.driveUrl || "", docLinks: links,
+          ...(res ? {} : { amendsActs: [...new Set(dirs.filter(d => d.op !== "repeal").map(d => d.act))], repealsActs: [] }),
+          history: [`Introduced by ${p.sponsorName || "a legislator"} — ${longDate(today)}`, ...(com ? [`Referred to the ${com} — ${longDate(today)}`] : [])],
           proposalId: p.id, updatedAt: serverTimestamp(), updatedBy: ctx.acct.name
         });
+        if (p.md) batch.set(doc(db, "documents", ref), {
+          ref, type: "introduced", kind: res ? "resolution" : "bill", label: "Introduced", number: num, title: p.actTitle || "", action: p.action || "create", target: p.target || "",
+          purpose: p.purpose || p.description || "", sponsors: p.sponsorName || "", committee: com, date: today, md: p.md, createdBy: ctx.acct.name, updatedAt: serverTimestamp()
+        });
+        if (!res && dirs.length) await syncAmendments(batch, { number: num, status: com ? "In committee" : "Introduced", amendsActs: [...new Set(dirs.filter(d => d.op !== "repeal").map(d => d.act))] }, ctx.acct.name);
         batch.update(doc(db, "proposals", p.id), { status: "Introduced", number: num, reviewedBy: ctx.acct.name, reviewedAt: serverTimestamp() });
         await batch.commit();
         await draw(); ctx.flash(`${p.type} No. ${num} introduced.`);
@@ -192,10 +181,11 @@ const COLLECTIONS = {
       kind: "Public Act", num: r => `${r.year} PA ${r.number}`, public: r => `public-acts/#${r.number}`,
       facts: r => [["Signed", fmt(r.signedDate)], ["Effective", fmt(r.effectiveDate)],
         ["Source bill", r.billNumber ? `<a href="../bills/#${esc(r.billNumber)}">Bill No. ${esc(r.billNumber)}</a>` : ""]],
-      prose: [["Summary", "description"], ["Act text", "text"]], docs: [["Open the enrolled act", "driveUrl"]],
+      prose: [["Summary", "description"], ["Act text", "text"]], docs: [["Open the enrolled act (Drive)", "driveUrl"]],
       related: async r => {
+        const dl = docVersionLinks(r.docLinks, "../..");
         const secs = await load("mclSections"), list = asList(r.amends).map(c => { const x = secs.find(y => y.cite === c); return `<li><a href="../mcl/#${esc(c)}">MCL ${esc(c)}</a>${x ? " — " + esc(x.title) : ""}</li>`; });
-        return list.length ? `<div class="sec"><h3 class="sub">Amends</h3><ul class="plain">${list.join("")}</ul></div>` : "";
+        return (dl ? `<div class="sec"><h3 class="sub">Documents</h3><div class="docs-list">${dl}</div></div>` : "") + (list.length ? `<div class="sec"><h3 class="sub">Amends</h3><ul class="plain">${list.join("")}</ul></div>` : "");
       },
       actions: r => [
         ...(r.status === "In effect" ? [{ label: "Mark amended", set: { status: "Amended" } }] : []),
@@ -217,9 +207,7 @@ const COLLECTIONS = {
       { key: "effectiveDate", label: "Effective", type: "date", default: "today" },
       { key: "amends", label: "MCL sections it amends", type: "refs", from: "mclSections", full: true, placeholder: "Search by citation or title…",
         option: s => opt(s.cite, `MCL ${s.cite} — ${s.title}`), hint: "Each section picked gets this act added to its history automatically." },
-      { key: "description", label: "Summary", type: "textarea", full: true },
-      { key: "text", label: "Act text", type: "textarea", rows: 8, full: true },
-      { key: "driveUrl", label: "Enrolled act (Google Drive link)", type: "url", full: true }
+      { key: "description", label: "Summary", type: "textarea", full: true }
     ],
     save: (batch, data, who) => writePublicAct(batch, data, who) },
 
@@ -480,14 +468,9 @@ async function mountWorkflow(ctx, kind) {
     { key: "introducedDate", label: "Introduced", type: "date", default: "today", span: 2 },
     { key: "description", label: "Description", type: "textarea", rows: 3, full: true }
   ];
-  const docFields = () => [
-    { key: "driveUrl", label: "Introduced text (Google Drive link)", type: "url" },
-    { key: "enrolledUrl", label: res ? "Adopted text (Google Drive link)" : "Enrolled text (Google Drive link)", type: "url" },
-    { key: "substituteUrls", label: "Substitute texts", type: "list", itemType: "url", full: true },
-    ...(res ? [] : [
-      { key: "amendsActs", label: "Amends these public acts", type: "refs", cast: "number", from: "publicActs", placeholder: "Search public acts…", option: a => ({ value: String(a.number), label: `Public Act ${a.number} of ${a.year} — ${a.title}` }), hint: "Linked automatically on the amended act’s page." },
-      { key: "repealsActs", label: "Repeals these public acts", type: "refs", cast: "number", from: "publicActs", placeholder: "Search public acts…", option: a => ({ value: String(a.number), label: `Public Act ${a.number} of ${a.year} — ${a.title}` }) }
-    ])
+  const docFields = () => res ? [] : [
+    { key: "amendsActs", label: "Amends these public acts", type: "refs", cast: "number", from: "publicActs", placeholder: "Search public acts…", option: a => ({ value: String(a.number), label: `Public Act ${a.number} of ${a.year} — ${a.title}` }), hint: "Filled in from the bill's amendments; linked automatically on the amended act’s page." },
+    { key: "repealsActs", label: "Repeals these public acts", type: "refs", cast: "number", from: "publicActs", placeholder: "Search public acts…", option: a => ({ value: String(a.number), label: `Public Act ${a.number} of ${a.year} — ${a.title}` }) }
   ];
   const newFields = () => [{ key: "number", label: `${word} number`, type: "number", req: true, auto: "number", span: 2 }, ...detailFields(), ...docFields()];
   let fs = "", tab = "timeline", form2 = null;
@@ -558,9 +541,13 @@ async function mountWorkflow(ctx, kind) {
   }
 
   const previews = r => {
-    const subs = asList(r.substituteUrls);
-    const h = docEmbed("Introduced text", r.driveUrl) + subs.map((u, i) => docEmbed(`Substitute${subs.length > 1 ? " " + (i + 1) : ""}`, u)).join("") + docEmbed(res ? "Adopted text" : "Enrolled text", r.enrolledUrl);
-    return h ? `<div class="sec"><h3 class="sub">Current documents</h3>${h}</div><h3 class="sub">Edit links</h3>` : "";
+    const links = docVersionLinks(r.docLinks, "../..");
+    const legacy = docEmbed("Introduced text (Drive)", r.driveUrl) + asList(r.substituteUrls).map((u, i) => docEmbed(`Substitute ${i + 1} (Drive)`, u)).join("") + docEmbed("Enrolled text (Drive)", r.enrolledUrl);
+    const final = ["Enacted", "Adopted", "Defeated", "Vetoed", "Repealed"].includes(r.status);
+    return `<div class="sec"><h3 class="sub">Documents</h3>
+      ${links ? `<div class="docs-list" style="margin-bottom:.6rem">${links}</div>` : '<p class="lead" style="margin:0 0 .6rem">No document text is on file for this ' + word.toLowerCase() + '.</p>'}
+      ${legacy ? `<details class="legacy"><summary>Older Google Drive links</summary>${legacy}</details>` : ""}
+      ${!final && (r.docLinks || []).length ? `<a class="btn btn-outline btn-sm" href="${BASE}drafter/?substitute=${esc(r.number)}">Write a substitute</a>` : ""}</div>`;
   };
 
   /* The "what happens next" bar: only the buttons that make sense for the current status. */
@@ -664,12 +651,37 @@ async function mountWorkflow(ctx, kind) {
       const acts = await load("publicActs", true);
       if (acts.some(a => Number(a.number) === Number(data.number))) { b.disabled = false; return ctx.flash(`Public Act ${data.number} already exists.`, "err"); }
       const history = [...asList(cur.history), dated(`Signed by the Governor — Public Act ${data.number} of ${data.year}`)];
-      const batch = writeBatch(db);
-      await writePublicAct(batch, { ...data, billNumber: Number(cur.number), status: "In effect", text: "", driveUrl: cur.enrolledUrl || "" }, who);
-      batch.update(doc(db, coll, cur._id), { status: "Enacted", paNumber: Number(data.number), history, ...stamp(who) });
-      await syncAmendments(batch, { ...cur, status: "Enacted", paNumber: Number(data.number), history }, who);
+      const batch = writeBatch(db), n = Number(data.number), eff = data.effectiveDate || data.signedDate || todayISO(), ref = `bill-${cur.number}`;
+      let warn = "", docLinks = (cur.docLinks || []).slice(), amendsActs = asList(cur.amendsActs).map(Number);
+      const srcId = document.getElementById("enactSrc")?.value;
+      if (srcId) {
+        const src = await getDoc(doc(db, "documents", srcId));
+        if (src.exists()) {
+          const sd = src.data(), base = { ref, kind: "bill", number: Number(cur.number), actNumber: n, year: data.year, title: sd.title || "", action: sd.action || "create", target: sd.target || "", purpose: sd.purpose || "", sponsors: cur.sponsors || sd.sponsors || "", committee: cur.committee || sd.committee || "", date: sd.date || cur.introducedDate || "", signedDate: data.signedDate || eff, filedDate: data.signedDate || eff, effectiveDate: eff };
+          batch.set(doc(db, "documents", `${ref}-enrolled`), { ...base, type: "enrolled", label: "Enrolled", md: cleanMd(sd.md), createdBy: who, updatedAt: serverTimestamp() });
+          batch.set(doc(db, "documents", `act-${n}`), { ...base, type: "act", label: "Public Act (current)", title: sd.title || data.title || cur.title, md: billToActMd(sd.md, { year: data.year, number: n, date: eff }), amendedBy: [], updatedThrough: eff, createdBy: who, updatedAt: serverTimestamp() });
+          docLinks = [...docLinks.filter(l => !/-enrolled$/.test(l.id)), { label: "Enrolled act", id: `${ref}-enrolled` }, { label: "Public act (current)", id: `act-${n}` }];
+          /* amendments this act makes to other public acts */
+          const byAct = {};
+          extractDirectives(sd.md).forEach(d => (byAct[d.act] ||= []).push(d));
+          const missing = [];
+          for (const [actNo, dirs] of Object.entries(byAct)) {
+            const t = await getDoc(doc(db, "documents", `act-${actNo}`));
+            if (!t.exists()) { missing.push(actNo); continue; }
+            let md = t.data().md; const verbs = { amend: [], repeal: [], add: [] };
+            for (const d of dirs) { const r = applyDirective(md, d, { year: data.year, number: n, date: eff }); if (r.ok) { md = r.md; verbs[d.op].push(d.sec); } }
+            const summary = [verbs.amend.length && `amended section${verbs.amend.length > 1 ? "s" : ""} ${verbs.amend.join(", ")}`, verbs.add.length && `added section${verbs.add.length > 1 ? "s" : ""} ${verbs.add.join(", ")}`, verbs.repeal.length && `repealed section${verbs.repeal.length > 1 ? "s" : ""} ${verbs.repeal.join(", ")}`].filter(Boolean).join("; ");
+            batch.update(doc(db, "documents", `act-${actNo}`), { md, amendedBy: [...(t.data().amendedBy || []), { act: n, year: data.year, bill: Number(cur.number), summary, date: eff }], updatedThrough: eff, updatedAt: serverTimestamp() });
+            if (!amendsActs.includes(Number(actNo))) amendsActs.push(Number(actNo));
+          }
+          if (missing.length) warn = ` Public Act${missing.length > 1 ? "s" : ""} ${missing.join(", ")} ${missing.length > 1 ? "have" : "has"} no digital text, so ${missing.length > 1 ? "their" : "its"} amendments were not applied.`;
+        }
+      }
+      await writePublicAct(batch, { ...data, billNumber: Number(cur.number), status: "In effect", text: "", driveUrl: "", docLinks: docLinks.filter(l => /-enrolled$|^act-/.test(l.id)) }, who);
+      batch.update(doc(db, coll, cur._id), { status: "Enacted", paNumber: n, history, docLinks, amendsActs, ...stamp(who) });
+      await syncAmendments(batch, { ...cur, status: "Enacted", paNumber: n, history, amendsActs }, who);
       await batch.commit(); invalidate(coll, "publicActs", "mclSections");
-      await open(cur._id, true); ctx.flash(`Public Act ${data.number} created.`);
+      await open(cur._id, true); ctx.flash(`Public Act ${data.number} created.${warn}`, warn ? "err" : "ok");
     })
   });
 
@@ -677,8 +689,10 @@ async function mountWorkflow(ctx, kind) {
     const fields = COLLECTIONS.publicActs.fields.filter(f => ["number", "year", "title", "signedDate", "effectiveDate", "amends", "description"].includes(f.key));
     const env = await prepare(fields, await load("publicActs", true));
     pa = buildForm(fields, null, env, { seed: { title: cur.title || "", description: cur.description || "" } });
+    const srcOpts = (cur.docLinks || []).filter(l => /^(bill|res)-\d+(-s\d+)?$/.test(l.id));
     document.getElementById("steps").innerHTML = `<div class="enact"><h3>Enact as a Public Act</h3>
-      <p class="lead">Number, year and dates are already set. Pick any MCL sections the act changes and each gets its history updated for you.</p>
+      <p class="lead">Number, year and dates are already set. This also creates the enrolled act and the current public act text${(cur.docLinks || []).length ? ", and applies any amendments the bill makes to other acts" : ""}.</p>
+      ${srcOpts.length ? `<div class="field"><label for="enactSrc">Text that passed</label><select id="enactSrc">${srcOpts.map((o, i) => `<option value="${esc(o.id)}" ${i === srcOpts.length - 1 ? "selected" : ""}>${esc(o.label)}</option>`).join("")}</select></div>` : '<div class="msg info">This bill has no digital text, so only the public act record is created.</div>'}
       <div id="enact" class="grid2">${pa.html}</div>
       <div class="form-actions"><button class="btn btn-primary" data-act="confirmEnact">Create Public Act &amp; mark enacted</button><button class="btn btn-outline" data-act="cancelEnact">Cancel</button></div></div>`;
     pa.init(document.getElementById("enact"));

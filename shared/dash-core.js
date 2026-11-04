@@ -156,10 +156,11 @@ export async function syncAmendments(batch, bill, who) {
   invalidate("bills", "publicActs");
 }
 
-/* Write a Public Act, add its citation to the history of every MCL section it amends, and mark the source bill enacted. */
+/* Write a Public Act, add its citation to the history of every MCL section it amends, and mark the source bill enacted.
+   merge keeps fields the form doesn't show (such as docLinks) when an existing act is edited. */
 export async function writePublicAct(batch, data, who) {
   const id = String(data.number);
-  batch.set(doc(db, "publicActs", id), { ...data, ...stamp(who) });
+  batch.set(doc(db, "publicActs", id), { ...data, ...stamp(who) }, { merge: true });
   const cite = `${data.year} PA ${data.number}`, eff = data.effectiveDate || data.signedDate;
   const secs = await load("mclSections");
   for (const c of data.amends || []) {
@@ -327,8 +328,8 @@ export const BASE = new URL("../dashboard/", import.meta.url).href;   // absolut
    coll = the Firestore collection a record-editor page manages. */
 export const PAGES = {
   overview:  { slug: "",            label: "Overview",        title: "Dashboard", group: "Dashboard", sub: "Your account and committee assignments." },
-  proposals: { slug: "proposals/",  label: "My proposals",    group: "Dashboard", sub: "Submit bills and resolutions as Google Drive links." },
-  drafter:   { slug: "drafter/",    label: "Bill drafter",    group: "Dashboard", sub: "Fill in the details and download a formatted bill PDF." },
+  proposals: { slug: "proposals/",  label: "My proposals",    group: "Dashboard", sub: "Bills and resolutions you've submitted." },
+  drafter:   { slug: "drafter/",    label: "Bill drafter",    group: "Dashboard", sub: "Write bills and resolutions here, save as you go, and submit them for introduction." },
   review:    { slug: "review/",     label: "Review proposals", group: "Dashboard", admin: true, sub: "Introduce or reject proposals from legislators." },
 
   bills:        { slug: "bills/",        label: "Bills",          group: "Official record", admin: true, coll: "bills", sub: "Move bills through the process; the timeline and links update themselves." },
@@ -360,6 +361,7 @@ export async function startDash({ page, render }) {
     get panel() { return document.getElementById("panel"); },
     flash(msg, type = "ok") {
       const p = ctx.panel, old = p.querySelector(".flash"); if (old) old.remove();
+      if (!msg) return;
       p.insertAdjacentHTML("afterbegin", `<div class="msg ${type} flash">${esc(msg)}</div>`);
       window.scrollTo({ top: 0, behavior: "smooth" });
     },

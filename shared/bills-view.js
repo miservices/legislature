@@ -1,5 +1,5 @@
 /* Config for the Bills and Resolutions pages (they share one layout). */
-import { esc, asList, fmtDate, docEmbed, badgeClass } from "./util.js";
+import { esc, asList, fmtDate, docEmbed, docVersionLinks, badgeClass } from "./util.js";
 
 export const BILL_STATUSES = ["Introduced", "In committee", "Floor vote", "Awaiting governor", "Enacted", "Tabled", "Defeated", "Vetoed", "Repealed"];
 export const RES_STATUSES = ["Introduced", "In committee", "Floor vote", "Adopted", "Tabled", "Defeated"];
@@ -57,7 +57,7 @@ export function billsConfig(kind) {
   }
 
   function docs(r, hasAmend) {
-    let h = docEmbed(res ? "Introduced text" : "Introduced text", r.driveUrl);
+    let h = docVersionLinks(r.docLinks) + docEmbed("Introduced text", r.driveUrl);
     const subs = asList(r.substituteUrls);
     subs.forEach((u, i) => { h += docEmbed(`Substitute${subs.length > 1 ? ` (${i + 1})` : ""}`, u); });
     if (r.enrolledUrl) {

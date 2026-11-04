@@ -16,7 +16,7 @@
 <script type="module">
   import { mountShell } from "../shared/shell.js";
   import { startBrowser, docConfig } from "../shared/browser.js";
-  import { esc, asList } from "../shared/util.js";
+  import { esc, asList, docVersionLinks } from "../shared/util.js";
 
   mountShell({ eyebrow: "Laws", title: "Public Acts", sub: "Bills that have been signed into law, with their enrolled text and the sections of law they change." });
 
@@ -40,10 +40,11 @@
     ],
     extra: r => {
       const amends = asList(r.amends);
-      return (r.billNumber || amends.length) ? `<div class="section-head">Related</div><div class="rel">
+      const dl = docVersionLinks(r.docLinks);
+      return (dl ? `<div class="section-head">Documents</div><div class="docs-list">${dl}</div>` : "") + ((r.billNumber || amends.length) ? `<div class="section-head">Related</div><div class="rel">
         ${r.billNumber ? `<div>Source bill: <a href="../bills/#${esc(r.billNumber)}">Bill No. ${esc(r.billNumber)}</a></div>` : ""}
         ${amends.length ? `<div>Amends: ${amends.map(c => `<a href="../mcl/#${esc(c)}">MCL ${esc(c)}</a>`).join(", ")}</div>` : ""}
-      </div>` : "";
+      </div>` : "");
     }
   }));
 </script>

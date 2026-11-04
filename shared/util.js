@@ -66,5 +66,9 @@ export function docEmbed(label, url) {
   const pv = previewUrl(url);
   return `<div class="doc-block">${link}${pv ? `<details class="embed"><summary>Read it here</summary><iframe src="${esc(pv)}" loading="lazy" title="${esc(label)}"></iframe></details>` : ""}</div>`;
 }
+/* Links to the in-site documents stored for a bill or act: [{label, id}] -> buttons to /document/#id. `up` = relative path to the site root. */
+export function docVersionLinks(list, up = "..") {
+  return (Array.isArray(list) ? list : []).filter(l => l && l.id).map(l => `<a class="doc-link" href="${esc(up)}/document/#${esc(l.id)}">${DOC_ICON}${esc(l.label || "Document")}</a>`).join("");
+}
 export const lines = text => String(text || "").split(/\r?\n/).map(l => l.trim()).filter(Boolean)
   .map(l => `<div class="line">${esc(l)}</div>`).join("");

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Document | Michigan Legislature</title>
+<link rel="icon" type="image/png" href="/legislature/legislature.png">
+<link rel="stylesheet" href="../shared/header.css">
+<link rel="stylesheet" href="../shared/pages.css">
+<link rel="stylesheet" href="../shared/doc.css">
+</head>
+<body>
+<script>window.ACTIVE_NAV = "";</script>
+<div id="site-header"></div>
+<script src="../shared/header.js"></script>
+<div id="app"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script type="module">
+  import { mountShell } from "../shared/shell.js";
+  import { auth, db, onAuthStateChanged, doc, getDoc, getDocs, collection, query, where } from "../shared/fb.js";
+  import { renderDoc, docTitle, fitPages, billPdf, fromDraft } from "../shared/docs.js";
+  import { esc } from "../shared/util.js";
+
+  mountShell({ eyebrow: "Official documents", title: "Document", sub: "Bills, enrolled acts and public acts.", filters: false, card: false });
+  const root = document.getElementById("content");
+  const RANK = { introduced: 0, substitute: 1, enrolled: 2, act: 3 };
+  const idOf = h => { h = decodeURIComponent(h.replace(/^#/, "")).replace(/^\/+/, ""); const m = h.match(/^(bill|res|act|enrolled)\/(\d+)$/); return m ? (m[1] === "enrolled" ? `bill-${m[2]}-enrolled` : `${m[1]}-${m[2]}`) : h; };
+  const signedIn = new Promise(res => { const off = onAuthStateChanged(auth, () => { off(); res(); }); });
+
+  async function load() {
+    const id = idOf(location.hash);
+    if (!id) return root.innerHTML = '<div class="dv-note">No document selected. Open one from a bill, resolution or public act page.</div>';
+    root.innerHTML = '<p class="lead">Loading…</p>';
+    let d, versions = [], priv = false;
+    try {
+      const m = id.match(/^(proposal|draft)\/(.+)$/);
+      if (m) {
+        await signedIn; priv = true;
+        const snap = await getDoc(doc(db, m[1] === "draft" ? "drafts" : "proposals", m[2]));
+        if (!snap.exists()) throw new Error("missing");
+        d = fromDraft(snap.data()); d.label = m[1] === "draft" ? "Draft" : "Proposal"; d.id = id;
+      } else {
+        const snap = await getDoc(doc(db, "documents", id));
+        if (!snap.exists()) throw new Error("missing");
+        d = { id, ...snap.data() };
+        if (d.ref) versions = (await getDocs(query(collection(db, "documents"), where("ref", "==", d.ref)))).docs.map(x => ({ id: x.id, ...x.data() }))
+          .sort((a, b) => (RANK[a.type] - RANK[b.type]) || ((a.sub || 0) - (b.sub || 0)));
+      }
+    } catch (e) {
+      return root.innerHTML = `<div class="dv-note">${e.message === "missing" ? "That document doesn't exist." : "You don't have permission to view that document."}</div>`;
+    }
+    document.title = docTitle(d) + " | Michigan Legislature";
+    const rec = d.type === "act" || d.type === "enrolled" ? `../public-acts/#${d.actNumber || d.number}` : d.kind === "resolution" ? `../resolutions/#${d.number}` : `../bills/#${d.number}`;
+    root.innerHTML = `
+      <div class="dv-bar"><h2 class="dv-title">${esc(docTitle(d))}</h2><span class="grow"></span>
+        ${d.number && !priv ? `<a class="btn btn-outline btn-sm" href="${rec}">${d.type === "act" || d.type === "enrolled" ? "Public act record" : "Tracker page"}</a>` : ""}
+        <button class="btn btn-outline btn-sm" id="md">Markdown</button>
+        <button class="btn btn-primary btn-sm" id="pdf">${d.type === "enrolled" || d.type === "act" ? "Print / Save PDF" : "Download PDF"}</button></div>
+      ${versions.length > 1 ? `<div class="dv-tabs">${versions.map(v => `<a href="#${esc(v.id)}" class="${v.id === d.id ? "on" : ""}">${esc(v.label || v.type)}</a>`).join("")}</div>` : ""}
+      ${priv ? '<div class="dv-note">This is an unpublished draft. The number and date are assigned when the bill is introduced.</div>' : ""}
+      <div id="doc">${renderDoc(d)}</div>`;
+    if (d.type !== "enrolled" && d.type !== "act") fitPages(document.getElementById("doc"));
+    document.getElementById("md").onclick = () => {
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([d.md || ""], { type: "text/markdown" })); a.download = `${d.id.replace(/\//g, "-")}.md`; a.click();
+    };
+    document.getElementById("pdf").onclick = () => {
+      if (d.type === "enrolled" || d.type === "act") return window.print();
+      if (!window.jspdf) return window.print();
+      billPdf(window.jspdf.jsPDF, d).save(`${docTitle(d)}.pdf`);
+    };
+  }
+  window.addEventListener("hashchange", load);
+  load();
+</script>
+</body>
+</html>
