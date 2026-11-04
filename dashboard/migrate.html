@@ -24,11 +24,18 @@ pre{background:#0b1f3a;color:#e5e7eb;border-radius:6px;padding:.8rem;max-height:
   <div id="body"></div>
 </div>
 <script type="module">
-import { auth, db, onAuthStateChanged, doc, getDoc, getDocs, collection, writeBatch, serverTimestamp, ADMIN_ROLES } from "../../shared/fb.js";
+const $ = id => document.getElementById(id);
+const showErr = (m) => { $("status").innerHTML = '<div class="err">' + String(m).replace(/</g, "&lt;") + "</div>"; };
+window.addEventListener("error", e => showErr("Script error: " + e.message));
+window.addEventListener("unhandledrejection", e => showErr("Error: " + ((e.reason && e.reason.message) || e.reason)));
+let F;
+try { F = await import("../../shared/fb.js"); }
+catch (e) { showErr("Could not load shared/fb.js from " + new URL("../../shared/fb.js", location.href).href + " (" + e.message + "). This page must be uploaded to dashboard/migrate/index.html on your site, not opened from your computer."); throw e; }
+const { auth, db, onAuthStateChanged, doc, getDoc, getDocs, collection, writeBatch, serverTimestamp, ADMIN_ROLES } = F;
 
+const fail = html => { $("status").innerHTML = `<div class="err">${html}</div>`; };
 const DATE = "2026-07-01", LONG = "July 1, 2026", YEAR = 2026;
 const MCL_HISTORY = "Add. Act 15, Imd. Eff. July 1, 2026";
-const $ = id => document.getElementById(id);
 const log = m => { const p = $("log"); if (p) { p.textContent += m + "\n"; p.scrollTop = p.scrollHeight; } };
 
 onAuthStateChanged(auth, async user => {
@@ -38,7 +45,6 @@ onAuthStateChanged(auth, async user => {
   if (!acct || !ADMIN_ROLES.includes(acct.role)) return fail("Only the Speaker, Deputy Speaker, Speaker Pro Tempore or Clerk of the Legislature can run this.");
   ready(acct);
 });
-const fail = html => { $("status").innerHTML = `<div class="err">${html}</div>`; };
 
 async function ready(acct) {
   $("status").textContent = "Loading bills and MCL sections…";
