@@ -208,7 +208,7 @@ export function layoutBill(d) {
     if (b.k === "dir") continue;
     if (b.k === "chapter") {
       if (body.length && !body[body.length - 1].blank) body.push({ blank: true });
-      for (const text of [`CHAPTER ${b.num}`.toUpperCase(), b.title.toUpperCase()].filter(Boolean)) body.push({ words: toWords([{ t: text, b: 0, i: 0, u: 1, s: 0 }]), first: true, center: true });
+      for (const text of [`CHAPTER ${b.num}`.toUpperCase(), b.title.toUpperCase()].filter(Boolean)) body.push({ words: toWords([{ t: text, b: 1, i: 0, u: 1, s: 0 }]), first: true, center: true });
       body.push({ blank: true }); skipBlank = true; continue;
     }
     if (b.k === "blank") { if (skipBlank) { skipBlank = false; continue; } if (body.length && body[body.length - 1].blank) continue; body.push({ blank: true }); continue; }

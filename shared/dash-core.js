@@ -319,7 +319,7 @@ export function pickAction(ctx, acts, btn) {
 /* ================================================================
    Shell: sign-in, access checks, navigation
    ================================================================ */
-export const DASH_VERSION = "5";
+export const DASH_VERSION = "6";
 const MIGOVT_LOGIN_URL = "https://migovt.org/login/";
 const SITE_NAME = "Michigan Legislature Dashboard";
 export const BASE = new URL("../dashboard/", import.meta.url).href;   // absolute URL of /dashboard/
