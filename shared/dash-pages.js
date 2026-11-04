@@ -4,8 +4,8 @@ import {
   db, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, query, where, getDocs, writeBatch, serverTimestamp
 } from "./fb.js";
 import { esc, asList, natCompare, badgeClass, tsDate, COMMITTEES, docEmbed, docVersionLinks } from "./util.js";
-import { extractDirectives, billToActMd, applyDirective, cleanMd, fullDate } from "./docs.js";
-import { mountDrafter } from "./dash-drafter.js";
+import { extractDirectives, billToActMd, applyDirective, cleanMd, fullDate } from "./docs.js?v=2";
+import { mountDrafter } from "./dash-drafter.js?v=2";
 import { BILL_STATUSES, RES_STATUSES } from "./bills-view.js";
 import {
   startDash, BASE, todayISO, longDate, addDays, load, invalidate, stamp, dated, appendHistory, syncAmendments, writePublicAct,

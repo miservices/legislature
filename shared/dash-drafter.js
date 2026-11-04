@@ -3,7 +3,7 @@
    Admins can also open a bill's latest text here to write a substitute (?substitute=<bill number>). */
 import { db, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, query, where, getDocs, writeBatch, serverTimestamp } from "./fb.js";
 import { esc, COMMITTEES } from "./util.js";
-import { blocks, parseInline, serializeRuns, runsText, clean, dirLine, parseAct, cleanMd, fromDraft, billHtml, billPdf, preambleParts, introDate, fitPages, docTitle } from "./docs.js";
+import { blocks, parseInline, serializeRuns, runsText, clean, dirLine, parseAct, cleanMd, fromDraft, billHtml, billPdf, preambleParts, introDate, fitPages, docTitle } from "./docs.js?v=2";
 import { todayISO } from "./dash-core.js";
 
 const SECRE = /^\s*(Sec\.\s*)(\d+[A-Za-z]*)(\.)/;
